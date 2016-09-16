@@ -1,0 +1,14 @@
+build/
+target/
+.idea
+out/
+*.iml
+gen-external-apklibs/
+classes/
+gen/
+log/
+logs/
+*_logs/
+*nohup.out
+remfly-conf.json
+*.db
