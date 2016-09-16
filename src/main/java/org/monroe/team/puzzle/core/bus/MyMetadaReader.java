@@ -75,6 +75,8 @@ public class MyMetadaReader extends MetadataReader{
                         handlerConfig,
                         getFilter(handlerConfig),
                         listenerMetadata);
+
+                //TODO: Начало колхоза
                 Class[] messageClasses = (Class[]) handlerProperties.get("messages");
                 if (messageClasses.length ==1 && messageClasses[0] == Event.class) {
                     try {
@@ -83,6 +85,7 @@ public class MyMetadaReader extends MetadataReader{
                         throw new RuntimeException(e);
                     }
                 }
+                //Конец колхоза
 
                 MessageHandler handlerMetadata = new MessageHandler(handlerProperties);
                 listenerMetadata.addHandler(handlerMetadata);
