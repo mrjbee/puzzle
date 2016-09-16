@@ -3,6 +3,7 @@ package org.monroe.team.puzzle.pieces.filewatcher;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.monroe.team.puzzle.core.events.EventBus;
+import org.monroe.team.puzzle.core.fs.config.FolderPropertiesProvider;
 import org.monroe.team.puzzle.core.logs.Log;
 import org.monroe.team.puzzle.core.logs.Logs;
 import org.monroe.team.puzzle.pieces.filewatcher.events.NewFileEvent;
@@ -13,8 +14,12 @@ import javax.annotation.PostConstruct;
 import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import java.io.File;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
 public class FileWatchTask {
@@ -25,6 +30,9 @@ public class FileWatchTask {
 
     @Autowired
     EventBus eventBus;
+
+    @Autowired
+    FolderPropertiesProvider folderPropertiesProvider;
 
     @NotNull
     List<String> watchFolders;
@@ -86,10 +94,27 @@ public class FileWatchTask {
     }
 
     private boolean publishNewFileIfNotAlreadyPublished(final File childFile) {
+
+        if (childFile.getName().equals(".puzzleconf")) {
+            exploredFileCache.put(childFile.getAbsolutePath(), true);
+            return false;
+        }
+
         String filePath = childFile.getAbsolutePath();
         Boolean alreadyDiscovered = exploredFileCache.getIfPresent(filePath);
         if (alreadyDiscovered == null || !alreadyDiscovered){
             String fullName = childFile.getName();
+
+            Properties conf = folderPropertiesProvider.forFolder(childFile.getParentFile());
+            if (conf.getProperty("exclude") != null){
+                for (String exclude : conf.getProperty("exclude").split("\\|\\|")) {
+                   if(FileSystems.getDefault().getPathMatcher(exclude).matches(new File(fullName).toPath())){
+                       exploredFileCache.put(childFile.getAbsolutePath(), true);
+                       return false;
+                   }
+                }
+            }
+
             String name = fullName;
             String ext = null;
             int extensionDotPosition = fullName.lastIndexOf(".");
@@ -97,6 +122,7 @@ public class FileWatchTask {
                 name = fullName.substring(0, extensionDotPosition);
                 ext = fullName.substring(extensionDotPosition);
             }
+
             NewFileEvent newFileEvent = new NewFileEvent(childFile.getAbsolutePath(), name, ext);
             eventBus.post(newFileEvent);
             exploredFileCache.put(newFileEvent.filePath, true);
