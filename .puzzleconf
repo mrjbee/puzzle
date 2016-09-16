@@ -1,0 +1,1 @@
+exclude = glob:*.java||glob:*.xml||glob:*.properties

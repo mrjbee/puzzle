@@ -11,13 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
-import javax.validation.constraints.Max;
 import javax.validation.constraints.NotNull;
 import java.io.File;
-import java.nio.file.FileSystem;
 import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
@@ -43,26 +39,26 @@ public class FileWatchTask {
 
 
     @PostConstruct
-    public void checkWatchFolders(){
+    public void checkWatchFolders() {
 
-        if (isFoldersNotSpecified()){
+        if (isFoldersNotSpecified()) {
             log.info("No watch folder specified = {}", "piece.filewatcher.watch.folder.list");
             watchFolders.clear();
-        }else {
+        } else {
             for (String watchFolder : watchFolders) {
                 File watchFolderFile = new File(watchFolder);
-                if (!watchFolderFile.exists()){
+                if (!watchFolderFile.exists()) {
                     log.warn("Watch folder doesnt exists = {}", watchFolderFile.getAbsolutePath());
                 }
             }
         }
-        exploredFileCache = CacheBuilder.<String,Boolean>newBuilder().expireAfterWrite(newFileCacheTimeout, TimeUnit.MILLISECONDS).build();
+        exploredFileCache = CacheBuilder.<String, Boolean>newBuilder().expireAfterWrite(newFileCacheTimeout, TimeUnit.MILLISECONDS).build();
     }
 
     @Scheduled(fixedRateString = "${piece.filewatcher.watch.rate.ms}")
     public void checkForNewFiles() {
         Logs.resetTransactionId("tm");
-        if (!isFoldersNotSpecified()){
+        if (!isFoldersNotSpecified()) {
             for (String watchFolder : watchFolders) {
                 File watchFolderFile = new File(watchFolder);
                 int publicationCount = traversFolderForANewFile(watchFolderFile, 0, maxPublishAtOnce);
@@ -71,19 +67,19 @@ public class FileWatchTask {
     }
 
     private int traversFolderForANewFile(final File file,
-                                          int published,
-                                          final int maxAllowedToPublishAtOnce) {
+                                         int published,
+                                         final int maxAllowedToPublishAtOnce) {
         if (!file.exists()) return published;
         File[] childFiles = file.listFiles();
         for (File childFile : childFiles) {
 
-            if (published >= maxAllowedToPublishAtOnce){
+            if (published >= maxAllowedToPublishAtOnce) {
                 return published;
             }
 
-            if (childFile.isDirectory()){
+            if (childFile.isDirectory()) {
                 published = traversFolderForANewFile(childFile, published, maxAllowedToPublishAtOnce);
-            }else {
+            } else {
                 boolean isPublished = publishNewFileIfNotAlreadyPublished(childFile);
                 if (isPublished) {
                     published++;
@@ -102,23 +98,23 @@ public class FileWatchTask {
 
         String filePath = childFile.getAbsolutePath();
         Boolean alreadyDiscovered = exploredFileCache.getIfPresent(filePath);
-        if (alreadyDiscovered == null || !alreadyDiscovered){
+        if (alreadyDiscovered == null || !alreadyDiscovered) {
             String fullName = childFile.getName();
 
             Properties conf = folderPropertiesProvider.forFolder(childFile.getParentFile());
-            if (conf.getProperty("exclude") != null){
+            if (conf.getProperty("exclude") != null) {
                 for (String exclude : conf.getProperty("exclude").split("\\|\\|")) {
-                   if(FileSystems.getDefault().getPathMatcher(exclude).matches(new File(fullName).toPath())){
-                       exploredFileCache.put(childFile.getAbsolutePath(), true);
-                       return false;
-                   }
+                    if (FileSystems.getDefault().getPathMatcher(exclude).matches(new File(fullName).toPath())) {
+                        exploredFileCache.put(childFile.getAbsolutePath(), true);
+                        return false;
+                    }
                 }
             }
 
             String name = fullName;
             String ext = null;
             int extensionDotPosition = fullName.lastIndexOf(".");
-            if (extensionDotPosition > 0){
+            if (extensionDotPosition > 0) {
                 name = fullName.substring(0, extensionDotPosition);
                 ext = fullName.substring(extensionDotPosition);
             }

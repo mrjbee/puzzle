@@ -2,6 +2,9 @@ package org.monroe.team.puzzle.pieces.filewatcher.events;
 
 import org.monroe.team.puzzle.core.events.Event;
 
+import java.io.File;
+import java.io.InputStream;
+
 public class NewFileEvent extends Event {
 
     public final String filePath;
@@ -22,4 +25,5 @@ public class NewFileEvent extends Event {
                 ", ext='" + ext + '\'' +
                 '}';
     }
+
 }
