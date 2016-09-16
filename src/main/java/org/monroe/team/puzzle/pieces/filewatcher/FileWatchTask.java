@@ -2,61 +2,60 @@ package org.monroe.team.puzzle.pieces.filewatcher;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import net.engio.mbassy.bus.MBassador;
-import org.monroe.team.puzzle.core.events.Event;
 import org.monroe.team.puzzle.core.events.EventBus;
 import org.monroe.team.puzzle.core.logs.Log;
 import org.monroe.team.puzzle.core.logs.Logs;
 import org.monroe.team.puzzle.pieces.filewatcher.events.NewFileEvent;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.NotNull;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@EnableScheduling
-@Component
 public class FileWatchTask {
 
-    Log log = Logs.piece("filewatcher");
+    final static Log log = Logs.piece("filewatcher");
+
+    private Cache<String, Boolean> exploredFileCache;
 
     @Autowired
     EventBus eventBus;
 
-    @Value("#{'${piece.filewatcher.watch.folder.list}'.split(';')}")
-    private List<String> watchFolderPathList;
+    @NotNull
+    List<String> watchFolders;
+    @NotNull
+    Integer maxPublishAtOnce;
+    @NotNull
+    Integer newFileCacheTimeout;
 
-    @Value("${piece.filewatcher.watch.max.publish.at.once:2}")
-    private int maxPublishAtOnce;
-
-    private Cache<String, Boolean> exploredFileCache;
 
     @PostConstruct
     public void checkWatchFolders(){
+
         if (isFoldersNotSpecified()){
             log.info("No watch folder specified = {}", "piece.filewatcher.watch.folder.list");
-            watchFolderPathList.clear();
+            watchFolders.clear();
         }else {
-            for (String watchFolder : watchFolderPathList) {
+            for (String watchFolder : watchFolders) {
                 File watchFolderFile = new File(watchFolder);
                 if (!watchFolderFile.exists()){
                     log.warn("Watch folder doesnt exists = {}", watchFolderFile.getAbsolutePath());
                 }
             }
         }
-        exploredFileCache = CacheBuilder.<String,Boolean>newBuilder().expireAfterWrite(5000, TimeUnit.MILLISECONDS).build();
+        exploredFileCache = CacheBuilder.<String,Boolean>newBuilder().expireAfterWrite(newFileCacheTimeout, TimeUnit.MILLISECONDS).build();
     }
 
     @Scheduled(fixedRateString = "${piece.filewatcher.watch.rate.ms}")
     public void checkForNewFiles() {
         Logs.resetTransactionId("tm");
         if (!isFoldersNotSpecified()){
-            for (String watchFolder : watchFolderPathList) {
+            for (String watchFolder : watchFolders) {
                 File watchFolderFile = new File(watchFolder);
                 int publicationCount = traversFolderForANewFile(watchFolderFile, 0, maxPublishAtOnce);
             }
@@ -108,7 +107,31 @@ public class FileWatchTask {
     }
 
     private boolean isFoldersNotSpecified() {
-        return watchFolderPathList.isEmpty() ||
-                (watchFolderPathList.size() == 1 && watchFolderPathList.get(0).trim().isEmpty());
+        return watchFolders.isEmpty() ||
+                (watchFolders.size() == 1 && watchFolders.get(0).trim().isEmpty());
+    }
+
+    public List<String> getWatchFolders() {
+        return watchFolders;
+    }
+
+    public void setWatchFolders(final List<String> watchFolders) {
+        this.watchFolders = watchFolders;
+    }
+
+    public Integer getMaxPublishAtOnce() {
+        return maxPublishAtOnce;
+    }
+
+    public void setMaxPublishAtOnce(final Integer maxPublishAtOnce) {
+        this.maxPublishAtOnce = maxPublishAtOnce;
+    }
+
+    public Integer getNewFileCacheTimeout() {
+        return newFileCacheTimeout;
+    }
+
+    public void setNewFileCacheTimeout(final Integer newFileCacheTimeout) {
+        this.newFileCacheTimeout = newFileCacheTimeout;
     }
 }
