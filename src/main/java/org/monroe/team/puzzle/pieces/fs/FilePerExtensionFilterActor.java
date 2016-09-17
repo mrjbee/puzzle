@@ -1,4 +1,4 @@
-package org.monroe.team.puzzle.pieces.metadata;
+package org.monroe.team.puzzle.pieces.fs;
 
 import org.monroe.team.puzzle.core.events.EventBus;
 import org.monroe.team.puzzle.core.events.MbassyEventSubscriber;
@@ -7,7 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-public class MediaFilePerTypeFilterActor extends MbassyEventSubscriber<FileEvent> {
+public class FilePerExtensionFilterActor extends MbassyEventSubscriber<FileEvent> {
 
     @Autowired
     EventBus eventBus;
@@ -15,7 +15,7 @@ public class MediaFilePerTypeFilterActor extends MbassyEventSubscriber<FileEvent
     private final Publisher publisher;
     private final List<String> supportedExtensions;
 
-    public MediaFilePerTypeFilterActor(
+    public FilePerExtensionFilterActor(
             final List<String> supportedExtensions,
             final Publisher publisher) {
         super(FileEvent.class);

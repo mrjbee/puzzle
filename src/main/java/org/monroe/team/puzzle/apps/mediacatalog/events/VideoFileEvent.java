@@ -1,4 +1,4 @@
-package org.monroe.team.puzzle.pieces.metadata.events;
+package org.monroe.team.puzzle.apps.mediacatalog.events;
 
 import org.monroe.team.puzzle.pieces.fs.events.FileEvent;
 
