@@ -3,7 +3,7 @@ package org.monroe.team.puzzle.pieces.metadata;
 import org.monroe.team.puzzle.core.events.EventBus;
 import org.monroe.team.puzzle.core.events.MbassyEventSubscriber;
 import org.monroe.team.puzzle.pieces.fs.events.FileEvent;
-import org.monroe.team.puzzle.pieces.metadata.events.MediaFile;
+import org.monroe.team.puzzle.pieces.metadata.events.MediaFileEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -40,12 +40,12 @@ public class MediaFileMetadataExtractActor<T extends FileEvent> extends MbassyEv
     }
 
     private void publishMediaAsMediaFile(final FileEvent event, final MediaMetadata metadata1) {
-        MediaFile mediaFile = new MediaFile(
+        MediaFileEvent mediaFileEvent = new MediaFileEvent(
                 event.filePath,
                 event.name,
                 event.ext,
                 metadata1);
-        eventBus.post(mediaFile);
+        eventBus.post(mediaFileEvent);
     }
 
     public interface FileEventFilter<T> {

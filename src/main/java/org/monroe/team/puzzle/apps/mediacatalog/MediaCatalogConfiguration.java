@@ -53,4 +53,9 @@ public class MediaCatalogConfiguration {
                 }
         );
     }
+
+    @Bean
+    public CatalogActor catalogActor(){
+        return new CatalogActor();
+    }
 }
