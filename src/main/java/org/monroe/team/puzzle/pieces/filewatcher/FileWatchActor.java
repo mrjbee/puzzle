@@ -4,9 +4,8 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.monroe.team.puzzle.core.events.EventBus;
 import org.monroe.team.puzzle.core.fs.config.FolderPropertiesProvider;
-import org.monroe.team.puzzle.core.logs.Log;
 import org.monroe.team.puzzle.core.logs.Logs;
-import org.monroe.team.puzzle.pieces.filewatcher.events.NewFileEvent;
+import org.monroe.team.puzzle.pieces.filewatcher.events.FileEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -18,9 +17,10 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
-public class FileWatchTask {
+public class FileWatchActor {
 
-    final static Log log = Logs.piece("filewatcher");
+    @Autowired
+    Log log;
 
     private Cache<String, Boolean> exploredFileCache;
 
@@ -119,9 +119,9 @@ public class FileWatchTask {
                 ext = fullName.substring(extensionDotPosition);
             }
 
-            NewFileEvent newFileEvent = new NewFileEvent(childFile.getAbsolutePath(), name, ext);
-            eventBus.post(newFileEvent);
-            exploredFileCache.put(newFileEvent.filePath, true);
+            FileEvent fileEvent = new FileEvent(childFile.getAbsolutePath(), name, ext);
+            eventBus.post(fileEvent);
+            exploredFileCache.put(fileEvent.filePath, true);
             return true;
         } else {
             return false;

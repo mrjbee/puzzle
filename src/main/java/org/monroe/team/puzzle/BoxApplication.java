@@ -29,7 +29,7 @@ public class BoxApplication {
         MBassador<Event> mBassador = new MBassador<Event>(
                 new BusConfiguration()
                 .addFeature( new Feature.SyncPubSub()
-                        .setMetadataReader(new MyMetadaReader())
+                        .setMetadataReader(new MetadataReader())
                         .setPublicationFactory(new MessagePublication.Factory())
                         .setSubscriptionFactory(new SubscriptionFactory())
                         .setSubscriptionManagerProvider(new SubscriptionManagerProvider()))
