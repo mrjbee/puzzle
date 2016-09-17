@@ -1,11 +1,12 @@
-package org.monroe.team.puzzle.pieces.filewatcher;
+package org.monroe.team.puzzle.pieces.fs;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import org.monroe.team.puzzle.core.events.EventBus;
 import org.monroe.team.puzzle.core.fs.config.FolderPropertiesProvider;
 import org.monroe.team.puzzle.core.logs.Logs;
-import org.monroe.team.puzzle.pieces.filewatcher.events.FileEvent;
+import org.monroe.team.puzzle.pieces.fs.Log;
+import org.monroe.team.puzzle.pieces.fs.events.FileEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 

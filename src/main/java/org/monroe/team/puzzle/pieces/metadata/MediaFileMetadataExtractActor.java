@@ -2,7 +2,7 @@ package org.monroe.team.puzzle.pieces.metadata;
 
 import org.monroe.team.puzzle.core.events.EventBus;
 import org.monroe.team.puzzle.core.events.MbassyEventSubscriber;
-import org.monroe.team.puzzle.pieces.filewatcher.events.FileEvent;
+import org.monroe.team.puzzle.pieces.fs.events.FileEvent;
 import org.monroe.team.puzzle.pieces.metadata.events.MediaFile;
 import org.springframework.beans.factory.annotation.Autowired;
 

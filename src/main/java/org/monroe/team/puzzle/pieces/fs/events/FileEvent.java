@@ -1,9 +1,6 @@
-package org.monroe.team.puzzle.pieces.filewatcher.events;
+package org.monroe.team.puzzle.pieces.fs.events;
 
 import org.monroe.team.puzzle.core.events.Event;
-
-import java.io.File;
-import java.io.InputStream;
 
 public class FileEvent extends Event {
 

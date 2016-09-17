@@ -1,6 +1,6 @@
 package org.monroe.team.puzzle.pieces.metadata.events;
 
-import org.monroe.team.puzzle.pieces.filewatcher.events.FileEvent;
+import org.monroe.team.puzzle.pieces.fs.events.FileEvent;
 import org.monroe.team.puzzle.pieces.metadata.MediaMetadata;
 
 public class MediaFile extends FileEvent{

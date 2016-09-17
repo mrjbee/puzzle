@@ -1,10 +1,10 @@
-package org.monroe.team.puzzle.pieces.filewatcher;
+package org.monroe.team.puzzle.pieces.fs;
 
 import org.springframework.stereotype.Component;
 
 @Component
 public class Log extends org.monroe.team.puzzle.core.logs.Log {
     Log() {
-        super("file-watcher");
+        super("file-system");
     }
 }
