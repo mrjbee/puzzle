@@ -45,6 +45,7 @@ public class MediaFileMetadataExtractActor<T extends FileEvent> extends MbassyEv
                 event.name,
                 event.ext,
                 metadata1);
+        log.info("Media metadata extracted and published as {}", mediaFileEvent);
         eventBus.post(mediaFileEvent);
     }
 
