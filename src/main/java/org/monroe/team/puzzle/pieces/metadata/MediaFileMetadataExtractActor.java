@@ -1,52 +1,52 @@
 package org.monroe.team.puzzle.pieces.metadata;
 
-import org.monroe.team.puzzle.core.events.EventBus;
-import org.monroe.team.puzzle.core.events.MbassyEventSubscriber;
-import org.monroe.team.puzzle.pieces.fs.events.FileEvent;
-import org.monroe.team.puzzle.pieces.metadata.events.MediaFileEvent;
+import org.monroe.team.puzzle.core.events.MessagePublisher;
+import org.monroe.team.puzzle.core.events.AbstractMessageSubscriber;
+import org.monroe.team.puzzle.pieces.fs.events.FileMessage;
+import org.monroe.team.puzzle.pieces.metadata.events.MediaFileMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
 
 
-public class MediaFileMetadataExtractActor<T extends FileEvent> extends MbassyEventSubscriber<T> {
+public class MediaFileMetadataExtractActor<T extends FileMessage> extends AbstractMessageSubscriber<T> {
 
     @Autowired
     Log log;
 
-    private final EventBus eventBus;
+    private final MessagePublisher messagePublisher;
     private final MediaFileMetadataExtractor metadataExtractor;
     private final FileEventFilter<T> fileEventFilter;
 
     public MediaFileMetadataExtractActor(
             Class<T> eventClass,
-            final EventBus eventBus,
+            final MessagePublisher messagePublisher,
             final MediaFileMetadataExtractor metadataExtractor,
             final FileEventFilter<T> fileEventFilter) {
         super(eventClass);
-        this.eventBus = eventBus;
+        this.messagePublisher = messagePublisher;
         this.metadataExtractor = metadataExtractor;
         this.fileEventFilter = fileEventFilter;
     }
 
     @Override
-    public void onEvent(final T event) {
-        File file = fileEventFilter.toFile(event);
+    public void onMessage(final T message) {
+        File file = fileEventFilter.toFile(message);
         if (file == null){
-            log.info("File event skipped = {}",event.filePath);
+            log.info("File event skipped = {}", message.filePath);
             return;
         }
-        publishMediaAsMediaFile(event, metadataExtractor.metadata(file));
+        publishMediaAsMediaFile(message, metadataExtractor.metadata(file));
     }
 
-    private void publishMediaAsMediaFile(final FileEvent event, final MediaMetadata metadata1) {
-        MediaFileEvent mediaFileEvent = new MediaFileEvent(
+    private void publishMediaAsMediaFile(final FileMessage event, final MediaMetadata metadata1) {
+        MediaFileMessage mediaFileEvent = new MediaFileMessage(
                 event.filePath,
                 event.name,
                 event.ext,
                 metadata1);
         log.info("Media metadata extracted and published as {}", mediaFileEvent);
-        eventBus.post(mediaFileEvent);
+        messagePublisher.post(mediaFileEvent);
     }
 
     public interface FileEventFilter<T> {

@@ -1,19 +1,19 @@
 package org.monroe.team.puzzle.pieces.fs;
 
-import org.monroe.team.puzzle.core.events.EventBus;
-import org.monroe.team.puzzle.core.events.MbassyEventSubscriber;
-import org.monroe.team.puzzle.pieces.fs.events.FileEvent;
+import org.monroe.team.puzzle.core.events.AbstractMessageSubscriber;
+import org.monroe.team.puzzle.core.events.MessagePublisher;
+import org.monroe.team.puzzle.pieces.fs.events.FileMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
-public class FilePerExtensionFilterActor extends MbassyEventSubscriber<FileEvent> {
+public class FilePerExtensionFilterActor extends AbstractMessageSubscriber<FileMessage> {
 
     @Autowired
     Log log;
 
     @Autowired
-    EventBus eventBus;
+    MessagePublisher messagePublisher;
 
     private final Publisher publisher;
     private final List<String> supportedExtensions;
@@ -21,25 +21,25 @@ public class FilePerExtensionFilterActor extends MbassyEventSubscriber<FileEvent
     public FilePerExtensionFilterActor(
             final List<String> supportedExtensions,
             final Publisher publisher) {
-        super(FileEvent.class);
+        super(FileMessage.class);
         this.publisher = publisher;
         this.supportedExtensions = supportedExtensions;
     }
 
     @Override
-    public void onEvent(final FileEvent event) {
+    public void onMessage(final FileMessage message) {
         for (String supportedExtension : supportedExtensions) {
-            if (event.ext != null && supportedExtension.toLowerCase().equals(event.ext.toLowerCase())){
-                log.info("Event gpong to be republished = {}", event);
-                publisher.republish(event, eventBus);
+            if (message.ext != null && supportedExtension.toLowerCase().equals(message.ext.toLowerCase())){
+                log.info("Message gpong to be republished = {}", message);
+                publisher.republish(message, messagePublisher);
                 return;
             }
         }
-        log.info("Event was filter out = {}", event);
+        log.info("Message was filter out = {}", message);
     }
 
     public interface Publisher {
-        void republish(FileEvent fileEvent, EventBus eventBus);
+        void republish(FileMessage fileEvent, MessagePublisher messagePublisher);
     }
 
 }

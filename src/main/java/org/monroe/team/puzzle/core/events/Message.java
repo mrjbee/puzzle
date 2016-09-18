@@ -1,6 +1,6 @@
 package org.monroe.team.puzzle.core.events;
 
 
-public class Event {
+public class Message {
     String transactionId;
 }

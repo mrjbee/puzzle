@@ -2,10 +2,10 @@ package org.monroe.team.puzzle.pieces.fs;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.monroe.team.puzzle.core.events.EventBus;
+import org.monroe.team.puzzle.core.events.MessagePublisher;
 import org.monroe.team.puzzle.core.fs.config.FolderPropertiesProvider;
 import org.monroe.team.puzzle.core.log.Logs;
-import org.monroe.team.puzzle.pieces.fs.events.FileEvent;
+import org.monroe.team.puzzle.pieces.fs.events.FileMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 
@@ -25,7 +25,7 @@ public class FileWatchActor {
     private Cache<String, Boolean> exploredFileCache;
 
     @Autowired
-    EventBus eventBus;
+    MessagePublisher messagePublisher;
 
     @Autowired
     FolderPropertiesProvider folderPropertiesProvider;
@@ -121,8 +121,8 @@ public class FileWatchActor {
                 ext = fullName.substring(extensionDotPosition);
             }
 
-            FileEvent fileEvent = new FileEvent(childFile.getAbsolutePath(), name, ext);
-            eventBus.post(fileEvent);
+            FileMessage fileEvent = new FileMessage(childFile.getAbsolutePath(), name, ext);
+            messagePublisher.post(fileEvent);
             exploredFileCache.put(fileEvent.filePath, true);
             return true;
         } else {

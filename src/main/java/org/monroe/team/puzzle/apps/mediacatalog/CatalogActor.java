@@ -1,8 +1,8 @@
 package org.monroe.team.puzzle.apps.mediacatalog;
 
-import org.monroe.team.puzzle.core.events.MbassyEventSubscriber;
+import org.monroe.team.puzzle.core.events.AbstractMessageSubscriber;
 import org.monroe.team.puzzle.core.fs.config.FolderPropertiesProvider;
-import org.monroe.team.puzzle.pieces.metadata.events.MediaFileEvent;
+import org.monroe.team.puzzle.pieces.metadata.events.MediaFileMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.io.File;
@@ -11,7 +11,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
-public class CatalogActor extends MbassyEventSubscriber<MediaFileEvent> {
+public class CatalogActor extends AbstractMessageSubscriber<MediaFileMessage> {
 
     @Autowired
     Log log;
@@ -20,22 +20,22 @@ public class CatalogActor extends MbassyEventSubscriber<MediaFileEvent> {
     FolderPropertiesProvider propertiesProvider;
 
     public CatalogActor() {
-        super(MediaFileEvent.class);
+        super(MediaFileMessage.class);
     }
 
     @Override
-    public void onEvent(final MediaFileEvent event) {
-        File mediaFile = new File(event.filePath);
+    public void onMessage(final MediaFileMessage message) {
+        File mediaFile = new File(message.filePath);
         Properties conf = propertiesProvider.forFolder(mediaFile.getParentFile());
         String rootMediaFolder = conf.getProperty("media-catalog.root.folder");
         if (rootMediaFolder == null){
-            log.warn("No media catalog folder defined in {} for resource: {} ","media-catalog.root.folder", event.filePath);
+            log.warn("No media catalog folder defined in {} for resource: {} ","media-catalog.root.folder", message.filePath);
         } else {
            File rootCatalogFolder = new File(rootMediaFolder);
            if (!rootCatalogFolder.exists() && !rootCatalogFolder.mkdirs()){
                log.warn("Could not create media catalog folder = "+rootCatalogFolder.getAbsolutePath());
            } else {
-               Date date = new Date(event.metadata.creationDate);
+               Date date = new Date(message.metadata.creationDate);
                DateFormat df = new SimpleDateFormat("yyyy MMMM dd");
                String folderName = df.format(date);
                File mediaFolder = new File(rootCatalogFolder, folderName);
