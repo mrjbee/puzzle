@@ -1,6 +1,6 @@
 package org.monroe.team.puzzle.core.events;
 import net.engio.mbassy.bus.MBassador;
-import org.monroe.team.puzzle.core.logs.Logs;
+import org.monroe.team.puzzle.core.log.Logs;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

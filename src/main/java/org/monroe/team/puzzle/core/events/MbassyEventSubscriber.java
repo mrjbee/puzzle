@@ -2,7 +2,7 @@ package org.monroe.team.puzzle.core.events;
 
 
 import net.engio.mbassy.listener.Handler;
-import org.monroe.team.puzzle.core.logs.Logs;
+import org.monroe.team.puzzle.core.log.Logs;
 
 public abstract class MbassyEventSubscriber<T extends Event> implements EventSubscriber<T>{
 
