@@ -17,6 +17,11 @@ jar {
 	baseName = 'box'
 	version = '0.0.1-SNAPSHOT'
 }
+
+bootRun {
+	systemProperties = System.properties
+}
+
 sourceCompatibility = 1.7
 targetCompatibility = 1.7
 
