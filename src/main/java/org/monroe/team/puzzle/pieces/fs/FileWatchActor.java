@@ -42,7 +42,7 @@ public class FileWatchActor {
     public void checkWatchFolders() {
 
         if (isFoldersNotSpecified()) {
-            log.info("No watch folder specified = {}", "piece.filewatcher.watch.folder.list");
+            log.info("No watch folder specified = {}", "watchFolders[0]");
             watchFolders.clear();
         } else {
             for (String watchFolder : watchFolders) {
