@@ -7,4 +7,9 @@ public class VideoFileEvent extends FileEvent{
     public VideoFileEvent(final String filePath, final String name, final String ext) {
         super(filePath, name, ext);
     }
+
+    @Override
+    public String toString() {
+        return "VideoFileEvent{"+super.toString()+"}";
+    }
 }

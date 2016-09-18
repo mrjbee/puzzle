@@ -35,6 +35,12 @@ public class PictureMetadataExtractor implements MediaFileMetadataExtractor{
         // query the tag's value
         Date date
                 = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
+
+        if (date == null){
+            log.warn("Failed to get creation date. Use now() date for = {}", file.getAbsoluteFile());
+            date = new Date();
+        }
+
         return new MediaMetadata(MediaMetadata.Type.PICTURE, date.getTime());
     }
 }

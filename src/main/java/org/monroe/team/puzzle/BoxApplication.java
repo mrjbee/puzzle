@@ -4,11 +4,14 @@ import net.engio.mbassy.bus.MBassador;
 import net.engio.mbassy.bus.MessagePublication;
 import net.engio.mbassy.bus.config.BusConfiguration;
 import net.engio.mbassy.bus.config.Feature;
+import net.engio.mbassy.bus.error.IPublicationErrorHandler;
+import net.engio.mbassy.bus.error.PublicationError;
 import net.engio.mbassy.listener.MetadataReader;
 import net.engio.mbassy.subscription.SubscriptionFactory;
 import net.engio.mbassy.subscription.SubscriptionManagerProvider;
 import org.monroe.team.puzzle.core.events.Event;
 import org.monroe.team.puzzle.core.events.EventSubscriber;
+import org.monroe.team.puzzle.core.log.Logs;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -32,10 +35,17 @@ public class BoxApplication {
                                 .setSubscriptionFactory(new SubscriptionFactory())
                                 .setSubscriptionManagerProvider(new SubscriptionManagerProvider()))
                         .addFeature(Feature.AsynchronousHandlerInvocation.Default())
-                        .addFeature(Feature.AsynchronousMessageDispatch.Default()));
+                        .addFeature(Feature.AsynchronousMessageDispatch.Default())
+                        .addPublicationErrorHandler(new IPublicationErrorHandler() {
+                            @Override
+                            public void handleError(final PublicationError error) {
+                                Logs.bus.warn(error.getCause(),"Dead letter channel message = {}",error.getPublishedMessage(),error);
+                            }
+                        }));
         for (EventSubscriber eventSubscriber : eventSubscribers) {
             mBassador.subscribe(eventSubscriber);
         }
+
         return mBassador;
     }
 

@@ -10,6 +10,9 @@ import java.util.List;
 public class FilePerExtensionFilterActor extends MbassyEventSubscriber<FileEvent> {
 
     @Autowired
+    Log log;
+
+    @Autowired
     EventBus eventBus;
 
     private final Publisher publisher;
@@ -27,9 +30,12 @@ public class FilePerExtensionFilterActor extends MbassyEventSubscriber<FileEvent
     public void onEvent(final FileEvent event) {
         for (String supportedExtension : supportedExtensions) {
             if (event.ext != null && supportedExtension.toLowerCase().equals(event.ext.toLowerCase())){
+                log.info("Event gpong to be republished = {}", event);
                 publisher.republish(event, eventBus);
+                return;
             }
         }
+        log.info("Event was filter out = {}", event);
     }
 
     public interface Publisher {
