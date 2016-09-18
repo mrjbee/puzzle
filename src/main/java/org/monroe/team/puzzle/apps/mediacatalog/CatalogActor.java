@@ -36,7 +36,7 @@ public class CatalogActor extends MbassyEventSubscriber<MediaFileEvent> {
                log.warn("Could not create media catalog folder = "+event.filePath);
            } else {
                Date date = new Date(event.metadata.creationDate);
-               DateFormat df = new SimpleDateFormat("dd MMMM yyyy");
+               DateFormat df = new SimpleDateFormat("yyyy MMMM dd");
                String folderName = df.format(date);
                File mediaFolder = new File(rootCatalogFolder, folderName);
                if (!mediaFolder.exists() && !mediaFolder.mkdirs()){

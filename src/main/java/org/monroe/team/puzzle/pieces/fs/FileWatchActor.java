@@ -71,18 +71,20 @@ public class FileWatchActor {
                                          final int maxAllowedToPublishAtOnce) {
         if (!file.exists()) return published;
         File[] childFiles = file.listFiles();
-        for (File childFile : childFiles) {
+        if (childFiles != null) {
+            for (File childFile : childFiles) {
 
-            if (published >= maxAllowedToPublishAtOnce) {
-                return published;
-            }
+                if (published >= maxAllowedToPublishAtOnce) {
+                    return published;
+                }
 
-            if (childFile.isDirectory()) {
-                published = traversFolderForANewFile(childFile, published, maxAllowedToPublishAtOnce);
-            } else {
-                boolean isPublished = publishNewFileIfNotAlreadyPublished(childFile);
-                if (isPublished) {
-                    published++;
+                if (childFile.isDirectory()) {
+                    published = traversFolderForANewFile(childFile, published, maxAllowedToPublishAtOnce);
+                } else {
+                    boolean isPublished = publishNewFileIfNotAlreadyPublished(childFile);
+                    if (isPublished) {
+                        published++;
+                    }
                 }
             }
         }
