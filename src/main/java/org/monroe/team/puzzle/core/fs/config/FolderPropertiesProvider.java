@@ -1,5 +1,7 @@
 package org.monroe.team.puzzle.core.fs.config;
 
+import org.monroe.team.puzzle.core.log.Logs;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
@@ -28,10 +30,20 @@ public class FolderPropertiesProvider {
         if (file.exists()){
             if (file.canRead()){
                 Properties properties = new Properties();
+                FileInputStream fileInputStream = null;
                 try {
-                    properties.load(new FileInputStream(file));
+                    fileInputStream = new FileInputStream(file);
+                    properties.load(fileInputStream);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
+                } finally {
+                    if (fileInputStream != null){
+                        try {
+                            fileInputStream.close();
+                        } catch (IOException e) {
+                            Logs.core.warn(e, "Couldnot close stream for file = {}", file.getAbsolutePath());
+                        }
+                    }
                 }
                 for (Map.Entry<Object, Object> objectObjectEntry : properties.entrySet()) {
                     mergeResult.put(objectObjectEntry.getKey(), objectObjectEntry.getValue());

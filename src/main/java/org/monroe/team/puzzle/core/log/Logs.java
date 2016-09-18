@@ -9,6 +9,7 @@ final public class Logs {
 
     private static AtomicLong transactionGenerator = new AtomicLong(0);
     public static Log bus = new Log(LoggerFactory.getLogger("puzzle.Bus"));
+    public static Log core = new Log(LoggerFactory.getLogger("puzzle.Core"));
 
     private Logs() {}
 
