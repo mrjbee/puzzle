@@ -27,4 +27,8 @@ final public class Logs {
         }
         MDC.put("transactionId", transactionId);
     }
+
+    public static String addTransactionLevel(final String transactionId) {
+        return transactionId+"-"+transactionGenerator.getAndAdd(1);
+    }
 }

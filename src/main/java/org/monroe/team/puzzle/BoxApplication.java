@@ -5,6 +5,9 @@ import org.monroe.team.puzzle.core.events.MessageSubscriber;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import reactor.Environment;
 import reactor.bus.EventBus;
 import reactor.bus.selector.Selectors;
@@ -18,6 +21,12 @@ public class BoxApplication {
     }
 
     @Bean
+    TaskScheduler taskScheduler(){
+        TaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        return scheduler;
+    }
+
+    @Bean
     Environment env() {
         return Environment.initializeIfEmpty()
                 .assignErrorJournal();
@@ -28,7 +37,7 @@ public class BoxApplication {
         EventBus eventBus = EventBus.create(env, Environment.THREAD_POOL);
         for (AbstractMessageSubscriber eventSubscriber : eventSubscribers) {
             eventBus.getConsumerRegistry().register(
-                    Selectors.<Object>$(eventSubscriber.eventClass.toString()),
+                    Selectors.regex(eventSubscriber.subscriberKey),
                     eventSubscriber
             );
         }

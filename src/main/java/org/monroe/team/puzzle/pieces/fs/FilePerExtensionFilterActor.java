@@ -21,17 +21,17 @@ public class FilePerExtensionFilterActor extends AbstractMessageSubscriber<FileM
     public FilePerExtensionFilterActor(
             final List<String> supportedExtensions,
             final Publisher publisher) {
-        super(FileMessage.class);
+ //       super(FileMessage.class);
         this.publisher = publisher;
         this.supportedExtensions = supportedExtensions;
     }
 
     @Override
-    public void onMessage(final FileMessage message) {
+    public void onMessage(String parentKey, FileMessage message) {
         for (String supportedExtension : supportedExtensions) {
             if (message.ext != null && supportedExtension.toLowerCase().equals(message.ext.toLowerCase())){
                 log.info("Message gpong to be republished = {}", message);
-                publisher.republish(message, messagePublisher);
+                publisher.republish(parentKey, message, messagePublisher);
                 return;
             }
         }
@@ -39,7 +39,10 @@ public class FilePerExtensionFilterActor extends AbstractMessageSubscriber<FileM
     }
 
     public interface Publisher {
-        void republish(FileMessage fileEvent, MessagePublisher messagePublisher);
+        void republish(
+                String parentKey,
+                FileMessage fileEvent,
+                MessagePublisher messagePublisher);
     }
 
 }
