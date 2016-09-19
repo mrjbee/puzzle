@@ -37,7 +37,7 @@ public class BoxApplication {
         EventBus eventBus = EventBus.create(env, Environment.THREAD_POOL);
         for (AbstractMessageSubscriber eventSubscriber : eventSubscribers) {
             eventBus.getConsumerRegistry().register(
-                    Selectors.<Object>$(eventSubscriber.subscriberKey),
+                    Selectors.regex(eventSubscriber.subscriberKey),
                     eventSubscriber
             );
         }
