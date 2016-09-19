@@ -16,6 +16,13 @@ public class DefaultMessagePublisher implements MessagePublisher {
     public void post(final Message message) {
         message.transactionId = Logs.getTransactionId();
         Logs.bus.info("Post message: {} ", message);
-        eventBus.notify(message.getClass().toString(), Event.wrap(message));
+        eventBus.notify(message.getClass().getName(), Event.wrap(message));
+    }
+
+    @Override
+    public void post(final String key, final Message message) {
+        message.transactionId = Logs.getTransactionId();
+        Logs.bus.info("Post message with key {} : {} ",key, message);
+        eventBus.notify(key, Event.wrap(message));
     }
 }

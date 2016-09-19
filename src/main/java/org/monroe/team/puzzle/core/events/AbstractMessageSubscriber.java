@@ -8,10 +8,14 @@ import reactor.fn.Consumer;
 public abstract class AbstractMessageSubscriber<T extends Message>
         implements MessageSubscriber<T>, Consumer<Event<T>>{
 
-    public final Class<T> eventClass;
+    public final String subscriberKey;
 
     public AbstractMessageSubscriber(final Class<T> eventClass) {
-        this.eventClass = eventClass;
+        this(eventClass.getName());
+    }
+
+    public AbstractMessageSubscriber(final String subscribeKey) {
+        this.subscriberKey = subscribeKey;
     }
 
     @Override
