@@ -39,5 +39,8 @@ dependencies {
 	compile('org.springframework.boot:spring-boot-starter-hateoas')
 	compile('org.springframework.boot:spring-boot-starter-web')
 	compile('com.google.guava:guava:19.0')
+	compile('org.webjars:jquery-mobile:1.4.5')
+	compile group: 'org.thymeleaf', name: 'thymeleaf-spring4', version: '3.0.1.RELEASE'
+	compile group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.1.RELEASE'
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
