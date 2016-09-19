@@ -33,9 +33,10 @@ public class MediaCatalogConfiguration {
     }
 
     @Bean
+    @ConfigurationProperties(prefix="photo-metadata-extractor", ignoreUnknownFields = true)
     public MediaFileMetadataExtractActor<PictureFileMessage> photoFileMetadataExtractor(MessagePublisher messagePublisher, PictureMetadataExtractor extractor){
         return new MediaFileMetadataExtractActor<PictureFileMessage>(
-                PictureFileMessage.class,
+  //              PictureFileMessage.class,
                 messagePublisher,
                 extractor,
                 new MediaFileMetadataExtractActor.FileEventFilter<PictureFileMessage>() {
@@ -47,9 +48,10 @@ public class MediaCatalogConfiguration {
     }
 
     @Bean
+    @ConfigurationProperties(prefix="video-metadata-extractor", ignoreUnknownFields = true)
     public MediaFileMetadataExtractActor<VideoFileMessage> videoFileMetadataExtractor(MessagePublisher messagePublisher, VideoMetadataExtractor extractor){
         return new MediaFileMetadataExtractActor<VideoFileMessage>(
-                VideoFileMessage.class,
+//                VideoFileMessage.class,
                 messagePublisher,
                 extractor,
                 new MediaFileMetadataExtractActor.FileEventFilter<VideoFileMessage>() {
@@ -61,13 +63,19 @@ public class MediaCatalogConfiguration {
     }
 
     @Bean
+    @ConfigurationProperties(prefix="picture-file-filter", ignoreUnknownFields = true)
     public FilePerExtensionFilterActor pictureFilter(){
         return new FilePerExtensionFilterActor(
                 Arrays.asList(".jpg", ".png", ".bmp"),
                 new FilePerExtensionFilterActor.Publisher() {
                     @Override
-                    public void republish(final FileMessage fileEvent, final MessagePublisher messagePublisher) {
-                        messagePublisher.post(new PictureFileMessage(
+                    public void republish(
+                            final String parentKey,
+                            final FileMessage fileEvent,
+                            final MessagePublisher messagePublisher) {
+                        messagePublisher.post(
+                        parentKey+".file.picture",
+                        new PictureFileMessage(
                                 fileEvent.filePath,
                                 fileEvent.name,
                                 fileEvent.ext
@@ -78,13 +86,19 @@ public class MediaCatalogConfiguration {
     }
 
     @Bean
+    @ConfigurationProperties(prefix="video-file-filter", ignoreUnknownFields = true)
     public FilePerExtensionFilterActor videoFilter(){
         return new FilePerExtensionFilterActor(
                 Arrays.asList(".mp4"),
                 new FilePerExtensionFilterActor.Publisher() {
                     @Override
-                    public void republish(final FileMessage fileEvent, final MessagePublisher messagePublisher) {
-                        messagePublisher.post(new VideoFileMessage(
+                    public void republish(
+                            final String parentKey,
+                            final FileMessage fileEvent,
+                            final MessagePublisher messagePublisher) {
+                        messagePublisher.post(
+                                parentKey+".file.video",
+                                new VideoFileMessage(
                                 fileEvent.filePath,
                                 fileEvent.name,
                                 fileEvent.ext

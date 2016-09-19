@@ -1,5 +1,5 @@
 package org.monroe.team.puzzle.core.events;
 
 public interface MessageSubscriber<T> {
-    void onMessage(T message);
+    void onMessage(String ketCapture, T message);
 }

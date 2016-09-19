@@ -19,34 +19,41 @@ public class MediaFileMetadataExtractActor<T extends FileMessage> extends Abstra
     private final FileEventFilter<T> fileEventFilter;
 
     public MediaFileMetadataExtractActor(
-            Class<T> eventClass,
             final MessagePublisher messagePublisher,
             final MediaFileMetadataExtractor metadataExtractor,
             final FileEventFilter<T> fileEventFilter) {
-        super(eventClass);
         this.messagePublisher = messagePublisher;
         this.metadataExtractor = metadataExtractor;
         this.fileEventFilter = fileEventFilter;
     }
 
     @Override
-    public void onMessage(final T message) {
+    public void onMessage(final String parentKey,
+                          final T message) {
         File file = fileEventFilter.toFile(message);
         if (file == null){
             log.info("File event skipped = {}", message.filePath);
             return;
         }
-        publishMediaAsMediaFile(message, metadataExtractor.metadata(file));
+        publishMediaAsMediaFile(parentKey, message, metadataExtractor.metadata(file));
     }
 
-    private void publishMediaAsMediaFile(final FileMessage event, final MediaMetadata metadata1) {
-        MediaFileMessage mediaFileEvent = new MediaFileMessage(
-                event.filePath,
-                event.name,
-                event.ext,
-                metadata1);
-        log.info("Media metadata extracted and published as {}", mediaFileEvent);
-        messagePublisher.post(mediaFileEvent);
+    private void publishMediaAsMediaFile(
+            final String parentKey,
+            final FileMessage event,
+            final MediaMetadata metadata1) {
+        MediaFileMessage mediaFileEvent =
+                new MediaFileMessage(
+                    event.filePath,
+                    event.name,
+                    event.ext,
+                    metadata1);
+        String publishKey = parentKey+".metadata";
+        log.info("Media metadata extracted and published with key {} as {}",
+                publishKey, mediaFileEvent);
+        messagePublisher.post(
+                publishKey,
+                mediaFileEvent);
     }
 
     public interface FileEventFilter<T> {

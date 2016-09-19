@@ -133,7 +133,7 @@ public class FileWatchActor {
             }
 
             FileMessage fileEvent = new FileMessage(childFile.getAbsolutePath(), name, ext);
-            messagePublisher.post(fileEvent);
+            messagePublisher.post("import.explored.file",fileEvent);
             exploredFileCache.put(fileEvent.filePath, true);
             return true;
         } else {

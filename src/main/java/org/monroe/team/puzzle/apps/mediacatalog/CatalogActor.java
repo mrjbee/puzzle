@@ -22,9 +22,9 @@ public class CatalogActor extends AbstractMessageSubscriber<MediaFileMessage> {
     @NotBlank
     String folder;
 
-    public CatalogActor() {
-        super(MediaFileMessage.class);
-    }
+ //   public CatalogActor() {
+ //       super(MediaFileMessage.class);
+ //   }
 
     @Override
     public void onMessage(final MediaFileMessage message) {
