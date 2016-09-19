@@ -3,16 +3,14 @@ package org.monroe.team.puzzle.pieces.fs;
 import org.monroe.team.puzzle.core.events.MessagePublisher;
 import org.monroe.team.puzzle.core.fs.config.FolderPropertiesProvider;
 import org.monroe.team.puzzle.core.log.Logs;
-import org.monroe.team.puzzle.pieces.fs.events.FileMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import java.io.File;
-import java.nio.file.FileSystems;
 import java.util.List;
-import java.util.Properties;
 
 public class FolderCleanupActor {
 
@@ -23,10 +21,16 @@ public class FolderCleanupActor {
     MessagePublisher messagePublisher;
 
     @Autowired
+    TaskScheduler taskScheduler;
+
+    @Autowired
     FolderPropertiesProvider folderPropertiesProvider;
 
     @NotNull
     List<String> watchFolders;
+
+    @NotNull
+    Integer rate;
 
     @PostConstruct
     public void checkWatchFolders() {
@@ -42,9 +46,14 @@ public class FolderCleanupActor {
                 }
             }
         }
+        taskScheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                checkForEmptyFolders();
+            }
+        }, rate );
     }
 
-    @Scheduled(fixedRateString = "${piece.filewatcher.watch.rate.ms}")
     public void checkForEmptyFolders() {
         Logs.resetTransactionId("tm");
         if (!isFoldersNotSpecified()) {
@@ -87,4 +96,11 @@ public class FolderCleanupActor {
         this.watchFolders = watchFolders;
     }
 
+    public Integer getRate() {
+        return rate;
+    }
+
+    public void setRate(final Integer rate) {
+        this.rate = rate;
+    }
 }

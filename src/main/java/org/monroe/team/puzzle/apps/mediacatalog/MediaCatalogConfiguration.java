@@ -27,7 +27,7 @@ public class MediaCatalogConfiguration {
     }
 
     @Bean
-    @ConfigurationProperties(prefix="media.dispatching.watcher", ignoreUnknownFields = true)
+    @ConfigurationProperties(prefix="media.dispatching.cleanup.watcher", ignoreUnknownFields = true)
     public FolderCleanupActor cleanupWatcher(){
         return new FolderCleanupActor();
     }

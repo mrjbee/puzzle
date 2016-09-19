@@ -7,6 +7,9 @@ import org.monroe.team.puzzle.core.fs.config.FolderPropertiesProvider;
 import org.monroe.team.puzzle.core.log.Logs;
 import org.monroe.team.puzzle.pieces.fs.events.FileMessage;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
@@ -29,6 +32,8 @@ public class FileWatchActor {
 
     @Autowired
     FolderPropertiesProvider folderPropertiesProvider;
+    @Autowired
+    TaskScheduler taskScheduler;
 
     @NotNull
     List<String> watchFolders;
@@ -36,7 +41,8 @@ public class FileWatchActor {
     Integer maxPublishAtOnce;
     @NotNull
     Integer newFileCacheTimeout;
-
+    @NotNull
+    Integer rate;
 
     @PostConstruct
     public void checkWatchFolders() {
@@ -53,9 +59,14 @@ public class FileWatchActor {
             }
         }
         exploredFileCache = CacheBuilder.<String, Boolean>newBuilder().expireAfterWrite(newFileCacheTimeout, TimeUnit.MILLISECONDS).build();
+        taskScheduler.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                checkForNewFiles();
+            }
+        }, rate);
     }
 
-    @Scheduled(fixedRateString = "${piece.filewatcher.watch.rate.ms}")
     public void checkForNewFiles() {
         Logs.resetTransactionId("tm");
         if (!isFoldersNotSpecified()) {
@@ -157,5 +168,13 @@ public class FileWatchActor {
 
     public void setNewFileCacheTimeout(final Integer newFileCacheTimeout) {
         this.newFileCacheTimeout = newFileCacheTimeout;
+    }
+
+    public Integer getRate() {
+        return rate;
+    }
+
+    public void setRate(final Integer rate) {
+        this.rate = rate;
     }
 }

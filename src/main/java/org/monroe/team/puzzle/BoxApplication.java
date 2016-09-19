@@ -5,6 +5,9 @@ import org.monroe.team.puzzle.core.events.MessageSubscriber;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.scheduling.TaskScheduler;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
 import reactor.Environment;
 import reactor.bus.EventBus;
 import reactor.bus.selector.Selectors;
@@ -15,6 +18,12 @@ public class BoxApplication {
     public static void main(String[] args) {
         SpringApplication.run(BoxApplication.class, args)
                 .registerShutdownHook();
+    }
+
+    @Bean
+    TaskScheduler taskScheduler(){
+        TaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        return scheduler;
     }
 
     @Bean
