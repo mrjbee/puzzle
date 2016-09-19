@@ -95,6 +95,7 @@ public class MediaCatalogConfiguration {
     }
 
     @Bean
+    @ConfigurationProperties(prefix="media.dispatching.catalog", ignoreUnknownFields = true)
     public CatalogActor catalogActor(){
         return new CatalogActor();
     }
