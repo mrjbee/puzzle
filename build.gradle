@@ -31,6 +31,7 @@ repositories {
 
 
 dependencies {
+	compile("org.springframework.boot:spring-boot-devtools")
 	compile("io.projectreactor:reactor-bus")
 	compile('com.googlecode.mp4parser:isoparser:1.1.7')
 	compile('com.drewnoakes:metadata-extractor:2.9.1')

@@ -1,19 +1,39 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>Getting Started: Spring Boot CLI + Javascript</title>
+    <title>Media Browser</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="webjars/jquery-mobile/1.4.5/jquery.mobile.css" />
     <script src="webjars/jquery/1.11.1/jquery.js"></script>
     <script src="webjars/jquery-mobile/1.4.5/jquery.mobile.js"></script>
-    <script type="text/javascript">
-        $(document).ready(function() {
+    <!--
+       <script type="text/javascript">
+            $(document).ready(function() {
             $('p').animate({
                 fontSize: '48px'
             }, "slow");
         });
-    </script>
+        </script>
+    -->
 </head>
 <body>
-<p th:text="'Hello, ' + ${name} + '!'" />
+
+
+<div data-role="page">
+
+    <div data-role="header" data-position="fixed">
+        <h1>Media Browser</h1>
+    </div><!-- /header -->
+
+    <div role="main" class="ui-content">
+        <p>Page content goes here.</p>
+    </div><!-- /content -->
+
+    <div data-role="footer" data-position="fixed">
+        <h4>Page Footer</h4>
+    </div><!-- /footer -->
+</div><!-- /page -->
+
 </body>
 </html>
