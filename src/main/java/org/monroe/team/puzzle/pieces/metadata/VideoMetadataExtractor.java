@@ -31,7 +31,7 @@ public class VideoMetadataExtractor implements MediaFileMetadataExtractor{
                 log.warn("Failed to get creation date. Use now() date for = {}", file.getAbsoluteFile());
                 date = new Date();
             }
-            return new MediaMetadata(MediaMetadata.Type.PICTURE, date.getTime());
+            return new MediaMetadata(MediaMetadata.Type.VIDEO, date.getTime());
         } catch (IOException e) {
             log.warn(e, "Failed to open file as ISO = {}", file.getAbsoluteFile());
             throw new RuntimeException(e);

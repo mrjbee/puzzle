@@ -43,5 +43,7 @@ dependencies {
 	compile('org.webjars:jquery-mobile:1.4.5')
 	compile group: 'org.thymeleaf', name: 'thymeleaf-spring4', version: '3.0.1.RELEASE'
 	compile group: 'org.thymeleaf', name: 'thymeleaf', version: '3.0.1.RELEASE'
+	compile("org.springframework.boot:spring-boot-starter-data-jpa")
+	compile("com.h2database:h2")
 	testCompile('org.springframework.boot:spring-boot-starter-test')
 }
