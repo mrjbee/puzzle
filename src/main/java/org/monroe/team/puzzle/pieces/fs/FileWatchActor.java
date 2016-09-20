@@ -85,19 +85,35 @@ public class FileWatchActor {
                                          final int maxAllowedToPublishAtOnce) {
         if (!file.exists()) return published;
         File[] childFiles = file.listFiles();
-        if (childFiles != null) {
+        if (childFiles != null && childFiles.length > 0) {
+            Properties conf = folderPropertiesProvider.forFolder(file);
             for (File childFile : childFiles) {
 
                 if (published >= maxAllowedToPublishAtOnce) {
                     return published;
                 }
 
-                if (childFile.isDirectory()) {
-                    published = traversFolderForANewFile(childFile, published, maxAllowedToPublishAtOnce);
-                } else {
-                    boolean isPublished = publishNewFileIfNotAlreadyPublished(childFile);
-                    if (isPublished) {
-                        published++;
+                //skip conf file if exist
+                if (childFile.getName().equals(".puzzleconf")) {
+                    continue;
+                }
+
+                String fullName = childFile.getName();
+
+                boolean isExclude = checkIfFIleExcluded(conf, fullName);
+
+                if (!isExclude) {
+                    if (childFile.isDirectory()) {
+                        published = traversFolderForANewFile(childFile, published, maxAllowedToPublishAtOnce);
+                    } else {
+                        Boolean alreadyDiscovered = exploredFileCache.getIfPresent(childFile.getAbsolutePath());
+                        if (alreadyDiscovered == null || !alreadyDiscovered) {
+                            boolean isPublished = publishNewFileIfNotAlreadyPublished(childFile);
+                            if (isPublished) {
+                                exploredFileCache.put(childFile.getAbsolutePath(), true);
+                                published++;
+                            }
+                        }
                     }
                 }
             }
@@ -105,44 +121,33 @@ public class FileWatchActor {
         return published;
     }
 
-    private boolean publishNewFileIfNotAlreadyPublished(final File childFile) {
-
-        if (childFile.getName().equals(".puzzleconf")) {
-            exploredFileCache.put(childFile.getAbsolutePath(), true);
-            return false;
-        }
-
-        String filePath = childFile.getAbsolutePath();
-        Boolean alreadyDiscovered = exploredFileCache.getIfPresent(filePath);
-        if (alreadyDiscovered == null || !alreadyDiscovered) {
-            String fullName = childFile.getName();
-
-            Properties conf = folderPropertiesProvider.forFolder(childFile.getParentFile());
-            if (conf.getProperty("exclude") != null) {
-                for (String exclude : conf.getProperty("exclude").split("\\|\\|")) {
-                    if (FileSystems.getDefault().getPathMatcher(exclude).matches(new File(fullName).toPath())) {
-                        exploredFileCache.put(childFile.getAbsolutePath(), true);
-                        return false;
-                    }
+    private boolean checkIfFIleExcluded(final Properties conf, final String fullName) {
+        boolean isExclude = false;
+        if (conf.getProperty("exclude") != null) {
+            for (String exclude : conf.getProperty("exclude").split("\\|\\|")) {
+                if (FileSystems.getDefault().getPathMatcher(exclude).matches(new File(fullName).toPath())) {
+                    isExclude = true;
+                    break;
                 }
             }
-
-            String name = fullName;
-            String ext = null;
-            int extensionDotPosition = fullName.lastIndexOf(".");
-            if (extensionDotPosition > 0) {
-                name = fullName.substring(0, extensionDotPosition);
-                ext = fullName.substring(extensionDotPosition);
-            }
-
-            FileMessage fileEvent = new FileMessage(childFile.getAbsolutePath(), name, ext);
-            //"import.explored.file"
-            messagePublisher.post(chanel,fileEvent);
-            exploredFileCache.put(fileEvent.filePath, true);
-            return true;
-        } else {
-            return false;
         }
+        return isExclude;
+    }
+
+    private boolean publishNewFileIfNotAlreadyPublished(final File childFile) {
+        String filePath = childFile.getAbsolutePath();
+        String fullName = childFile.getName();
+        String name = fullName;
+        String ext = null;
+        int extensionDotPosition = fullName.lastIndexOf(".");
+        if (extensionDotPosition > 0) {
+            name = fullName.substring(0, extensionDotPosition);
+            ext = fullName.substring(extensionDotPosition);
+        }
+
+        FileMessage fileEvent = new FileMessage(filePath, name, ext);
+        messagePublisher.post(chanel,fileEvent);
+        return true;
     }
 
     private boolean isFoldersNotSpecified() {
