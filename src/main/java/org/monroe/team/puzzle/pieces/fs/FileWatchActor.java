@@ -1,17 +1,12 @@
 package org.monroe.team.puzzle.pieces.fs;
 
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.monroe.team.puzzle.core.events.MessagePublisher;
 import org.monroe.team.puzzle.core.fs.config.FolderPropertiesProvider;
 import org.monroe.team.puzzle.core.log.Logs;
 import org.monroe.team.puzzle.pieces.fs.events.FileMessage;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.task.TaskExecutor;
 import org.springframework.scheduling.TaskScheduler;
-import org.springframework.scheduling.annotation.Scheduled;
 
 import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
@@ -19,14 +14,11 @@ import java.io.File;
 import java.nio.file.FileSystems;
 import java.util.List;
 import java.util.Properties;
-import java.util.concurrent.TimeUnit;
 
 public class FileWatchActor {
 
     @Autowired
     Log log;
-
-    private Cache<String, Boolean> exploredFileCache;
 
     @Autowired
     MessagePublisher messagePublisher;
@@ -36,16 +28,21 @@ public class FileWatchActor {
     @Autowired
     TaskScheduler taskScheduler;
 
+
     @NotNull
     List<String> watchFolders;
     @NotNull
     Integer maxPublishAtOnce;
     @NotNull
-    Integer newFileCacheTimeout;
-    @NotNull
     Integer rate;
     @NotEmpty
     String chanel;
+
+    private final FileWatchOperationLog operationLog;
+
+    public FileWatchActor(final FileWatchOperationLog operationLog) {
+        this.operationLog = operationLog;
+    }
 
     @PostConstruct
     public void checkWatchFolders() {
@@ -61,7 +58,6 @@ public class FileWatchActor {
                 }
             }
         }
-        exploredFileCache = CacheBuilder.<String, Boolean>newBuilder().expireAfterWrite(newFileCacheTimeout, TimeUnit.MILLISECONDS).build();
         taskScheduler.scheduleAtFixedRate(new Runnable() {
             @Override
             public void run() {
@@ -106,11 +102,10 @@ public class FileWatchActor {
                     if (childFile.isDirectory()) {
                         published = traversFolderForANewFile(childFile, published, maxAllowedToPublishAtOnce);
                     } else {
-                        Boolean alreadyDiscovered = exploredFileCache.getIfPresent(childFile.getAbsolutePath());
-                        if (alreadyDiscovered == null || !alreadyDiscovered) {
+                        if (!operationLog.isFileWasLogged(childFile)) {
                             boolean isPublished = publishNewFileIfNotAlreadyPublished(childFile);
                             if (isPublished) {
-                                exploredFileCache.put(childFile.getAbsolutePath(), true);
+                                operationLog.markFileAsLogged(childFile);
                                 published++;
                             }
                         }
@@ -146,7 +141,7 @@ public class FileWatchActor {
         }
 
         FileMessage fileEvent = new FileMessage(filePath, name, ext);
-        messagePublisher.post(chanel,fileEvent);
+        messagePublisher.post(chanel, fileEvent);
         return true;
     }
 
@@ -169,14 +164,6 @@ public class FileWatchActor {
 
     public void setMaxPublishAtOnce(final Integer maxPublishAtOnce) {
         this.maxPublishAtOnce = maxPublishAtOnce;
-    }
-
-    public Integer getNewFileCacheTimeout() {
-        return newFileCacheTimeout;
-    }
-
-    public void setNewFileCacheTimeout(final Integer newFileCacheTimeout) {
-        this.newFileCacheTimeout = newFileCacheTimeout;
     }
 
     public Integer getRate() {

@@ -1,29 +1,30 @@
 package org.monroe.team.puzzle.apps.mediacatalog;
 
-import org.monroe.team.puzzle.apps.mediacatalog.events.PictureFileMessage;
-import org.monroe.team.puzzle.apps.mediacatalog.events.VideoFileMessage;
-import org.monroe.team.puzzle.core.events.MessagePublisher;
 import org.monroe.team.puzzle.pieces.fs.FileWatchActor;
+import org.monroe.team.puzzle.pieces.fs.FileWatchOperationLog;
 import org.monroe.team.puzzle.pieces.fs.FolderCleanupActor;
-import org.monroe.team.puzzle.pieces.fs.events.FileMessage;
-import org.monroe.team.puzzle.pieces.metadata.MediaFileMetadataExtractActor;
-import org.monroe.team.puzzle.pieces.fs.FilePerExtensionFilterActor;
-import org.monroe.team.puzzle.pieces.metadata.PictureMetadataExtractor;
-import org.monroe.team.puzzle.pieces.metadata.VideoMetadataExtractor;
+import org.monroe.team.puzzle.pieces.fs.TempCachedFileWatchOperationLog;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import java.io.File;
-import java.util.Arrays;
 
 @Configuration
 public class MediaCatalogConfiguration {
 
     @Bean
+    @Qualifier("media.dispatching.watcher.operation.log")
+    @ConfigurationProperties(prefix="media.dispatching.watcher.operation.log", ignoreUnknownFields = true)
+    public FileWatchOperationLog fileWatcherOperationLog(){
+        return new TempCachedFileWatchOperationLog();
+    }
+
+    @Bean
     @ConfigurationProperties(prefix="media.dispatching.watcher", ignoreUnknownFields = true)
-    public FileWatchActor fileWatcher(){
-        return new FileWatchActor();
+    public FileWatchActor fileWatcher(
+            @Qualifier("media.dispatching.watcher.operation.log")
+            FileWatchOperationLog fileWatchOperationLog){
+        return new FileWatchActor(fileWatchOperationLog);
     }
 
     @Bean

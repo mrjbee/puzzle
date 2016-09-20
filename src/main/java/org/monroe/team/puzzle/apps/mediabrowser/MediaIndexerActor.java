@@ -18,9 +18,12 @@ public class MediaIndexerActor extends AbstractMessageSubscriber<MediaFileMessag
     @Autowired
     MediaFileRepository repository;
 
+    @Autowired
+    FileToIdGenerator fileToIdGenerator;
+
     @Override
     public void onMessage(final MediaFileMessage message) {
-        long fileHash = Hashing.md5().hashString(message.filePath, Charset.defaultCharset()).asLong();
+        long fileHash = fileToIdGenerator.toId(message.filePath);
         if (!repository.exists(fileHash)) {
             MediaFileEntity entity = repository.save(new MediaFileEntity(
                     fileHash,
