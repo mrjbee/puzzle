@@ -1,5 +1,8 @@
 package org.monroe.team.puzzle.apps.mediabrowser.indexer;
 
-import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface MediaFileRepository extends CrudRepository<MediaFileEntity,Long> {}
+public interface MediaFileRepository extends JpaRepository<MediaFileEntity,Long> {
+
+
+}
