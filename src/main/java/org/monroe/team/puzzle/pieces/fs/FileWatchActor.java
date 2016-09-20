@@ -2,6 +2,7 @@ package org.monroe.team.puzzle.pieces.fs;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import org.hibernate.validator.constraints.NotEmpty;
 import org.monroe.team.puzzle.core.events.MessagePublisher;
 import org.monroe.team.puzzle.core.fs.config.FolderPropertiesProvider;
 import org.monroe.team.puzzle.core.log.Logs;
@@ -43,6 +44,8 @@ public class FileWatchActor {
     Integer newFileCacheTimeout;
     @NotNull
     Integer rate;
+    @NotEmpty
+    String chanel;
 
     @PostConstruct
     public void checkWatchFolders() {
@@ -133,7 +136,8 @@ public class FileWatchActor {
             }
 
             FileMessage fileEvent = new FileMessage(childFile.getAbsolutePath(), name, ext);
-            messagePublisher.post("import.explored.file",fileEvent);
+            //"import.explored.file"
+            messagePublisher.post(chanel,fileEvent);
             exploredFileCache.put(fileEvent.filePath, true);
             return true;
         } else {
@@ -176,5 +180,13 @@ public class FileWatchActor {
 
     public void setRate(final Integer rate) {
         this.rate = rate;
+    }
+
+    public String getChanel() {
+        return chanel;
+    }
+
+    public void setChanel(final String chanel) {
+        this.chanel = chanel;
     }
 }

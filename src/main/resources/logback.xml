@@ -30,7 +30,7 @@
     <logger name="org.hibernate" level="WARN"/>
     <logger name="org.apache" level="WARN"/>
     <logger name="ch.qos.logback" level="WARN"/>
-    <logger name="puzzle.Bus" level="INFO"/>
+    <logger name="puzzle.Bus" level="WARN"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
