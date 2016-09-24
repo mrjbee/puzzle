@@ -19,7 +19,10 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class LinuxVideoFileMetadataExtractor {
 
-    //exiftool VID_20160915_001549.mp4
+    private final static String KEY_CREATION_DATE = "Media Create Date".toLowerCase();
+    private final static String KEY_IMAGE_WIDTH = "Source Image Width".toLowerCase();
+    private final static String KEY_IMAGE_HEIGHT = "Source Image Height".toLowerCase();
+
     //ffmpeg -i VID_20160915_001549.mp4 -ss 00:00:05 -vframes 1 output2.jpg
 
     @Autowired
@@ -30,9 +33,17 @@ public class LinuxVideoFileMetadataExtractor {
 
     private final String exifDataToolCommand = "exiftool '{in.file}' >> '{out.file}'";
 
+    public int[] imageSize(File file){
+        Map<String, String> metadataMap = getMetadataMap(file);
+        String width = metadataMap.get(KEY_IMAGE_WIDTH.toLowerCase());
+        String height = metadataMap.get(KEY_IMAGE_HEIGHT.toLowerCase());
+        return new int[]{Integer.parseInt(width), Integer.parseInt(height)};
+    }
+
+
     public Date creationDate(File file){
         Map<String, String> metadataMap = getMetadataMap(file);
-        String creationDateString = metadataMap.get("Media Create Date".toLowerCase());
+        String creationDateString = metadataMap.get(KEY_CREATION_DATE.toLowerCase());
         SimpleDateFormat formatter = new SimpleDateFormat("yyyy:MM:dd HH:mm:ss");
         try {
             return formatter.parse(creationDateString);

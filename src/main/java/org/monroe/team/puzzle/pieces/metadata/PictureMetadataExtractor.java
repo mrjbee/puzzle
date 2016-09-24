@@ -36,11 +36,15 @@ public class PictureMetadataExtractor implements MediaFileMetadataExtractor{
         Date date
                 = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
 
+        Integer width = directory.getInteger(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH);
+        Integer height = directory.getInteger(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT);
+
         if (date == null){
             log.warn("Failed to get creation date. Use now() date for = {}", file.getAbsoluteFile());
             date = new Date();
         }
 
-        return new MediaMetadata(MediaMetadata.Type.PICTURE, date.getTime());
+
+        return new MediaMetadata(MediaMetadata.Type.PICTURE, date.getTime(), new int[]{width, height});
     }
 }

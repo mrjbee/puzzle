@@ -14,6 +14,8 @@ public class MediaFileEntity {
     private Long id;
     private String fileName;
     private Long creationDate;
+    private int width;
+    private int height;
 
     @Enumerated(EnumType.STRING)
     private MediaMetadata.Type type;
@@ -23,11 +25,15 @@ public class MediaFileEntity {
     public MediaFileEntity(final Long id,
                            final String fileName,
                            final Long creationDate,
-                           final MediaMetadata.Type type) {
+                           final MediaMetadata.Type type,
+                           final int width,
+                           final int height) {
         this.id = id;
         this.fileName = fileName;
         this.creationDate = creationDate;
         this.type = type;
+        this.width = width;
+        this.height = height;
     }
 
     public Long getId() {
@@ -44,6 +50,22 @@ public class MediaFileEntity {
 
     public MediaMetadata.Type getType() {
         return type;
+    }
+
+    public int getWidth() {
+        return width;
+    }
+
+    public void setWidth(final int width) {
+        this.width = width;
+    }
+
+    public int getHeight() {
+        return height;
+    }
+
+    public void setHeight(final int height) {
+        this.height = height;
     }
 
     @Override

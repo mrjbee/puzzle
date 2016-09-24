@@ -26,8 +26,10 @@ public class MediaIndexerActor extends AbstractMessageSubscriber<MediaFileMessag
                     fileHash,
                     message.filePath,
                     message.metadata.creationDate,
-                    message.metadata.type
-            ));
+                    message.metadata.type,
+                    message.metadata.imageSize[0],
+                    message.metadata.imageSize[1]
+                    ));
             log.info("Metadata saved as id = {} : {}",fileHash, entity);
         } else {
             log.info("Metadata with id = {} skipped. Message : {}",fileHash, message);

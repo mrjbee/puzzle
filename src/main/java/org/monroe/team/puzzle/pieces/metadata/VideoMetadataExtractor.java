@@ -19,6 +19,6 @@ public class VideoMetadataExtractor implements MediaFileMetadataExtractor{
     @Override
     public MediaMetadata metadata(final File file) {
          Date date = metadataExtractor.creationDate(file);
-         return new MediaMetadata(MediaMetadata.Type.VIDEO, date.getTime());
+         return new MediaMetadata(MediaMetadata.Type.VIDEO, date.getTime(), metadataExtractor.imageSize(file));
     }
 }
