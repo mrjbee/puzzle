@@ -1,6 +1,7 @@
 package org.monroe.team.puzzle.apps.mediabrowser;
 
 import org.monroe.team.puzzle.apps.mediabrowser.indexer.MediaFileRepository;
+import org.monroe.team.puzzle.pieces.fs.FileHasher;
 import org.monroe.team.puzzle.pieces.fs.FileWatchOperationLog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -16,11 +17,11 @@ public class IndexBasedFileWatchOperationLog implements FileWatchOperationLog {
     @Autowired
     MediaFileRepository repository;
     @Autowired
-    FileToIdGenerator fileToIdGenerator;
+    FileHasher fileHasher;
 
     @Override
     public boolean isFileWasLogged(final File file) {
-        long fileHash = fileToIdGenerator.toId(file.getAbsolutePath());
+        long fileHash = fileHasher.hash(file.getAbsolutePath());
         return repository.exists(fileHash);
     }
 
