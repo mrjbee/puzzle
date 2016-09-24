@@ -1,6 +1,5 @@
 package org.monroe.team.puzzle.pieces.fs;
 
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -53,7 +52,7 @@ public class LinuxVideoFileMetadataExtractor {
     }
 
     private Map<String, String> getMetadataMap(final File file) {
-        File metadataFolder = getFileMetadaFolder(file);
+        File metadataFolder = getMetadataFolder(file);
         File exifDataFile = new File(metadataFolder,"metadata.exif");
         if (!exifDataFile.exists()) {
             generateMetadaFile(file, exifDataFile);
@@ -106,7 +105,7 @@ public class LinuxVideoFileMetadataExtractor {
         }
     }
 
-    private File getFileMetadaFolder(final File file) {
+    private File getMetadataFolder(final File file) {
         long hash = fileHasher.hash(file.getAbsolutePath());
         File fileMetadataFolder = new File(new File(tmpFolder), Long.toString(hash));
         if (!fileMetadataFolder.exists() && !fileMetadataFolder.mkdirs()){
@@ -121,5 +120,34 @@ public class LinuxVideoFileMetadataExtractor {
 
     public void setTmpFolder(final String tmpFolder) {
         this.tmpFolder = tmpFolder;
+    }
+
+    public File getVideoThumbnail(final File file) {
+        File metadataFolder = getMetadataFolder(file);
+        File thumbnailFile = new File(metadataFolder,"thumbnail.jpg");
+        if (!thumbnailFile.exists()) {
+            //TODO: Per resource monitor required here
+            String cmd = "ffmpeg -i '" + file.getAbsolutePath() + "' -ss 00:00:01 -vframes 1 '" + thumbnailFile.getAbsolutePath() + "'";
+            try {
+                Process process = Runtime.getRuntime().exec(new String[]{
+                        "/bin/sh",
+                        "-c",
+                        cmd});
+                process.waitFor(10, TimeUnit.SECONDS);
+                int exitStatus = process.exitValue();
+                if (exitStatus != 0 && thumbnailFile.exists()){
+                    thumbnailFile.delete();
+                }
+                if (exitStatus != 0){
+                    throw new RuntimeException("Could not generate thumbnail file. Cmd ends with = "+exitStatus +" For cmd = "+cmd);
+                }
+                if (!thumbnailFile.exists()){
+                    throw new RuntimeException("No thumbnail file produced. Cmd ends with = "+exitStatus +" For cmd = "+cmd);
+                }
+            } catch (IOException|InterruptedException e) {
+                throw new RuntimeException("Could not execute = "+cmd, e);
+            }
+        }
+        return thumbnailFile;
     }
 }
