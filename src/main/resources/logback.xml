@@ -6,7 +6,7 @@
             <Pattern>%d{HH:mm:ss.SSS} [%thread] [%mdc{transactionId:-N/A}] [%-5level] [%logger] %msg%n</Pattern>
         </layout>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
+            <level>WARN</level>
         </filter>
     </appender>
 

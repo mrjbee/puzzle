@@ -49,7 +49,7 @@ public class CommonConfig {
     @ConfigurationProperties(prefix="picture-file-filter", ignoreUnknownFields = true)
     public FilePerExtensionFilterActor pictureFilter(){
         return new FilePerExtensionFilterActor(
-                Arrays.asList(".jpg", ".png", ".bmp"),
+                Arrays.asList(".jpeg",".jpg", ".png", ".bmp"),
                 new FilePerExtensionFilterActor.Publisher() {
                     @Override
                     public void republish(

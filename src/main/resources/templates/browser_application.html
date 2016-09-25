@@ -7,16 +7,17 @@
     <link rel="stylesheet" href="webjars/jquery-mobile/1.4.5/jquery.mobile.css" />
     <script src="webjars/jquery/1.11.1/jquery.js"></script>
     <script src="webjars/jquery-mobile/1.4.5/jquery.mobile.js"></script>
-    <!--
-       <script type="text/javascript">
-            $(document).ready(function() {
-            $('p').animate({
-                fontSize: '48px'
-            }, "slow");
-        });
-        </script>
-    -->
+    <script src="js/browser_application.js"></script>
 </head>
+<style>
+    .floating-box {
+    float: left;
+    width:  200px;
+    height: 150px;
+    margin: 1px;
+    border: 0px solid #73AD21;
+    }
+</style>
 <body>
 
 
@@ -26,9 +27,9 @@
         <h1>Media Browser</h1>
     </div><!-- /header -->
 
-    <div role="main" class="ui-content">
-        <p>Page content goes here.</p>
-    </div><!-- /content -->
+    <div id="panel_image" role="main" class="ui-content">
+        
+    </div>
 
     <div data-role="footer" data-position="fixed">
         <h4>Page Footer</h4>

@@ -13,7 +13,6 @@ import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -47,10 +46,12 @@ public class BrowserApi {
             @Override
             public MediaResource convert(final MediaFileEntity source) {
                 return new MediaResource(
-                        source.getId(),
+                        Long.toString(source.getId()),
                         source.getType().name(),
                         source.getCreationDate(),
-                        new File(source.getFileName()).getName());
+                        new File(source.getFileName()).getName(),
+                        source.getHeight(),
+                        source.getWidth());
             }
         }).getContent();
 
@@ -109,13 +110,13 @@ public class BrowserApi {
 
                 if (widthDiff > heightDiff){
                     outputSize = new Dimension(
-                            (int)(originalWidth * widthDiff),
-                            (int)(originalHeight * widthDiff * originalAspectRation)
+                            Math.round(originalWidth * widthDiff),
+                            Math.round(originalHeight * widthDiff )
                     );
                 } else {
                     outputSize = new Dimension(
-                            (int)(originalWidth * heightDiff * originalAspectRation),
-                            (int)(originalHeight * heightDiff)
+                            Math.round(originalWidth * heightDiff  ),
+                            Math.round(originalHeight * heightDiff)
                     );
                 }
 
@@ -124,6 +125,9 @@ public class BrowserApi {
                         height,
                         BufferedImage.TYPE_INT_RGB);
                 Graphics2D g = resizedImage.createGraphics();
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 
                 int xOffset = (int) ((outputSize.getWidth() - width) / 2);
                 int yOffset = (int) ((outputSize.getHeight() - height) / 2);
@@ -145,31 +149,4 @@ public class BrowserApi {
         }
     }
 
-    public static Dimension getScaledDimension(Dimension imgSize, Dimension boundary) {
-
-        int original_width = imgSize.width;
-        int original_height = imgSize.height;
-        int bound_width = boundary.width;
-        int bound_height = boundary.height;
-        int new_width = original_width;
-        int new_height = original_height;
-
-        // first check if we need to scale width
-        if (original_width > bound_width) {
-            //scale width to fit
-            new_width = bound_width;
-            //scale height to maintain aspect ratio
-            new_height = (new_width * original_height) / original_width;
-        }
-
-        // then check if we need to scale even with the new height
-        if (new_height > bound_height) {
-            //scale height to fit instead
-            new_height = bound_height;
-            //scale width to maintain aspect ratio
-            new_width = (new_height * original_width) / original_height;
-        }
-
-        return new Dimension(new_width, new_height);
-    }
 }

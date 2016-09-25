@@ -29,9 +29,13 @@ repositories {
 	mavenCentral()
 }
 
+configurations {
+	dev
+}
 
 dependencies {
-	compile("org.springframework.boot:spring-boot-devtools")
+	dev("org.springframework.boot:spring-boot-devtools")
+
 	compile("io.projectreactor:reactor-bus")
 	compile('com.drewnoakes:metadata-extractor:2.9.1')
 	compile('org.springframework.boot:spring-boot-starter')
@@ -46,4 +50,10 @@ dependencies {
 	compile("org.springframework.boot:spring-boot-starter-data-jpa")
 	compile("com.h2database:h2")
 	testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+
+bootRun {
+	// Use Spring Boot DevTool only when we run Gradle bootRun task
+	classpath = sourceSets.main.runtimeClasspath + configurations.dev
+	systemProperty "spring.profiles.active", "dev,default"
 }
