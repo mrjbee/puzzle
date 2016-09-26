@@ -1,19 +1,50 @@
-$(document).ready(function() {
+var cellSizeLayoutIndex = 0;
+var cellSizesPerLayout = []
 
-/*
-     $.mobile.loading( "show", {
-                text: "Loading. PLease wait",
-                textVisible: false,
-     });
-    $.mobile.loading( "hide" );
-*/
-    loadMoreMediaItems(0)
+$( window ).resize(function() {
+    var cellSize = currentCellSizeLayout()
+    var thumbnailsPanelWidth = Math.round(panelImageWidth()/cellSize.width) * cellSize.width
+
+    $('.center-panel').each(function() {
+            $(this).width(thumbnailsPanelWidth);
     });
+});
 
+$(document).ready(function() {
+    cellSizesPerLayout.push(bigGridLayoutSaleSize())
+    loadMoreMediaItems(0)
+});
+
+function currentCellSizeLayout(){
+    return cellSizesPerLayout[cellSizeLayoutIndex]
+}
+
+function panelImageWidth(){
+    return $(document).width() - 200;
+}
+
+function bigGridLayoutSaleSize(){
+    var pageWidth = panelImageWidth()
+    var cellWidth = Math.round(pageWidth / 2)
+    if (cellWidth > 300) {
+        cellWidth = 300
+    }
+
+    return {
+        width:cellWidth,
+        height:Math.round(cellWidth * 0.8)
+    }
+}
 
 var hasMoreMediaItems = true
 
 function loadMoreMediaItems(offsetIndex){
+
+    $.mobile.loading( "show", {
+                text: "Loading. PLease wait",
+                textVisible: false,
+    });
+
     $.get("/api/media-stream?offset="+offsetIndex)
         .success(function(data) {
             hasMoreMediaItems = data.mediaResourceIds.length == data.paging.limit
@@ -24,6 +55,7 @@ function loadMoreMediaItems(offsetIndex){
         })
         .error(function() { alert("Error during loading media-stream"); })
         .complete(function() {
+            $.mobile.loading( "hide" );
         });
 }
 
@@ -44,8 +76,10 @@ function onNewMediaItem(mediaResource){
 }
 
 function onMedia(media){
+    var cellSize = currentCellSizeLayout()
+    var thumbnailsPanelWidth = Math.round(panelImageWidth()/cellSize.width) * cellSize.width
+    var panel_image = $("#panel_image")
     var groupId = "sort_date_panel_" + media.sortByDate.getTime();
-    //console.log(sortDateMs+": "+media.sortByDate.toDateString())
     var mediaPanel;
     if ( $( "#"+groupId ).length ) {
         var mediaPanel =  $( "#"+groupId )
@@ -56,18 +90,23 @@ function onMedia(media){
             .addClass("ui-bar-a")
             .addClass("ui-corner-all")
             .text(media.sortByDate.toDateString());
-        var mediaContentPanel = $('<div>').addClass("ui-body")
+        var mediaContentPanel = $('<div>')
+            .addClass("ui-body")
+            .addClass('center-panel')
+            .width(thumbnailsPanelWidth)
         mediaPanel.append(mediaPanelTitle)
         mediaPanel.append(mediaContentPanel)
-        $("#panel_image").append(mediaPanel)
+        panel_image.append(mediaPanel)
     }
-    //TODO replace with selector
+
     var content = mediaPanel.children("div");
 
     var thumbnailPanel = $('<div>')
         .attr("id","thumbnail_"+media.orig.id)
-        .addClass("floating-box");
+        .addClass("floating-box")
+        .width(cellSize.width - 2)
+        .height(cellSize.height - 2);
     thumbnailPanel.append($('<img>')
-        .attr("src","api/thumbnail/"+media.orig.id+"?width=200&height=150"))
+        .attr("src","api/thumbnail/"+media.orig.id+"?width="+(cellSize.width-2)+"&height="+(cellSize.height-2)))
     content.append(thumbnailPanel)
 }

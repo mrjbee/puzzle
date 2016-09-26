@@ -55,6 +55,8 @@ public class BrowserApi {
             }
         }).getContent();
 
+        answerList.get(0);
+
         return new MediaStream(
                 new Paging(
                         offset,
