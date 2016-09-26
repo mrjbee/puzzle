@@ -1,9 +1,9 @@
 var cellSizeLayoutIndex = 0;
 var cellSizesPerLayout = []
 
-$( window ).resize(function() {
+$(window).resize(function() {
     var cellSize = currentCellSizeLayout()
-    var thumbnailsPanelWidth = Math.round(panelImageWidth()/cellSize.width) * cellSize.width
+    var thumbnailsPanelWidth = Math.floor(panelImageWidth()/cellSize.width) * cellSize.width
 
     $('.center-panel').each(function() {
             $(this).width(thumbnailsPanelWidth);
@@ -20,12 +20,12 @@ function currentCellSizeLayout(){
 }
 
 function panelImageWidth(){
-    return $(document).width() - 200;
+    return $(window).width();
 }
 
 function bigGridLayoutSaleSize(){
     var pageWidth = panelImageWidth()
-    var cellWidth = Math.round(pageWidth / 2)
+    var cellWidth = Math.floor(pageWidth / 2)
     if (cellWidth > 300) {
         cellWidth = 300
     }
@@ -77,7 +77,7 @@ function onNewMediaItem(mediaResource){
 
 function onMedia(media){
     var cellSize = currentCellSizeLayout()
-    var thumbnailsPanelWidth = Math.round(panelImageWidth()/cellSize.width) * cellSize.width
+    var thumbnailsPanelWidth = Math.floor(panelImageWidth()/cellSize.width) * cellSize.width
     var panel_image = $("#panel_image")
     var groupId = "sort_date_panel_" + media.sortByDate.getTime();
     var mediaPanel;
@@ -88,7 +88,6 @@ function onMedia(media){
         var mediaPanelTitle = $('<h3>')
             .addClass("ui-bar")
             .addClass("ui-bar-a")
-            .addClass("ui-corner-all")
             .text(media.sortByDate.toDateString());
         var mediaContentPanel = $('<div>')
             .addClass("ui-body")
