@@ -1,4 +1,13 @@
 function initialize_browser_module(){
+
+   $(window).resize(function() {
+        var cellSize = thumbnailCellSize()
+        var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
+        $('.panel-thumbnails').each(function() {
+                $(this).width(thumbnailsPanelWidth);
+        });
+   });
+
    loadMoreMediaItems(0)
 }
 
@@ -66,34 +75,38 @@ function onMedia(media){
     var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
 
     var panel_image = $("#panel_image")
-    var groupId = "sort_date_panel_" + media.sortByDate.getTime();
-    var mediaPanel;
+    var groupId = "panel_thumbnails_" + media.sortByDate.getTime();
+    var panel_thumbnails;
     if ( $( "#"+groupId ).length ) {
-        var mediaPanel =  $( "#"+groupId )
+        panel_thumbnails =  $( "#"+groupId )
     } else {
-        var mediaPanel = $('<div>').attr("id",groupId);
-        var mediaPanelTitle = $('<h3>')
-            .addClass("ui-bar")
-            .addClass("ui-bar-a")
-            .text(media.sortByDate.toDateString());
-        var mediaContentPanel = $('<div>')
-            .addClass("ui-body")
-            .addClass('center-panel')
-            .width(thumbnailsPanelWidth)
-        mediaPanel.append(mediaPanelTitle)
-        mediaPanel.append(mediaContentPanel)
-        panel_image.append(mediaPanel)
+        panel_thumbnails = $('<div>').attr("id",groupId)
+            .append(
+                $('<h3>')
+                    .addClass("ui-bar")
+                    .addClass("ui-bar-a")
+                    .text(media.sortByDate.toDateString())
+            )
+            .append(
+                 $('<div>')
+                    .addClass("ui-body")
+                    .addClass('panel-thumbnails')
+                    .width(thumbnailsPanelWidth)
+            )
+
+        panel_image.append(panel_thumbnails)
     }
 
-    var content = mediaPanel.children("div");
-
-    var thumbnailPanel = $('<div>')
-        .attr("id","thumbnail_"+media.orig.id)
-        .addClass("floating-box")
-        .width(cellSize.width - 2)
-        .height(cellSize.height - 2);
-    thumbnailPanel.append($('<img>')
-        .attr("src","api/thumbnail/"+media.orig.id+"?width="+MAX_THUMBNAIL_CELL_SIZE+"&height="+MAX_THUMBNAIL_CELL_SIZE)
-        .addClass("image-thumbnail"))
-    content.append(thumbnailPanel)
+    var content = panel_thumbnails.children("div");
+    content.append(
+        $('<div>')
+            .attr("id","thumbnail_"+media.orig.id)
+            .addClass("panel-thumbnail")
+            .width(cellSize.width - 6)
+            .height(cellSize.height - 6)
+            .append(
+                $('<img>')
+                    .attr("src","api/thumbnail/"+media.orig.id+"?width="+MAX_THUMBNAIL_CELL_SIZE+"&height="+MAX_THUMBNAIL_CELL_SIZE)
+            )
+    )
 }

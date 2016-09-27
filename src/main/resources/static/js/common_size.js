@@ -7,16 +7,6 @@ function initialize_size_module(){
    _cellSizesPerLayout.push(_initBigGridThumbnailCellSize())
 }
 
-$(window).resize(function() {
-    var cellSize = thumbnailCellSize()
-    var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
-    $('.center-panel').each(function() {
-            $(this).width(thumbnailsPanelWidth);
-    });
-});
-
-
-
 function _initBigGridThumbnailCellSize(){
     var cellWidth = Math.floor(pageWidth() / 2)
     if (cellWidth > MAX_THUMBNAIL_CELL_SIZE) {
