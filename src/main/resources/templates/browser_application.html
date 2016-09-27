@@ -8,9 +8,20 @@
     <script src="webjars/jquery/1.11.1/jquery.js"></script>
     <script src="webjars/jquery-mobile/1.4.5/jquery.mobile.js"></script>
     <script src="js/browser_application.js"></script>
+    <script src="js/common_size.js"></script>
+    <script style="js">
+        $(document).ready(function() {
+            initialize_size_module()
+            initialize_browser_module()
+        });
+    </script>
 </head>
 <style>
-
+    .image-thumbnail{
+        width:100%;
+        height:100%;
+        object-fit: cover;
+    }
     .floating-box {
         float: left;
         margin: 1px;

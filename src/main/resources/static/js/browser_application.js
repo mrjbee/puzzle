@@ -1,39 +1,5 @@
-var cellSizeLayoutIndex = 0;
-var cellSizesPerLayout = []
-
-$(window).resize(function() {
-    var cellSize = currentCellSizeLayout()
-    var thumbnailsPanelWidth = Math.floor(panelImageWidth()/cellSize.width) * cellSize.width
-
-    $('.center-panel').each(function() {
-            $(this).width(thumbnailsPanelWidth);
-    });
-});
-
-$(document).ready(function() {
-    cellSizesPerLayout.push(bigGridLayoutSaleSize())
-    loadMoreMediaItems(0)
-});
-
-function currentCellSizeLayout(){
-    return cellSizesPerLayout[cellSizeLayoutIndex]
-}
-
-function panelImageWidth(){
-    return $(window).width();
-}
-
-function bigGridLayoutSaleSize(){
-    var pageWidth = panelImageWidth()
-    var cellWidth = Math.floor(pageWidth / 2)
-    if (cellWidth > 300) {
-        cellWidth = 300
-    }
-
-    return {
-        width:cellWidth,
-        height:Math.round(cellWidth * 0.8)
-    }
+function initialize_browser_module(){
+   loadMoreMediaItems(0)
 }
 
 var hasMoreMediaItems = true
@@ -52,6 +18,7 @@ function loadMoreMediaItems(offsetIndex){
             for (i = 0; i < data.mediaResourceIds.length; i++) {
                 onNewMediaItem(data.mediaResourceIds[i])
             }
+            onNewMediaItem(null)
         })
         .error(function() { alert("Error during loading media-stream"); })
         .complete(function() {
@@ -60,6 +27,10 @@ function loadMoreMediaItems(offsetIndex){
 }
 
 function onNewMediaItem(mediaResource){
+    if (mediaResource == null){
+        onMedia(null)
+        return
+    }
     var creationDate = new Date(mediaResource.creationDate);
 
     var sortingDate  = new Date(
@@ -75,9 +46,25 @@ function onNewMediaItem(mediaResource){
     onMedia(media)
 }
 
+var firstMediaInACell = null
+var selectedPattern = null;
+
+function randomInteger(min, max) {
+    var rand = min - 0.5 + Math.random() * (max - min + 1)
+    rand = Math.round(rand);
+    return rand;
+}
+
 function onMedia(media){
-    var cellSize = currentCellSizeLayout()
-    var thumbnailsPanelWidth = Math.floor(panelImageWidth()/cellSize.width) * cellSize.width
+    if (media == null){
+        return
+    }
+    if (selectedPattern == null){
+        selectedPattern = randomInteger(0,2)
+    }
+    var cellSize = thumbnailCellSize()
+    var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
+
     var panel_image = $("#panel_image")
     var groupId = "sort_date_panel_" + media.sortByDate.getTime();
     var mediaPanel;
@@ -106,6 +93,7 @@ function onMedia(media){
         .width(cellSize.width - 2)
         .height(cellSize.height - 2);
     thumbnailPanel.append($('<img>')
-        .attr("src","api/thumbnail/"+media.orig.id+"?width="+(cellSize.width-2)+"&height="+(cellSize.height-2)))
+        .attr("src","api/thumbnail/"+media.orig.id+"?width="+MAX_THUMBNAIL_CELL_SIZE+"&height="+MAX_THUMBNAIL_CELL_SIZE)
+        .addClass("image-thumbnail"))
     content.append(thumbnailPanel)
 }
