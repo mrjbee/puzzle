@@ -3,6 +3,7 @@ package org.monroe.team.puzzle.apps.mediabrowser.api;
 import org.monroe.team.puzzle.apps.mediabrowser.api.dto.MediaResource;
 import org.monroe.team.puzzle.apps.mediabrowser.api.dto.MediaStream;
 import org.monroe.team.puzzle.apps.mediabrowser.api.dto.Paging;
+import org.monroe.team.puzzle.apps.mediabrowser.api.ext.ChunkPageable;
 import org.monroe.team.puzzle.apps.mediabrowser.indexer.MediaFileEntity;
 import org.monroe.team.puzzle.apps.mediabrowser.indexer.MediaFileRepository;
 import org.monroe.team.puzzle.pieces.fs.LinuxVideoFileMetadataExtractor;
@@ -12,6 +13,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -37,7 +39,7 @@ public class BrowserApi {
             @RequestParam(value="offset", defaultValue="0") Integer offset,
             @RequestParam(value="limit", defaultValue="100") Integer limit) {
 
-        PageRequest pageRequest = new PageRequest(
+        Pageable pageRequest = new ChunkPageable(
                 offset, limit, Sort.Direction.DESC, "creationDate"
         );
 
@@ -54,8 +56,6 @@ public class BrowserApi {
                         source.getWidth());
             }
         }).getContent();
-
-        answerList.get(0);
 
         return new MediaStream(
                 new Paging(

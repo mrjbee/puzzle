@@ -8,21 +8,22 @@ function initialize_browser_module(){
         });
    });
 
-   loadMoreMediaItems(0)
+   loadMoreMediaItems()
 }
 
 var hasMoreMediaItems = true
-
-function loadMoreMediaItems(offsetIndex){
+var _mediaItemsOffset = 0;
+function loadMoreMediaItems(){
 
     $.mobile.loading( "show", {
                 text: "Loading. PLease wait",
                 textVisible: false,
     });
 
-    $.get("/api/media-stream?offset="+offsetIndex)
+    $.get("/api/media-stream?offset="+_mediaItemsOffset+"&limit=10")
         .success(function(data) {
             hasMoreMediaItems = data.mediaResourceIds.length == data.paging.limit
+            _mediaItemsOffset += data.mediaResourceIds.length
             console.log("Has more elements:"+hasMoreMediaItems)
             for (i = 0; i < data.mediaResourceIds.length; i++) {
                 onNewMediaItem(data.mediaResourceIds[i])
@@ -64,10 +65,33 @@ function randomInteger(min, max) {
     return rand;
 }
 
+
+var content
 function onMedia(media){
-    if (media == null){
+
+    if (media == null) {
+        if (hasMoreMediaItems){
+            var panel = content
+            if (panel == null){
+                panel = $("#panel_image")
+            }
+            panel.append(
+                $('<div>')
+                    .attr("id", "element_waypoint")
+            )
+            var waypoint = new Waypoint({
+              element: document.getElementById('element_waypoint'),
+              handler: function(direction) {
+                //remove
+                $("#element_waypoint").remove();
+                loadMoreMediaItems()
+              },
+              offset: '100%'
+            })
+        }
         return
     }
+
     if (selectedPattern == null){
         selectedPattern = randomInteger(0,2)
     }
@@ -97,7 +121,7 @@ function onMedia(media){
         panel_image.append(panel_thumbnails)
     }
 
-    var content = panel_thumbnails.children("div");
+    content = panel_thumbnails.children("div");
     content.append(
         $('<div>')
             .attr("id","thumbnail_"+media.orig.id)
