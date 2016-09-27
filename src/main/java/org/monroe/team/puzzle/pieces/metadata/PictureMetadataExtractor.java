@@ -4,6 +4,8 @@ import com.drew.imaging.ImageMetadataReader;
 import com.drew.imaging.ImageProcessingException;
 import com.drew.metadata.Metadata;
 import com.drew.metadata.exif.ExifSubIFDDirectory;
+import com.drew.metadata.jpeg.JpegDirectory;
+import com.drew.metadata.png.PngDirectory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -28,19 +30,48 @@ public class PictureMetadataExtractor implements MediaFileMetadataExtractor{
             throw new RuntimeException(e);
         }
 
+        Date creationDate = null;
+        Integer width = null, height = null;
+
+
         // obtain the Exif directory
-        ExifSubIFDDirectory directory
+        ExifSubIFDDirectory exifDirectory
                 = metadata.getFirstDirectoryOfType(ExifSubIFDDirectory.class);
 
-        // query the tag's value
-        Date date
-                = directory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
+        if (exifDirectory != null){
+            creationDate
+                    = exifDirectory.getDate(ExifSubIFDDirectory.TAG_DATETIME_ORIGINAL);
 
-        if (date == null){
-            log.warn("Failed to get creation date. Use now() date for = {}", file.getAbsoluteFile());
-            date = new Date();
+            width = exifDirectory.getInteger(ExifSubIFDDirectory.TAG_EXIF_IMAGE_WIDTH);
+            height = exifDirectory.getInteger(ExifSubIFDDirectory.TAG_EXIF_IMAGE_HEIGHT);
         }
 
-        return new MediaMetadata(MediaMetadata.Type.PICTURE, date.getTime());
+        if (creationDate == null){
+            log.warn("Failed to get creation date. Use now() date for = {}", file.getAbsoluteFile());
+            creationDate = new Date();
+        }
+
+
+        if (height == null || height == 0 || width == null || width == 0){
+            JpegDirectory jpegDescription = metadata.getFirstDirectoryOfType(JpegDirectory.class);
+            if (jpegDescription != null){
+                height = jpegDescription.getInteger(JpegDirectory.TAG_IMAGE_HEIGHT);
+                width = jpegDescription.getInteger(JpegDirectory.TAG_IMAGE_WIDTH);
+            } else {
+                PngDirectory pngDirectory = metadata.getFirstDirectoryOfType(PngDirectory.class);
+                if (pngDirectory != null){
+                    height = pngDirectory.getInteger(PngDirectory.TAG_IMAGE_HEIGHT);
+                    width = pngDirectory.getInteger(PngDirectory.TAG_IMAGE_WIDTH);
+                }
+            }
+        }
+
+        if (height == null || height == 0 || width == null || width == 0){
+            log.warn("Failed to get width or(and) height for = {}", file.getAbsoluteFile());
+            width = 100;
+            height = 100;
+        }
+
+        return new MediaMetadata(MediaMetadata.Type.PICTURE, creationDate.getTime(), new int[]{width, height});
     }
 }

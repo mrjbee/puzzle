@@ -6,7 +6,7 @@
             <Pattern>%d{HH:mm:ss.SSS} [%thread] [%mdc{transactionId:-N/A}] [%-5level] [%logger] %msg%n</Pattern>
         </layout>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-            <level>INFO</level>
+            <level>WARN</level>
         </filter>
     </appender>
 
@@ -30,7 +30,7 @@
     <logger name="org.hibernate" level="WARN"/>
     <logger name="org.apache" level="WARN"/>
     <logger name="ch.qos.logback" level="WARN"/>
-    <logger name="puzzle.Bus" level="INFO"/>
+    <logger name="puzzle.Bus" level="WARN"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
