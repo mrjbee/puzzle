@@ -6,6 +6,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -63,7 +64,7 @@ public class LinuxVideoFileMetadataExtractor {
     private Map<String, String> exifFileToMap(final File exifDataFile) {
         Map<String, String> metadataMap = new HashMap<>();
         try {
-            List<String> strings = Files.readAllLines(exifDataFile.toPath());
+            List<String> strings = Files.readAllLines(exifDataFile.toPath(), Charset.defaultCharset());
             for (String string : strings) {
                 int colonIndex = string.indexOf(":");
                 if (colonIndex > 0){
@@ -89,8 +90,7 @@ public class LinuxVideoFileMetadataExtractor {
                     "/bin/sh",
                     "-c",
                     cmd});
-            process.waitFor(10, TimeUnit.SECONDS);
-            int exitStatus = process.exitValue();
+            int exitStatus = process.waitFor();
             if (exitStatus != 0 && exifDataFile.exists()){
                 exifDataFile.delete();
             }
@@ -133,8 +133,7 @@ public class LinuxVideoFileMetadataExtractor {
                         "/bin/sh",
                         "-c",
                         cmd});
-                process.waitFor(10, TimeUnit.SECONDS);
-                int exitStatus = process.exitValue();
+                int exitStatus = process.waitFor();
                 if (exitStatus != 0 && thumbnailFile.exists()){
                     thumbnailFile.delete();
                 }
