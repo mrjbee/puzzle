@@ -127,11 +127,61 @@ function onMedia(media){
         $('<div>')
             .attr("id","thumbnail_"+media.orig.id)
             .addClass("panel-thumbnail")
-            .width(cellSize.width - 6)
-            .height(cellSize.height - 6)
+            .width(cellSize.width - 8)
+            .height(cellSize.height - 8)
             .append(
                 $('<img>')
                     .attr("src","api/thumbnail/"+media.orig.id+"?width="+MAX_THUMBNAIL_CELL_SIZE+"&height="+MAX_THUMBNAIL_CELL_SIZE)
+
+            )
+            .append (
+                $('<div>')
+                    .on( "taphold", function( event ) {
+                          onThumbnailLongPress(media.orig.id)
+                    } )
+                   .on( "tap", function( event ) {
+                          onThumbnailPress(media.orig.id)
+                    } )
+
             )
     )
+}
+
+var selectedMediaIds = []
+function onThumbnailPress(mediaId){
+    if (selectedMediaIds.length == 0){
+        alert("Single click is not implemented")
+    } else {
+        ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)
+        selectedMediaIds = []
+    }
+}
+
+function onThumbnailLongPress(mediaId){
+    var mediaIdIndex = $.inArray(mediaId, selectedMediaIds)
+    if (mediaIdIndex == -1){
+        selectedMediaIds.push(mediaId)
+        ui_thumbnail_selectById(mediaId)
+    } else {
+        selectedMediaIds.splice(mediaIdIndex,1)
+        ui_thumbnail_deSelectById(mediaId)
+    }
+}
+
+function ui_updateByIdOrIds(idOrIds, updateFunction){
+    if ($.isArray(idOrIds)){
+        $.each(idOrIds, function( index, value ) {
+            updateFunction(value);
+          })
+    } else {
+        updateFunction(idOrIds);
+    }
+}
+
+function ui_thumbnail_deSelectById(id){
+    $("#thumbnail_"+id+" div").removeClass("selection")
+}
+
+function ui_thumbnail_selectById(id){
+    $("#thumbnail_"+id+" div").addClass("selection")
 }
