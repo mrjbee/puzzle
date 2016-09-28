@@ -83,6 +83,7 @@ function onMedia(media){
               element: document.getElementById('element_waypoint'),
               handler: function(direction) {
                 //remove
+                waypoint.destroy()
                 $("#element_waypoint").remove();
                 loadMoreMediaItems()
               },
