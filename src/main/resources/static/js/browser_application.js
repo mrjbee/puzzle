@@ -150,10 +150,11 @@ function onMedia(media){
 var selectedMediaIds = []
 function onThumbnailPress(mediaId){
     if (selectedMediaIds.length == 0){
-        alert("Single click is not implemented")
+        console.log("Single click is not implemented")
     } else {
         ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)
         selectedMediaIds = []
+        ui_update_footer_on_thumbnail_selection_if_required()
     }
 }
 
@@ -166,6 +167,7 @@ function onThumbnailLongPress(mediaId){
         selectedMediaIds.splice(mediaIdIndex,1)
         ui_thumbnail_deSelectById(mediaId)
     }
+    ui_update_footer_on_thumbnail_selection_if_required()
 }
 
 function ui_updateByIdOrIds(idOrIds, updateFunction){
@@ -178,10 +180,69 @@ function ui_updateByIdOrIds(idOrIds, updateFunction){
     }
 }
 
+function ui_update_footer_on_thumbnail_selection_if_required(){
+    if (selectedMediaIds.length != 0){
+        showHeader()
+        showFooter()
+        //$("[data-role=footer]").toolbar( "show" );
+    } else {
+        hideHeader()
+        hideFooter()
+    }
+}
+
 function ui_thumbnail_deSelectById(id){
     $("#thumbnail_"+id+" div").removeClass("selection")
 }
 
 function ui_thumbnail_selectById(id){
     $("#thumbnail_"+id+" div").addClass("selection")
+}
+
+var lastScrollPosition;
+
+$(document).scroll( function() {
+  var scrollPosition = $(this).scrollTop();
+
+  // Scrolling down
+  if (scrollPosition > lastScrollPosition){
+    hideHeader()
+    hideFooter()
+  }
+
+  // Scrolling up
+  else {
+    showHeader()
+    showFooter()
+  }
+
+  lastScrollPosition = scrollPosition;
+});
+
+function hideHeader(){
+    // If the header is currently showing
+    if (!$('[data-role=header].ui-fixed-hidden').length) {
+      $('[data-role=header]').toolbar('hide');
+    }
+}
+
+function showHeader(){
+// If the header is currently hidden
+    if ($('[data-role=header].ui-fixed-hidden').length) {
+      $('[data-role=header]').toolbar('show');
+    }
+}
+
+function hideFooter(){
+    // If the header is currently showing
+    if (!$('[data-role=footer].ui-fixed-hidden').length) {
+      $('[data-role=footer]').toolbar('hide');
+    }
+}
+
+function showFooter(){
+// If the header is currently hidden
+    if ($('[data-role=footer].ui-fixed-hidden').length) {
+      $('[data-role=footer]').toolbar('show');
+    }
 }
