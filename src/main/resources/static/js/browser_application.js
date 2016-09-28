@@ -9,6 +9,7 @@ function initialize_browser_module(){
    });
 
    $("#drop-selection-btn").click(function (event){
+         vibrate(50)
          ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)
          selectedMediaIds = []
          onSelectedMediaChange()
@@ -144,7 +145,8 @@ function onMedia(media){
             .append (
                 $('<div>')
                     .on( "taphold", function( event ) {
-                          onThumbnailLongPress(media.orig.id)
+                       vibrate(100)
+                       onThumbnailLongPress(media.orig.id)
                     } )
                    .on( "tap", function( event ) {
                           onThumbnailPress(media.orig.id)
@@ -152,6 +154,12 @@ function onMedia(media){
 
             )
     )
+}
+
+function vibrate(ms){
+   if ('vibrate' in navigator) {
+      navigator.vibrate(ms);
+   }
 }
 
 var selectedMediaIds = []
