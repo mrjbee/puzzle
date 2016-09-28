@@ -8,6 +8,13 @@ function initialize_browser_module(){
         });
    });
 
+   $("#drop-selection-btn").click(function (event){
+         ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)
+         selectedMediaIds = []
+         onSelectedMediaChange()
+   })
+
+
    loadMoreMediaItems()
 }
 
@@ -107,7 +114,7 @@ function onMedia(media){
     } else {
         panel_thumbnails = $('<div>').attr("id",groupId)
             .append(
-                $('<h3>')
+                $('<h4>')
                     .addClass("ui-bar")
                     .addClass("ui-bar-a")
                     .text(media.sortByDate.toDateString())
@@ -154,7 +161,7 @@ function onThumbnailPress(mediaId){
     } else {
         ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)
         selectedMediaIds = []
-        ui_update_footer_on_thumbnail_selection_if_required()
+        onSelectedMediaChange()
     }
 }
 
@@ -167,7 +174,7 @@ function onThumbnailLongPress(mediaId){
         selectedMediaIds.splice(mediaIdIndex,1)
         ui_thumbnail_deSelectById(mediaId)
     }
-    ui_update_footer_on_thumbnail_selection_if_required()
+    onSelectedMediaChange()
 }
 
 function ui_updateByIdOrIds(idOrIds, updateFunction){
@@ -180,15 +187,17 @@ function ui_updateByIdOrIds(idOrIds, updateFunction){
     }
 }
 
-function ui_update_footer_on_thumbnail_selection_if_required(){
+function onSelectedMediaChange(){
     if (selectedMediaIds.length != 0){
         showHeader()
         showFooter()
-        //$("[data-role=footer]").toolbar( "show" );
+        $('#drop-selection-btn').show()
     } else {
         hideHeader()
         hideFooter()
+        $('#drop-selection-btn').hide()
     }
+    $('#selected-counter-text').text(selectedMediaIds.length)
 }
 
 function ui_thumbnail_deSelectById(id){
