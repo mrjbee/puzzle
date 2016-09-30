@@ -200,10 +200,10 @@ function ui_updateByIdOrIds(idOrIds, updateFunction){
 function onSelectedMediaChange(){
     if (selectedMediaIds.length != 0){
         showHeader()
-        $('#drop-selection-btn').show()
+        $('#selection-actions-btn-group').show()
     } else {
         hideHeader()
-        $('#drop-selection-btn').hide()
+        $('#selection-actions-btn-group').hide()
     }
     $('#selected-counter-text').text(selectedMediaIds.length)
 }
