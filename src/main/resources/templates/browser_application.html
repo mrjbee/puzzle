@@ -83,10 +83,19 @@
 <div data-role="page">
 
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
+        <div id="selection-actions-btn-group" data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right" style="display: none;">
+            <a href="#" class="ui-btn ui-btn-b"><span id="selected-counter-text">0</span>selected</a>
+            <a href="#" id="drop-selection-btn" class="ui-btn ui-btn-b ui-corner-all ui-icon-forbidden ui-btn-icon-notext">Icon only</a>
+        </div>
         <h1>Media Browser</h1>
+        <!--
+        <div data-role="controlgroup" data-type="horizontal">
+            <a href="#" id="selected-counter-text" class="ui-btn ui-corner-all">0</a>
+            <a href="#" id="drop-selection-btn" class="ui-btn ui-corner-all ui-icon-forbidden ui-btn-icon-right"></a>
+        </div>
         <button style="display: none;" id="drop-selection-btn" class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-corner-all ui-btn-icon-right ui-icon-forbidden">
-            <span id="selected-counter-text">0</span> selected
         </button>
+        -->
     </div><!-- /header -->
 
     <div id="panel_image" role="main" class="ui-content" style="padding: 0px;">
