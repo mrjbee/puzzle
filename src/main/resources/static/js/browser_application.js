@@ -30,6 +30,7 @@ function loadMoreMediaItems(){
 
     $.get("/api/media-stream?offset="+_mediaItemsOffset+"&limit=10")
         .success(function(data) {
+            $("#total-counter-text").text(data.paging.actualCount)
             hasMoreMediaItems = data.mediaResourceIds.length == data.paging.limit
             _mediaItemsOffset += data.mediaResourceIds.length
             console.log("Has more elements:"+hasMoreMediaItems)
@@ -199,11 +200,9 @@ function ui_updateByIdOrIds(idOrIds, updateFunction){
 function onSelectedMediaChange(){
     if (selectedMediaIds.length != 0){
         showHeader()
-        showFooter()
         $('#drop-selection-btn').show()
     } else {
         hideHeader()
-        hideFooter()
         $('#drop-selection-btn').hide()
     }
     $('#selected-counter-text').text(selectedMediaIds.length)
@@ -225,13 +224,11 @@ $(document).scroll( function() {
   // Scrolling down
   if (scrollPosition > lastScrollPosition){
     hideHeader()
-    hideFooter()
   }
 
   // Scrolling up
   else {
     showHeader()
-    showFooter()
   }
 
   lastScrollPosition = scrollPosition;
@@ -248,19 +245,5 @@ function showHeader(){
 // If the header is currently hidden
     if ($('[data-role=header].ui-fixed-hidden').length) {
       $('[data-role=header]').toolbar('show');
-    }
-}
-
-function hideFooter(){
-    // If the header is currently showing
-    if (!$('[data-role=footer].ui-fixed-hidden').length) {
-      $('[data-role=footer]').toolbar('hide');
-    }
-}
-
-function showFooter(){
-// If the header is currently hidden
-    if ($('[data-role=footer].ui-fixed-hidden').length) {
-      $('[data-role=footer]').toolbar('show');
     }
 }
