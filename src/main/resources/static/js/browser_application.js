@@ -167,6 +167,7 @@ function onThumbnailPress(mediaId){
     if (selectedMediaIds.length == 0){
         console.log("Single click is not implemented")
     } else {
+        vibrate(50)
         ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)
         selectedMediaIds = []
         onSelectedMediaChange()
