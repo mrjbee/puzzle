@@ -19,6 +19,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -33,6 +34,17 @@ public class BrowserApi {
     MediaFileRepository repository;
     @Autowired
     LinuxVideoFileMetadataExtractor linuxVideoFileMetadataExtractor;
+
+    private BufferedImage playImage;
+
+    @PostConstruct
+    public void initializeResources(){
+        try {
+            playImage = ImageIO.read(this.getClass().getClassLoader().getResource("video-play-icon.png"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @RequestMapping(value = "/media-stream", method = RequestMethod.GET)
     public MediaStream mediaStream(
@@ -72,8 +84,8 @@ public class BrowserApi {
     @ResponseBody
     public ResponseEntity getThumbnail(
             @PathVariable Long mediaId,
-            @RequestParam(value="width", required=false) Integer width,
-            @RequestParam(value="height", required=false) Integer height) {
+            @RequestParam(value="width", required=false, defaultValue = "100") Integer width,
+            @RequestParam(value="height", required=false, defaultValue = "100") Integer height) {
 
         MediaFileEntity mediaFileEntity = repository.findOne(mediaId);
         if (mediaFileEntity == null){
@@ -88,67 +100,58 @@ public class BrowserApi {
             return ResponseEntity.notFound().build();
         }
 
-        if (width == null || height == null){
-            try {
-                return ResponseEntity.ok()
-                        .contentLength(file.length())
-                        .contentType(MediaType.IMAGE_JPEG)
-                        .body(new InputStreamResource(new FileInputStream(file)));
-            } catch (FileNotFoundException e) {
-                throw new RuntimeException(e);
+        try {
+            BufferedImage originalImage = ImageIO.read(file);
+            int originalWidth = originalImage.getWidth();
+            int originalHeight = originalImage.getHeight();
+            Dimension outputSize = null;
+            float widthDiff =  (float)width/(float)originalWidth;
+            float heightDiff =  (float)height/(float)originalHeight;
+
+            if (widthDiff > heightDiff){
+                outputSize = new Dimension(
+                        Math.round(originalWidth * widthDiff),
+                        Math.round(originalHeight * widthDiff )
+                );
+            } else {
+                outputSize = new Dimension(
+                        Math.round(originalWidth * heightDiff  ),
+                        Math.round(originalHeight * heightDiff)
+                );
             }
-        } else {
-            try {
-                BufferedImage originalImage = ImageIO.read(file);
-                int originalWidth = originalImage.getWidth();
-                int originalHeight = originalImage.getHeight();
-                Dimension outputSize =new Dimension(100, 100);
 
-                float originalAspectRation = (float) originalWidth/(float) originalHeight;
-                float aspectRation = (float) width/(float) height;
+            BufferedImage resizedImage = new BufferedImage(
+                    width,
+                    height,
+                    BufferedImage.TYPE_INT_RGB);
+            Graphics2D g = resizedImage.createGraphics();
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
 
-                float widthDiff =  (float)width/(float)originalWidth;
-                float heightDiff =  (float)height/(float)originalHeight;
+            int xOffset = (int) ((outputSize.getWidth() - width) / 2);
+            int yOffset = (int) ((outputSize.getHeight() - height) / 2);
 
-                if (widthDiff > heightDiff){
-                    outputSize = new Dimension(
-                            Math.round(originalWidth * widthDiff),
-                            Math.round(originalHeight * widthDiff )
-                    );
-                } else {
-                    outputSize = new Dimension(
-                            Math.round(originalWidth * heightDiff  ),
-                            Math.round(originalHeight * heightDiff)
-                    );
-                }
-
-                BufferedImage resizedImage = new BufferedImage(
-                        width,
-                        height,
-                        BufferedImage.TYPE_INT_RGB);
-                Graphics2D g = resizedImage.createGraphics();
-                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-                g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-                g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-
-                int xOffset = (int) ((outputSize.getWidth() - width) / 2);
-                int yOffset = (int) ((outputSize.getHeight() - height) / 2);
-
-                g.drawImage(originalImage, -xOffset, -yOffset,
-                        outputSize.width,
-                        outputSize.height, null);
-                g.dispose();
-
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                ImageIO.write(resizedImage, "jpg", os);
-                return ResponseEntity.ok()
-                        .contentLength(os.size())
-                        .contentType(MediaType.IMAGE_JPEG)
-                        .body(new InputStreamResource(new ByteArrayInputStream(os.toByteArray())));
-            } catch (IOException e) {
-                throw new RuntimeException(e);
+            g.drawImage(originalImage, -xOffset, -yOffset,
+                    outputSize.width,
+                    outputSize.height, null);
+            if (mediaFileEntity.getType() == MediaMetadata.Type.VIDEO) {
+                //g.setColor(new Color(0, 0, 0, 136));
+                //g.fillRect(0,0,width,height);
+                g.drawImage(playImage,
+                        width/2 - playImage.getWidth()/2,
+                        height/2 - playImage.getHeight()/2, null);
             }
+            g.dispose();
+
+            ByteArrayOutputStream os = new ByteArrayOutputStream();
+            ImageIO.write(resizedImage, "jpg", os);
+            return ResponseEntity.ok()
+                    .contentLength(os.size())
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(new InputStreamResource(new ByteArrayInputStream(os.toByteArray())));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
-
 }
