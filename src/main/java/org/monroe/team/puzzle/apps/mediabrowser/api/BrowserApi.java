@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
@@ -23,7 +22,10 @@ import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
 import java.util.List;
 
 @RestController
@@ -38,7 +40,7 @@ public class BrowserApi {
     private BufferedImage playImage;
 
     @PostConstruct
-    public void initializeResources(){
+    public void initializeResources() {
         try {
             playImage = ImageIO.read(this.getClass().getClassLoader().getResource("video-play-icon.png"));
         } catch (IOException e) {
@@ -48,8 +50,8 @@ public class BrowserApi {
 
     @RequestMapping(value = "/media-stream", method = RequestMethod.GET)
     public MediaStream mediaStream(
-            @RequestParam(value="offset", defaultValue="0") Integer offset,
-            @RequestParam(value="limit", defaultValue="100") Integer limit) {
+            @RequestParam(value = "offset", defaultValue = "0") Integer offset,
+            @RequestParam(value = "limit", defaultValue = "100") Integer limit) {
 
         Pageable pageRequest = new ChunkPageable(
                 offset, limit, Sort.Direction.DESC, "creationDate"
@@ -79,24 +81,40 @@ public class BrowserApi {
         );
     }
 
+    @RequestMapping(value = "media/{mediaId}", method = RequestMethod.DELETE)
+    @ResponseBody
+    public ResponseEntity deleteMedia(@PathVariable Long mediaId) {
+        MediaFileEntity mediaFileEntity = repository.findOne(mediaId);
+        if (mediaFileEntity == null) {
+            return ResponseEntity.notFound().build();
+        }
+        File file = new File(mediaFileEntity.getFileName());
+        if ((!file.exists()) || file.delete()) {
+            //TODO: cleanup metadata in case of video
+            repository.delete(mediaFileEntity.getId());
+            return ResponseEntity.ok().build();
+        } else {
+            throw new IllegalStateException("Could not remove file:" + file.getAbsolutePath());
+        }
+    }
 
     @RequestMapping(value = "thumbnail/{mediaId}", method = RequestMethod.GET)
     @ResponseBody
     public ResponseEntity getThumbnail(
             @PathVariable Long mediaId,
-            @RequestParam(value="width", required=false, defaultValue = "100") Integer width,
-            @RequestParam(value="height", required=false, defaultValue = "100") Integer height) {
+            @RequestParam(value = "width", required = false, defaultValue = "100") Integer width,
+            @RequestParam(value = "height", required = false, defaultValue = "100") Integer height) {
 
         MediaFileEntity mediaFileEntity = repository.findOne(mediaId);
-        if (mediaFileEntity == null){
+        if (mediaFileEntity == null) {
             return ResponseEntity.notFound().build();
         }
         File file = new File(mediaFileEntity.getFileName());
-        if (mediaFileEntity.getType() == MediaMetadata.Type.VIDEO){
+        if (mediaFileEntity.getType() == MediaMetadata.Type.VIDEO) {
             file = linuxVideoFileMetadataExtractor.getVideoThumbnail(file);
         }
 
-        if (!file.exists()){
+        if (!file.exists()) {
             return ResponseEntity.notFound().build();
         }
 
@@ -105,17 +123,17 @@ public class BrowserApi {
             int originalWidth = originalImage.getWidth();
             int originalHeight = originalImage.getHeight();
             Dimension outputSize = null;
-            float widthDiff =  (float)width/(float)originalWidth;
-            float heightDiff =  (float)height/(float)originalHeight;
+            float widthDiff = (float) width / (float) originalWidth;
+            float heightDiff = (float) height / (float) originalHeight;
 
-            if (widthDiff > heightDiff){
+            if (widthDiff > heightDiff) {
                 outputSize = new Dimension(
                         Math.round(originalWidth * widthDiff),
-                        Math.round(originalHeight * widthDiff )
+                        Math.round(originalHeight * widthDiff)
                 );
             } else {
                 outputSize = new Dimension(
-                        Math.round(originalWidth * heightDiff  ),
+                        Math.round(originalWidth * heightDiff),
                         Math.round(originalHeight * heightDiff)
                 );
             }
@@ -125,9 +143,9 @@ public class BrowserApi {
                     height,
                     BufferedImage.TYPE_INT_RGB);
             Graphics2D g = resizedImage.createGraphics();
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
             int xOffset = (int) ((outputSize.getWidth() - width) / 2);
             int yOffset = (int) ((outputSize.getHeight() - height) / 2);
@@ -139,8 +157,8 @@ public class BrowserApi {
                 //g.setColor(new Color(0, 0, 0, 136));
                 //g.fillRect(0,0,width,height);
                 g.drawImage(playImage,
-                        width/2 - playImage.getWidth()/2,
-                        height/2 - playImage.getHeight()/2, null);
+                        width / 2 - playImage.getWidth() / 2,
+                        height / 2 - playImage.getHeight() / 2, null);
             }
             g.dispose();
 
