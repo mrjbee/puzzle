@@ -150,7 +150,6 @@ function onMedia(media){
             .append (
                 $('<div>')
                     .on( "taphold", function( event ) {
-                       vibrate(100)
                        onThumbnailLongPress(media.orig.id)
                     } )
                    .on( "tap", function( event ) {
@@ -179,20 +178,27 @@ function onThumbnailPress(mediaId){
         console.log("Single click is not implemented")
     } else {
         vibrate(50)
-        ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)
-        selectedMediaIds = []
-        onSelectedMediaChange()
+        var mediaIdIndex = $.inArray(mediaId, selectedMediaIds)
+        if (mediaIdIndex == -1){
+            selectedMediaIds.push(mediaId)
+            ui_thumbnail_selectById(mediaId)
+        } else {
+            selectedMediaIds.splice(mediaIdIndex,1)
+            ui_thumbnail_deSelectById(mediaId)
+        }
+         onSelectedMediaChange()
     }
 }
 
 function onThumbnailLongPress(mediaId){
-    var mediaIdIndex = $.inArray(mediaId, selectedMediaIds)
-    if (mediaIdIndex == -1){
+    vibrate(100)
+    if (selectedMediaIds.length == 0){
         selectedMediaIds.push(mediaId)
         ui_thumbnail_selectById(mediaId)
     } else {
-        selectedMediaIds.splice(mediaIdIndex,1)
-        ui_thumbnail_deSelectById(mediaId)
+        ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)
+        selectedMediaIds = []
+        onSelectedMediaChange()
     }
     onSelectedMediaChange()
 }
