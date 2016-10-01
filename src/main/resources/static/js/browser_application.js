@@ -15,6 +15,9 @@ function initialize_browser_module(){
          onSelectedMediaChange()
    })
 
+   $( "#pageDelete" ).on( "pagebeforeshow", function( event ) {
+        onDeletePopupShow(selectedMediaIds)
+   } )
 
    loadMoreMediaItems()
 }
@@ -66,7 +69,6 @@ function onNewMediaItem(mediaResource){
 }
 
 var firstMediaInACell = null
-var selectedPattern = null;
 
 function randomInteger(min, max) {
     var rand = min - 0.5 + Math.random() * (max - min + 1)
@@ -102,9 +104,6 @@ function onMedia(media){
         return
     }
 
-    if (selectedPattern == null){
-        selectedPattern = randomInteger(0,2)
-    }
     var cellSize = thumbnailCellSize()
     var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
 
@@ -236,14 +235,47 @@ $(document).scroll( function() {
 
 function hideHeader(){
     // If the header is currently showing
-    if (!$('[data-role=header].ui-fixed-hidden').length) {
-      $('[data-role=header]').toolbar('hide');
+    if (!$('#pageDashboard [data-role=header].ui-fixed-hidden').length) {
+      $('#pageDashboard [data-role=header]').toolbar('hide');
     }
 }
 
 function showHeader(){
 // If the header is currently hidden
-    if ($('[data-role=header].ui-fixed-hidden').length) {
-      $('[data-role=header]').toolbar('show');
+    if ($('#pageDashboard [data-role=header].ui-fixed-hidden').length) {
+      $('#pageDashboard [data-role=header]').toolbar('show');
+    }
+}
+
+function onDeletePopupShow(selectedMediaIds){
+    var deleteThumbnailPanel = $('#panel_delete_images')
+    deleteThumbnailPanel.empty()
+    var cellSize = thumbnailCellSize()
+    var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
+    deleteThumbnailPanel.width(thumbnailsPanelWidth)
+    for (i = 0; i < selectedMediaIds.length; i++) {
+        deleteThumbnailPanel.append(
+            $('<div>')
+                .attr("id","delete_thumbnail_"+selectedMediaIds[i])
+                .addClass("panel-thumbnail")
+                .width(cellSize.width - 8)
+                .height(cellSize.height - 8)
+                .append(
+                    $('<img>')
+                        .attr("src","api/thumbnail/"+selectedMediaIds[i]+"?width="+MAX_THUMBNAIL_CELL_SIZE+"&height="+MAX_THUMBNAIL_CELL_SIZE)
+
+                )
+                .append (
+                    $('<div>')
+                        .on( "taphold", function( event ) {
+                           //vibrate(100)
+                           //onThumbnailLongPress(media.orig.id)
+                        } )
+                       .on( "tap", function( event ) {
+                             // onThumbnailPress(media.orig.id)
+                        } )
+
+                )
+        )
     }
 }
