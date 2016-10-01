@@ -154,8 +154,8 @@ public class BrowserApi {
                     outputSize.width,
                     outputSize.height, null);
             if (mediaFileEntity.getType() == MediaMetadata.Type.VIDEO) {
-                //g.setColor(new Color(0, 0, 0, 136));
-                //g.fillRect(0,0,width,height);
+                g.setColor(new Color(0, 0, 0, 151));
+                g.fillRect(0,0,width,height);
                 g.drawImage(playImage,
                         width / 2 - playImage.getWidth() / 2,
                         height / 2 - playImage.getHeight() / 2, null);

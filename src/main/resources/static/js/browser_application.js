@@ -156,7 +156,13 @@ function onMedia(media){
                    .on( "tap", function( event ) {
                           onThumbnailPress(media.orig.id)
                     } )
-
+            ).append (
+                $('<div>')
+                    .addClass("ui-page-theme-b")
+                    .addClass("ui-btn-b")
+                    .addClass("ui-corner-all")
+                    .addClass("thumbnail_tooltip_"+media.orig.type)
+                    .text(media.orig.type.toLowerCase())
             )
     )
 }

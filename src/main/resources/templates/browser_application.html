@@ -54,13 +54,27 @@
     }
 
     .selection {
-        background: rgba(27, 126, 255, 0.6) none repeat scroll 0% 0%;
+        background: rgba(27, 126, 255, 0.9) none repeat scroll 0% 0%;
     }
+
 
     #selected-counter-text {
         background: #D43069;
         padding: 2px 4px 4px 4px;
         margin-right: 5px;
+    }
+
+    .thumbnail_tooltip_PICTURE {
+        display: none;
+    }
+
+    .thumbnail_tooltip_VIDEO {
+        width: initial !important;
+        height: initial !important;
+        background: rgba(181, 21, 77, 0.95);
+        padding: 10px;width: initial !important;
+        height: initial !important;
+        padding: 5px;
     }
 
     .footer-button-left,
@@ -93,7 +107,7 @@
 
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
         <div id="selection-actions-btn-group" data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right" style="display: none;">
-            <a href="#selectedActionsPopup"  data-rel="popup" data-transition="slideup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"><span id="selected-counter-text">0</span>selected</a>
+            <a href="#selectedActionsPopup"  data-rel="popup" data-transition="slideup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"><span id="selected-counter-text" class="ui-corner-all">0</span>selected</a>
             <a href="#" id="drop-selection-btn" class="ui-btn ui-btn-b ui-corner-all ui-icon-forbidden ui-btn-icon-notext">Icon only</a>
         </div>
         <h1>Media Browser</h1>
