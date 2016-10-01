@@ -19,7 +19,12 @@ function initialize_browser_module(){
         onDeletePopupShow(selectedMediaIds)
    } )
 
-   loadMoreMediaItems()
+    $('#delete-selected-approved-btn').click(function(){
+        onDeleteResourcesAccepted()
+        return false;
+    })
+
+    loadMoreMediaItems()
 }
 
 var hasMoreMediaItems = true
@@ -278,4 +283,41 @@ function onDeletePopupShow(selectedMediaIds){
                 )
         )
     }
+}
+
+function onDeleteResourcesAccepted(){
+    var resultsPromiseMap = {}
+    var mediaRemoveIds = selectedMediaIds.slice();
+    for (i = 0; i < mediaRemoveIds.length; i++) {
+        resultsPromiseMap[mediaRemoveIds[i]] = {
+            result:0
+        }
+
+        $.ajax({
+            resourceId: i,
+            url: '/api/media/'+mediaRemoveIds[i],
+            type: 'DELETE',
+            success: function(result) {
+                resultsPromiseMap[mediaRemoveIds[this.resourceId]].result = 1
+                $("#delete_thumbnail_"+mediaRemoveIds[this.resourceId]).remove();
+                $("#thumbnail_"+mediaRemoveIds[this.resourceId]).remove();
+                var mediaIdIndex = $.inArray(mediaRemoveIds[this.resourceId], selectedMediaIds)
+                selectedMediaIds.splice(mediaIdIndex,1)
+                onSelectedMediaChange()
+            },
+            error: function(result) {
+                resultsPromiseMap[mediaRemoveIds[this.resourceId]].result = 2
+            },
+            complete: function() {
+                for (var id in resultsPromiseMap) {
+                    if(resultsPromiseMap[id].result == 0){
+                        return
+                    }
+                }
+                parent.history.back();
+            }
+        });
+    }
+
+
 }
