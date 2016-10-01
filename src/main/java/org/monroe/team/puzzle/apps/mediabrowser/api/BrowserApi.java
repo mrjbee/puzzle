@@ -22,10 +22,7 @@ import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
 
 @RestController
@@ -96,6 +93,31 @@ public class BrowserApi {
         } else {
             throw new IllegalStateException("Could not remove file:" + file.getAbsolutePath());
         }
+    }
+    @RequestMapping(value = "media/{mediaId}", method = RequestMethod.GET)
+    public ResponseEntity getMedia(
+            @PathVariable Long mediaId) {
+        MediaFileEntity mediaFileEntity = repository.findOne(mediaId);
+        if (mediaFileEntity == null) {
+            return ResponseEntity.notFound().build();
+        }
+        File file = new File(mediaFileEntity.getFileName());
+        if (!file.exists()) {
+            return ResponseEntity.notFound().build();
+        }
+        FileInputStream fileInputStream = null;
+        try {
+            fileInputStream = new FileInputStream(file);
+            return ResponseEntity.ok()
+                    .header("Content-Disposition","inline; filename=\""+file.getName()+"\"")
+                    .contentLength(file.length())
+                    .contentType(mediaFileEntity.getType() == MediaMetadata.Type.VIDEO ?
+                            MediaType.parseMediaType("video/mp4"):MediaType.IMAGE_JPEG)
+                    .body(new InputStreamResource(fileInputStream));
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     @RequestMapping(value = "thumbnail/{mediaId}", method = RequestMethod.GET)

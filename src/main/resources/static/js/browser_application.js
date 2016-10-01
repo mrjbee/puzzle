@@ -24,6 +24,14 @@ function initialize_browser_module(){
         return false;
     })
 
+    $('#open-selection-btn').click(function(){
+        for (i = 0; i < selectedMediaIds.length; i++) {
+            openMediaInTab(selectedMediaIds[i])
+        }
+        parent.history.back();
+        return false;
+    })
+
     loadMoreMediaItems()
 }
 
@@ -172,10 +180,22 @@ function vibrate(ms){
    }
 }
 
+function openMediaInTab(mediaId){
+        var url = window.location.origin+'/api/media/'+mediaId
+        var win = window.open(url, '_blank');
+        /*if (win) {
+            //Browser has allowed it to be opened
+            win.focus();
+        } else {
+            //Browser has blocked it
+            alert('Please allow popups for this website');
+        }*/
+}
+
 var selectedMediaIds = []
 function onThumbnailPress(mediaId){
     if (selectedMediaIds.length == 0){
-        console.log("Single click is not implemented")
+        openMediaInTab(mediaId)
     } else {
         vibrate(50)
         var mediaIdIndex = $.inArray(mediaId, selectedMediaIds)
