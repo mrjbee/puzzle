@@ -389,6 +389,7 @@ function onDeleteResourcesAccepted(){
 
 function onTagPopupShow(selectedMediaIds){
     commonTag = {}
+    commonTagRemove = {}
     var deleteThumbnailPanel = $('#panel_tags_images')
     deleteThumbnailPanel.empty()
     var cellSize = thumbnailCellSize()
@@ -459,6 +460,45 @@ function onApplyTags(){
                 }
             }
 
+            //Update common tags with new colors and tags
+            for (tag in commonTagRemove){
+                if (!(tag in commonTag)){
+                    body.removeTags.push({
+                        name:tag,
+                        color:commonTagRemove[tag]
+                    })
+                }
+            }
+
+            //Update selected media with changes
+            $.each(selectedMediaIds, function(selectedId){
+                var id = selectedMediaIds[selectedId]
+                $.each(commonTag, function(key,val){
+
+                    var index = $.inArray(key,$.map(fetchedMedia[id].tags, function(elem){
+                        return elem.name
+                    }))
+                    if (index == -1){
+                        fetchedMedia[id].tags.push({
+                                                   name: key,
+                                                   color:val
+                                              })
+                    } else {
+                        fetchedMedia[id].tags[index].color = val
+                    }
+                })
+
+                $.each(body.removeTags, function(itag, tag){
+                    var index = $.inArray(tag.name,$.map(fetchedMedia[id].tags, function(elem){
+                        return elem.name
+                    }))
+                    if (index != -1){
+                        fetchedMedia[id].tags.splice(index,1)
+                    }
+                })
+
+            })
+
             $.ajax({
                 url: '/api/tags/update',
                 type: 'POST',
@@ -484,22 +524,32 @@ function onNewCommonTag(title, color){
     onCommonTagsChanged()
 }
 
+var commonTagRemove = {}
+function onRemoveCommonTag(title, color){
+    commonTagRemove[title] = color
+    delete commonTag[title]
+    onCommonTagsChanged()
+}
+
 
 function onCommonTagsChanged(){
     var tagsPanel = $("#common-tag-panel")
     tagsPanel.empty()
-    for (tag in commonTag){
-        tagsPanel.append(
-            $('<div>')
-                .attr("id","common_tag_"+tag)
-                .text(tag)
-                .addClass("ui-page-theme-b")
-                .addClass("ui-btn-b")
-                .addClass("ui-corner-all")
-                .addClass("tag")
-                .addClass("tag-color-"+commonTag[tag])
-        )
-    }
+    $.each(commonTag,function(key, val){
+            tagsPanel.append(
+                $('<div>')
+                    .attr("id","common_tag_"+key)
+                    .text(key)
+                    .addClass("ui-page-theme-b")
+                    .addClass("ui-btn-b")
+                    .addClass("ui-corner-all")
+                    .addClass("tag")
+                    .addClass("tag-color-"+val)
+                    .on( "tap", function( event ) {
+                          onRemoveCommonTag(key, val)
+                    } )
+            )
+        })
 }
 
 function onAllTagsChanged(){

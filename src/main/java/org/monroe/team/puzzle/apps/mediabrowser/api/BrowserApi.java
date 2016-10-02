@@ -114,6 +114,10 @@ public class BrowserApi {
         if ((!file.exists()) || file.delete()) {
             //TODO: cleanup metadata in case of video
             mediFileRepository.delete(mediaFileEntity.getId());
+            List<MediaFileToTagLink> tagLinks =
+                    mediaFileToTagLinkRepository
+                            .findAll(Example.of(new MediaFileToTagLink(mediaFileEntity.getId(), null)));
+            mediaFileToTagLinkRepository.delete(tagLinks);
             return ResponseEntity.ok().build();
         } else {
             throw new IllegalStateException("Could not remove file:" + file.getAbsolutePath());
@@ -230,15 +234,25 @@ public class BrowserApi {
             tagEntities.add(tagRepository.save(new TagEntity(tag.getName(), tag.getColor())));
         }
 
+        if (tagsUpdate.getRemoveTags() != null && !tagsUpdate.getRemoveTags().isEmpty()){
+            for (Tag tag : tagsUpdate.getRemoveTags()) {
+                for (Long mediaId : tagsUpdate.getMediaIds()) {
+                    mediaFileToTagLinkRepository.delete(
+                            new MediaFileToTagLink(
+                                mediaId,
+                                new TagEntity(tag.getName(), tag.getColor()).getId()
+                            )
+                    );
+                }
+            }
+        }
+
         for (Long mediaId : tagsUpdate.getMediaIds()) {
             for (TagEntity tagEntity : tagEntities) {
                 mediaFileToTagLinkRepository.save(new MediaFileToTagLink(mediaId, tagEntity.getId()));
             }
         }
 
-        if (tagsUpdate.getRemoveTags() != null && !tagsUpdate.getRemoveTags().isEmpty()){
-            //TODO: implement removing
-        }
 
         return ResponseEntity.accepted().build();
     }
