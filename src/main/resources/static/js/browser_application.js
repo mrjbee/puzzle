@@ -49,13 +49,27 @@ function initialize_browser_module(){
         return false;
     })
 
+    $.get("/api/tags")
+        .success(function(data) {
+            allTagsMap = {}
+            for (i = 0; i< data.length; i++){
+                allTagsMap[data[i].name] = data[i]
+            }
+            onAllTagsChanged()
+        })
+        .error(function() { alert("Error during loading tags"); });
 
     loadMoreMediaItems()
 }
 
+var allTagsMap = {}
 var hasMoreMediaItems = true
 var _mediaItemsOffset = 0;
 function loadMoreMediaItems(){
+
+    if (_mediaItemsOffset == 0){
+        fetchedMedia = {};
+    }
 
     $.mobile.loading( "show", {
                 text: "Loading. PLease wait",
@@ -79,11 +93,16 @@ function loadMoreMediaItems(){
         });
 }
 
+var fetchedMedia = {}
+
 function onNewMediaItem(mediaResource){
+
     if (mediaResource == null){
         onMedia(null)
         return
     }
+
+    fetchedMedia[mediaResource.id] = mediaResource
     var creationDate = new Date(mediaResource.creationDate);
 
     var sortingDate  = new Date(
@@ -109,7 +128,6 @@ function randomInteger(min, max) {
 
 var content
 function onMedia(media){
-
     if (media == null) {
         if (hasMoreMediaItems){
             var panel = content
@@ -369,6 +387,59 @@ function onDeleteResourcesAccepted(){
     }
 }
 
+function onTagPopupShow(selectedMediaIds){
+    commonTag = {}
+    var deleteThumbnailPanel = $('#panel_tags_images')
+    deleteThumbnailPanel.empty()
+    var cellSize = thumbnailCellSize()
+    var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
+    deleteThumbnailPanel.width(thumbnailsPanelWidth)
+    var tagsCountMap = {}
+    for (i = 0; i < selectedMediaIds.length; i++) {
+        var assignedTags = fetchedMedia[selectedMediaIds[i]].tags
+
+        for(j=0; j < assignedTags.length; j++){
+            if (assignedTags[j].name in tagsCountMap) {
+                tagsCountMap[assignedTags[j].name] = tagsCountMap[assignedTags[j].name] + 1
+            } else {
+                tagsCountMap[assignedTags[j].name] = 1
+            }
+        }
+
+        deleteThumbnailPanel.append(
+            $('<div>')
+                .attr("id","tags_thumbnail_"+selectedMediaIds[i])
+                .addClass("panel-thumbnail")
+                .width(cellSize.width - 8)
+                .height(cellSize.height - 8)
+                .append(
+                    $('<img>')
+                        .attr("src","api/thumbnail/"+selectedMediaIds[i]+"?width="+MAX_THUMBNAIL_CELL_SIZE+"&height="+MAX_THUMBNAIL_CELL_SIZE)
+
+                )
+                .append (
+                    $('<div>')
+                        .on( "taphold", function( event ) {
+                           //vibrate(100)
+                           //onThumbnailLongPress(media.orig.id)
+                        } )
+                       .on( "tap", function( event ) {
+                             // onThumbnailPress(media.orig.id)
+                        } )
+
+                )
+        )
+    }
+
+    for (tag in tagsCountMap) {
+        if (tagsCountMap[tag] == selectedMediaIds.length) {
+            commonTag[tag] = allTagsMap[tag].color
+        }
+    }
+    onCommonTagsChanged()
+}
+
+
 function onApplyTags(){
 
             var body = {
@@ -382,6 +453,10 @@ function onApplyTags(){
                     name:tag,
                     color:commonTag[tag]
                 })
+                allTagsMap[tag] = {
+                    name:tag,
+                    color:commonTag[tag]
+                }
             }
 
             $.ajax({
@@ -399,6 +474,7 @@ function onApplyTags(){
                     parent.history.back();
                 }
             });
+            onAllTagsChanged()
 }
 
 var commonTag = {}
@@ -424,4 +500,24 @@ function onCommonTagsChanged(){
                 .addClass("tag-color-"+commonTag[tag])
         )
     }
+}
+
+function onAllTagsChanged(){
+    var tagsPanel = $("#all-tag-panel")
+    tagsPanel.empty()
+    $.each(allTagsMap,function(key, val){
+        tagsPanel.append(
+            $('<div>')
+                .attr("id","common_tag_"+key)
+                .text(key)
+                .addClass("ui-page-theme-b")
+                .addClass("ui-btn-b")
+                .addClass("ui-corner-all")
+                .addClass("tag")
+                .addClass("tag-color-"+val.color)
+                .on( "tap", function( event ) {
+                      onNewCommonTag(key, val.color)
+                } )
+        )
+    })
 }

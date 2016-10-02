@@ -28,6 +28,7 @@ import java.awt.image.BufferedImage;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 @RestController
@@ -240,5 +241,15 @@ public class BrowserApi {
         }
 
         return ResponseEntity.accepted().build();
+    }
+
+    @RequestMapping(value = "tags", method = RequestMethod.GET)
+    @ResponseBody
+    public List<Tag> tags() {
+        List<Tag> tags = new LinkedList<>();
+        for (TagEntity tagEntity : tagRepository.findAll()) {
+            tags.add(new Tag(tagEntity.getTitle(),tagEntity.getColor()));
+        }
+        return tags;
     }
 }
