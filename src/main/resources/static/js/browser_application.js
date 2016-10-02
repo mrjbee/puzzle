@@ -44,7 +44,7 @@ function loadMoreMediaItems(){
                 textVisible: false,
     });
 
-    $.get("/api/media-stream?offset="+_mediaItemsOffset+"&limit=10")
+    $.get("/api/media-stream?offset="+_mediaItemsOffset+"&limit=50")
         .success(function(data) {
             $("#total-counter-text").text(data.paging.actualCount)
             hasMoreMediaItems = data.mediaResourceIds.length == data.paging.limit
@@ -70,8 +70,7 @@ function onNewMediaItem(mediaResource){
 
     var sortingDate  = new Date(
         creationDate.getFullYear(),
-        creationDate.getMonth(),
-        creationDate.getDate(), 0,0,0,0)
+        creationDate.getMonth(),0,0,0,0,0)
 
     var media = {
         orig:mediaResource,
@@ -131,7 +130,7 @@ function onMedia(media){
                 $('<h4>')
                     .addClass("ui-bar")
                     .addClass("ui-bar-a")
-                    .text(media.sortByDate.toDateString())
+                    .text(moment(media.sortByDate).format("MMMM YYYY"))
             )
             .append(
                  $('<div>')
