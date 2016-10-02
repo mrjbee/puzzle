@@ -3,6 +3,7 @@ package org.monroe.team.puzzle.apps.mediabrowser.api;
 import org.monroe.team.puzzle.apps.mediabrowser.api.dto.MediaResource;
 import org.monroe.team.puzzle.apps.mediabrowser.api.dto.MediaStream;
 import org.monroe.team.puzzle.apps.mediabrowser.api.dto.Paging;
+import org.monroe.team.puzzle.apps.mediabrowser.api.dto.TagsUpdate;
 import org.monroe.team.puzzle.apps.mediabrowser.api.ext.ChunkPageable;
 import org.monroe.team.puzzle.apps.mediabrowser.indexer.MediaFileEntity;
 import org.monroe.team.puzzle.apps.mediabrowser.indexer.MediaFileRepository;
@@ -94,6 +95,7 @@ public class BrowserApi {
             throw new IllegalStateException("Could not remove file:" + file.getAbsolutePath());
         }
     }
+
     @RequestMapping(value = "media/{mediaId}", method = RequestMethod.GET)
     public ResponseEntity getMedia(
             @PathVariable Long mediaId) {
@@ -109,10 +111,10 @@ public class BrowserApi {
         try {
             fileInputStream = new FileInputStream(file);
             return ResponseEntity.ok()
-                    .header("Content-Disposition","inline; filename=\""+file.getName()+"\"")
+                    .header("Content-Disposition", "inline; filename=\"" + file.getName() + "\"")
                     .contentLength(file.length())
                     .contentType(mediaFileEntity.getType() == MediaMetadata.Type.VIDEO ?
-                            MediaType.parseMediaType("video/mp4"):MediaType.IMAGE_JPEG)
+                            MediaType.parseMediaType("video/mp4") : MediaType.IMAGE_JPEG)
                     .body(new InputStreamResource(fileInputStream));
         } catch (FileNotFoundException e) {
             throw new RuntimeException(e);
@@ -177,7 +179,7 @@ public class BrowserApi {
                     outputSize.height, null);
             if (mediaFileEntity.getType() == MediaMetadata.Type.VIDEO) {
                 g.setColor(new Color(0, 0, 0, 151));
-                g.fillRect(0,0,width,height);
+                g.fillRect(0, 0, width, height);
                 g.drawImage(playImage,
                         width / 2 - playImage.getWidth() / 2,
                         height / 2 - playImage.getHeight() / 2, null);
@@ -193,5 +195,12 @@ public class BrowserApi {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @RequestMapping(value = "tags/update", method = RequestMethod.POST)
+    @ResponseBody
+    public ResponseEntity updateTags(@RequestBody TagsUpdate tagsUpdate) {
+        System.out.println(tagsUpdate);
+        return ResponseEntity.accepted().build();
     }
 }

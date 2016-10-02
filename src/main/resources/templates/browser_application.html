@@ -73,9 +73,32 @@
         width: initial !important;
         height: initial !important;
         background: rgba(181, 21, 77, 0.95);
-        padding: 10px;width: initial !important;
+        padding: 5px;
+    }
+
+    .tag {
+        width: initial !important;
         height: initial !important;
         padding: 5px;
+        margin: 5px;
+        float: left;
+    }
+
+
+    .tag-color-purple{
+        background: #A00B84;
+    }
+
+    .tag-color-green{
+        background: #07B769;
+    }
+
+    .tag-color-blue{
+        background: #2378BB;
+    }
+
+    .tag-color-red{
+        background: rgba(181, 21, 77, 0.95);
     }
 
     .footer-button-left,
@@ -133,7 +156,38 @@
         <div id="panel_delete_images" role="main" class="ui-content panel-thumbnails" style="padding: 0px;">
         </div><!-- /content -->
 </div><!-- /page -->
+<div data-role="page" id="pageTagsEditor">
 
+    <div data-role="header" data-position="fixed" data-tap-toggle="false">
+        <a href="#pageDashboard" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Cancel</a>
+        <h1>Tags Editor</h1>
+        <button id='apply-tags-btn' class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-check">Apply</button>
+    </div><!-- /header -->
+    <div role="main" class="ui-content" style="padding: 0px;">
+        <div id="panel_tags_images" role="main" class="ui-content panel-thumbnails" style="padding: 0px;">
+        </div>
 
+        <h3 class="ui-bar ui-bar-a ui-corner-all">Assigned Tags</h3>
+        <div class="ui-body ui-body-a ui-corner-all">
+            <p>List of all common resource tags. Click to remove a tag for all resources</p>
+            <div id="common-tag-panel" role="main" class="ui-content"></div>
+        </div>
+
+        <h3 class="ui-bar ui-bar-a ui-corner-all">Tags Space</h3>
+        <div class="ui-body ui-body-a ui-corner-all">
+            <p>List of all existing tags. Click to assign or create and assign new</p>
+            <div data-role="controlgroup" data-theme="b" data-type="horizontal">
+                <select id="new-tag-color-option">
+                    <option>Red</option>
+                    <option>Purple</option>
+                    <option>Green</option>
+                    <option>Blue</option>
+                </select>
+                <input id="new-tag-title-edit" data-wrapper-class="controlgroup-textinput ui-btn ui-btn-b" type="text">
+                <button id="new-tag-btn" class="ui-btn ui-btn-b ui-icon-tag ui-btn-icon-left">Assign tag</button>
+            </div>
+        </div>
+    </div>
+</div><!-- /page -->
 </body>
 </html>

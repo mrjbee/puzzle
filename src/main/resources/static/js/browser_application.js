@@ -17,10 +17,27 @@ function initialize_browser_module(){
 
    $( "#pageDelete" ).on( "pagebeforeshow", function( event ) {
         onDeletePopupShow(selectedMediaIds)
-   } )
+    } )
+
 
     $('#delete-selected-approved-btn').click(function(){
         onDeleteResourcesAccepted()
+        return false;
+    })
+
+    $( "#pageTagsEditor" ).on( "pagebeforeshow", function( event ) {
+        onTagPopupShow(selectedMediaIds)
+    } )
+
+    $('#new-tag-btn').click(function(){
+        var newTagTitle = $('#new-tag-title-edit').val().toLowerCase();
+        var newTagColor = $("#new-tag-color-option option:selected" ).text().toLowerCase()
+        onNewCommonTag(newTagTitle, newTagColor);
+        return false;
+    })
+
+    $('#apply-tags-btn').click(function(){
+        onApplyTags()
         return false;
     })
 
@@ -31,6 +48,7 @@ function initialize_browser_module(){
         parent.history.back();
         return false;
     })
+
 
     loadMoreMediaItems()
 }
@@ -349,6 +367,62 @@ function onDeleteResourcesAccepted(){
             }
         });
     }
+}
+
+function onApplyTags(){
+
+            var body = {
+                       "mediaIds": selectedMediaIds,
+                       "assignTags": [],
+                       "removeTags": []
+                   }
+
+            for (tag in commonTag){
+                body.assignTags.push({
+                    name:tag,
+                    color:commonTag[tag]
+                })
+            }
+
+            $.ajax({
+                url: '/api/tags/update',
+                type: 'POST',
+                contentType: 'application/json',
+                dataType: 'json',
+                data: JSON.stringify(body),
+                success: function(result) {
+                    //TODO: update content dash if required
+                },
+                error: function(result) {
+                    alert(result)
+                },
+                complete: function() {
+                    parent.history.back();
+                }
+            });
+}
+
+var commonTag = {}
+function onNewCommonTag(title, color){
+    commonTag[title] = color
+    console.log("New tag"+title)
+    onCommonTagsChanged()
+}
 
 
+function onCommonTagsChanged(){
+    var tagsPanel = $("#common-tag-panel")
+    tagsPanel.empty()
+    for (tag in commonTag){
+        tagsPanel.append(
+            $('<div>')
+                .attr("id","common_tag_"+tag)
+                .text(tag)
+                .addClass("ui-page-theme-b")
+                .addClass("ui-btn-b")
+                .addClass("ui-corner-all")
+                .addClass("tag")
+                .addClass("tag-color-"+commonTag[tag])
+        )
+    }
 }
