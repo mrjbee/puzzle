@@ -20,7 +20,10 @@
     </script>
 </head>
 <style>
-
+    .controlgroup-textinput{
+        padding-top:.22em;
+        padding-bottom:.22em;
+    }
     .panel-thumbnails {
         display: block;
         margin-left: auto;
@@ -100,10 +103,12 @@
 
     <div data-role="popup" id="selectedActionsPopup" data-theme="b">
         <ul data-role="listview" data-inset="true" style="min-width:210px;">
-            <li><a href="#pageDelete" data-transition="slide"
-                   class="ui-btn ui-btn-b ui-mini ui-corner-all ui-shadow ui-btn-inline ui-icon-delete ui-btn-icon-left">Delete resources</a></li>
             <li><a href="#" id="open-selection-btn"
                    class="ui-btn ui-btn-b ui-mini ui-corner-all ui-shadow ui-btn-inline ui-icon-action ui-btn-icon-left">Open in tabs</a></li>
+            <li><a href="#pageTagsEditor" data-transition="slide"
+                   class="ui-btn ui-btn-b ui-mini ui-corner-all ui-shadow ui-btn-inline ui-icon-tag ui-btn-icon-left">Tags Editor</a></li>
+            <li><a href="#pageDelete" data-transition="slide"
+                   class="ui-btn ui-btn-b ui-mini ui-corner-all ui-shadow ui-btn-inline ui-icon-delete ui-btn-icon-left">Delete resources</a></li>
         </ul>
 
     </div>
@@ -132,8 +137,43 @@
         <h4 style="padding: 15px;">Are you sure want to remove following media resources?</h4>
         <div id="panel_delete_images" role="main" class="ui-content panel-thumbnails" style="padding: 0px;">
         </div><!-- /content -->
+    </div>
 </div><!-- /page -->
 
+
+<div data-role="page" id="pageTagsEditor">
+
+    <div data-role="header" data-position="fixed" data-tap-toggle="false">
+        <a href="#pageDashboard" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Cancel</a>
+        <h1>Tags Editor</h1>
+        <button id='apply-tags-btn' class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-check">Apply</button>
+    </div><!-- /header -->
+    <div role="main" class="ui-content" style="padding: 0px;">
+        <div id="panel_tags_images" role="main" class="ui-content panel-thumbnails" style="padding: 0px;">
+        </div>
+
+        <h3 class="ui-bar ui-bar-a ui-corner-all">Assigned Tags</h3>
+        <div class="ui-body ui-body-a ui-corner-all">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse accumsan blandit fermentum. Pellentesque cursus mauris purus, auctor commodo mi ullamcorper nec. Donec semper mattis eros, nec condimentum ante sollicitudin quis. Etiam orci sem, porttitor ut tellus nec, blandit posuere urna. Proin a arcu non lacus pretium faucibus. Aliquam sed est porttitor, ullamcorper urna nec, vehicula lorem. Cras porttitor est lorem, non venenatis diam convallis congue.</p>
+        </div>
+
+        <h3 class="ui-bar ui-bar-a ui-corner-all">Existing Tags</h3>
+        <div class="ui-body ui-body-a ui-corner-all">
+            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse accumsan blandit fermentum. Pellentesque cursus mauris purus, auctor commodo mi ullamcorper nec. Donec semper mattis eros, nec condimentum ante sollicitudin quis. Etiam orci sem, porttitor ut tellus nec, blandit posuere urna. Proin a arcu non lacus pretium faucibus. Aliquam sed est porttitor, ullamcorper urna nec, vehicula lorem. Cras porttitor est lorem, non venenatis diam convallis congue.</p>
+            <div data-role="controlgroup" data-theme="b" data-type="horizontal">
+                <select>
+                    <option>Red</option>
+                    <option>Purple</option>
+                    <option>Green</option>
+                    <option>Black</option>
+                    <option>Blue</option>
+                </select>
+                <input id="currency-controlgroup" data-wrapper-class="controlgroup-textinput ui-btn ui-btn-b" type="text">
+                <button class="ui-btn ui-btn-b ui-icon-tag ui-btn-icon-left">New tag</button>
+            </div>
+        </div>
+    </div>
+</div><!-- /page -->
 
 </body>
 </html>
