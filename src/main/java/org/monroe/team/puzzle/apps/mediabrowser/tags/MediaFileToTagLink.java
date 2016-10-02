@@ -16,7 +16,7 @@ public class MediaFileToTagLink {
     protected MediaFileToTagLink() {
     }
 
-    public MediaFileToTagLink(long mediaId, long tagId) {
+    public MediaFileToTagLink(Long mediaId, Long tagId) {
         id = new Key();
         id.setMediaId(mediaId);
         id.setTagId(tagId);
@@ -34,32 +34,32 @@ public class MediaFileToTagLink {
     public static class Key implements Serializable {
 
         @Column(nullable = false)
-        private long mediaId;
+        private Long mediaId;
 
         @Column(nullable = false)
-        private long tagId;
+        private Long tagId;
 
         public Key() {
         }
 
-        public Key(final long mediaId, final long tagId) {
+        public Key(final Long mediaId, final Long tagId) {
             this.mediaId = mediaId;
             this.tagId = tagId;
         }
 
-        public long getMediaId() {
+        public Long getMediaId() {
             return mediaId;
         }
 
-        public void setMediaId(final long mediaId) {
+        public void setMediaId(final Long mediaId) {
             this.mediaId = mediaId;
         }
 
-        public long getTagId() {
+        public Long getTagId() {
             return tagId;
         }
 
-        public void setTagId(final long tagId) {
+        public void setTagId(final Long tagId) {
             this.tagId = tagId;
         }
 

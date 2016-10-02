@@ -1,5 +1,7 @@
 package org.monroe.team.puzzle.apps.mediabrowser.api.dto;
 
+import java.util.List;
+
 public class MediaResource {
 
     private final String id;
@@ -8,15 +10,17 @@ public class MediaResource {
     private final String name;
     private final int height;
     private final int width;
+    private final List<Tag> tags;
 
 
-    public MediaResource(final String id, final String type, final long creationDate, final String name, final int height, final int width) {
+    public MediaResource(final String id, final String type, final long creationDate, final String name, final int height, final int width, final List<Tag> tags) {
         this.id = id;
         this.type = type;
         this.creationDate = creationDate;
         this.name = name;
         this.height = height;
         this.width = width;
+        this.tags = tags;
     }
 
     public String getId() {
@@ -42,4 +46,9 @@ public class MediaResource {
     public int getWidth() {
         return width;
     }
+
+    public List<Tag> getTags() {
+        return tags;
+    }
+
 }
