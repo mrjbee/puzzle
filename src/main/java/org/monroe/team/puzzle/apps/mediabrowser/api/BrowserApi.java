@@ -1,12 +1,13 @@
 package org.monroe.team.puzzle.apps.mediabrowser.api;
 
-import org.monroe.team.puzzle.apps.mediabrowser.api.dto.MediaResource;
-import org.monroe.team.puzzle.apps.mediabrowser.api.dto.MediaStream;
-import org.monroe.team.puzzle.apps.mediabrowser.api.dto.Paging;
-import org.monroe.team.puzzle.apps.mediabrowser.api.dto.TagsUpdate;
+import org.monroe.team.puzzle.apps.mediabrowser.api.dto.*;
 import org.monroe.team.puzzle.apps.mediabrowser.api.ext.ChunkPageable;
 import org.monroe.team.puzzle.apps.mediabrowser.indexer.MediaFileEntity;
 import org.monroe.team.puzzle.apps.mediabrowser.indexer.MediaFileRepository;
+import org.monroe.team.puzzle.apps.mediabrowser.tags.MediaFileToTagLink;
+import org.monroe.team.puzzle.apps.mediabrowser.tags.MediaFileToTagLinkRepository;
+import org.monroe.team.puzzle.apps.mediabrowser.tags.TagEntity;
+import org.monroe.team.puzzle.apps.mediabrowser.tags.TagRepository;
 import org.monroe.team.puzzle.pieces.fs.LinuxVideoFileMetadataExtractor;
 import org.monroe.team.puzzle.pieces.metadata.MediaMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +25,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -31,7 +33,14 @@ import java.util.List;
 public class BrowserApi {
 
     @Autowired
-    MediaFileRepository repository;
+    MediaFileRepository mediFileRepository;
+
+    @Autowired
+    TagRepository tagRepository;
+
+    @Autowired
+    MediaFileToTagLinkRepository mediaFileToTagLinkRepository;
+
     @Autowired
     LinuxVideoFileMetadataExtractor linuxVideoFileMetadataExtractor;
 
@@ -55,7 +64,7 @@ public class BrowserApi {
                 offset, limit, Sort.Direction.DESC, "creationDate"
         );
 
-        Page<MediaFileEntity> mediaFileEntityList = repository.findAll(pageRequest);
+        Page<MediaFileEntity> mediaFileEntityList = mediFileRepository.findAll(pageRequest);
         List<MediaResource> answerList = mediaFileEntityList.map(new Converter<MediaFileEntity, MediaResource>() {
             @Override
             public MediaResource convert(final MediaFileEntity source) {
@@ -82,14 +91,14 @@ public class BrowserApi {
     @RequestMapping(value = "media/{mediaId}", method = RequestMethod.DELETE)
     @ResponseBody
     public ResponseEntity deleteMedia(@PathVariable Long mediaId) {
-        MediaFileEntity mediaFileEntity = repository.findOne(mediaId);
+        MediaFileEntity mediaFileEntity = mediFileRepository.findOne(mediaId);
         if (mediaFileEntity == null) {
             return ResponseEntity.notFound().build();
         }
         File file = new File(mediaFileEntity.getFileName());
         if ((!file.exists()) || file.delete()) {
             //TODO: cleanup metadata in case of video
-            repository.delete(mediaFileEntity.getId());
+            mediFileRepository.delete(mediaFileEntity.getId());
             return ResponseEntity.ok().build();
         } else {
             throw new IllegalStateException("Could not remove file:" + file.getAbsolutePath());
@@ -99,7 +108,7 @@ public class BrowserApi {
     @RequestMapping(value = "media/{mediaId}", method = RequestMethod.GET)
     public ResponseEntity getMedia(
             @PathVariable Long mediaId) {
-        MediaFileEntity mediaFileEntity = repository.findOne(mediaId);
+        MediaFileEntity mediaFileEntity = mediFileRepository.findOne(mediaId);
         if (mediaFileEntity == null) {
             return ResponseEntity.notFound().build();
         }
@@ -129,7 +138,7 @@ public class BrowserApi {
             @RequestParam(value = "width", required = false, defaultValue = "100") Integer width,
             @RequestParam(value = "height", required = false, defaultValue = "100") Integer height) {
 
-        MediaFileEntity mediaFileEntity = repository.findOne(mediaId);
+        MediaFileEntity mediaFileEntity = mediFileRepository.findOne(mediaId);
         if (mediaFileEntity == null) {
             return ResponseEntity.notFound().build();
         }
@@ -200,7 +209,22 @@ public class BrowserApi {
     @RequestMapping(value = "tags/update", method = RequestMethod.POST)
     @ResponseBody
     public ResponseEntity updateTags(@RequestBody TagsUpdate tagsUpdate) {
-        System.out.println(tagsUpdate);
+
+        List<TagEntity> tagEntities = new ArrayList<>(tagsUpdate.getAssignTags().size());
+        for (Tag tag : tagsUpdate.getAssignTags()) {
+            tagEntities.add(tagRepository.save(new TagEntity(tag.getName(), tag.getColor())));
+        }
+
+        for (Long mediaId : tagsUpdate.getMediaIds()) {
+            for (TagEntity tagEntity : tagEntities) {
+                mediaFileToTagLinkRepository.save(new MediaFileToTagLink(mediaId, tagEntity.getId()));
+            }
+        }
+
+        if (tagsUpdate.getRemoveTags() != null && !tagsUpdate.getRemoveTags().isEmpty()){
+            //TODO: implement removing
+        }
+
         return ResponseEntity.accepted().build();
     }
 }

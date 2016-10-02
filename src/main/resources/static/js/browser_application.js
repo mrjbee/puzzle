@@ -388,7 +388,6 @@ function onApplyTags(){
                 url: '/api/tags/update',
                 type: 'POST',
                 contentType: 'application/json',
-                dataType: 'json',
                 data: JSON.stringify(body),
                 success: function(result) {
                     //TODO: update content dash if required

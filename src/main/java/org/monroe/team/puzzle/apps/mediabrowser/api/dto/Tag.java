@@ -1,5 +1,10 @@
 package org.monroe.team.puzzle.apps.mediabrowser.api.dto;
 
+import org.monroe.team.puzzle.apps.mediabrowser.indexer.MediaFileEntity;
+
+import javax.persistence.ManyToMany;
+import java.util.Set;
+
 public class Tag {
 
     private String name;
@@ -20,4 +25,5 @@ public class Tag {
     public void setColor(final String color) {
         this.color = color;
     }
+
 }
