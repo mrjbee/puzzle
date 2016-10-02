@@ -10,6 +10,14 @@ public class Tag {
     private String name;
     private String color;
 
+    public Tag(final String name, final String color) {
+        this.name = name;
+        this.color = color;
+    }
+
+    public Tag() {
+    }
+
     public String getName() {
         return name;
     }
