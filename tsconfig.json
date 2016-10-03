@@ -1,0 +1,11 @@
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "sourceMap": false,
+        "outDir":"/home/mrjbee/Repos/puzzle_box/src/main/resources/static/generated-js"
+    },
+    "include": [
+        "src/main/typescript/**/*"
+    ]
+}

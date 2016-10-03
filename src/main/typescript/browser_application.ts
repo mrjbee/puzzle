@@ -1,3 +1,4 @@
+/// <reference path="../../../typings/index.d.ts" />
 function initialize_browser_module(){
 
    $(window).resize(function() {
@@ -42,7 +43,7 @@ function initialize_browser_module(){
     })
 
     $('#open-selection-btn').click(function(){
-        for (i = 0; i < selectedMediaIds.length; i++) {
+        for (var i = 0; i < selectedMediaIds.length; i++) {
             openMediaInTab(selectedMediaIds[i])
         }
         parent.history.back();
@@ -52,7 +53,7 @@ function initialize_browser_module(){
     $.get("/api/tags")
         .success(function(data) {
             allTagsMap = {}
-            for (i = 0; i< data.length; i++){
+            for (var i = 0; i< data.length; i++){
                 allTagsMap[data[i].name] = data[i]
             }
             onAllTagsChanged()
@@ -82,7 +83,7 @@ function loadMoreMediaItems(){
             hasMoreMediaItems = data.mediaResourceIds.length == data.paging.limit
             _mediaItemsOffset += data.mediaResourceIds.length
             console.log("Has more elements:"+hasMoreMediaItems)
-            for (i = 0; i < data.mediaResourceIds.length; i++) {
+            for (var i = 0; i < data.mediaResourceIds.length; i++) {
                 onNewMediaItem(data.mediaResourceIds[i])
             }
             onNewMediaItem(null)
@@ -326,7 +327,7 @@ function onDeletePopupShow(selectedMediaIds){
     var cellSize = thumbnailCellSize()
     var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
     deleteThumbnailPanel.width(thumbnailsPanelWidth)
-    for (i = 0; i < selectedMediaIds.length; i++) {
+    for (var i = 0; i < selectedMediaIds.length; i++) {
         deleteThumbnailPanel.append(
             $('<div>')
                 .attr("id","delete_thumbnail_"+selectedMediaIds[i])
@@ -356,25 +357,24 @@ function onDeletePopupShow(selectedMediaIds){
 function onDeleteResourcesAccepted(){
     var resultsPromiseMap = {}
     var mediaRemoveIds = selectedMediaIds.slice();
-    for (i = 0; i < mediaRemoveIds.length; i++) {
-        resultsPromiseMap[mediaRemoveIds[i]] = {
+    mediaRemoveIds.forEach((mediaId,index)=>{
+        resultsPromiseMap[mediaId] = {
             result:0
         }
 
         $.ajax({
-            resourceId: i,
-            url: '/api/media/'+mediaRemoveIds[i],
+            url: '/api/media/'+mediaId,
             type: 'DELETE',
             success: function(result) {
-                resultsPromiseMap[mediaRemoveIds[this.resourceId]].result = 1
-                $("#delete_thumbnail_"+mediaRemoveIds[this.resourceId]).remove();
-                $("#thumbnail_"+mediaRemoveIds[this.resourceId]).remove();
-                var mediaIdIndex = $.inArray(mediaRemoveIds[this.resourceId], selectedMediaIds)
+                resultsPromiseMap[mediaId].result = 1
+                $("#delete_thumbnail_"+mediaId).remove();
+                $("#thumbnail_"+mediaId).remove();
+                var mediaIdIndex = $.inArray(mediaId, selectedMediaIds)
                 selectedMediaIds.splice(mediaIdIndex,1)
                 onSelectedMediaChange()
             },
             error: function(result) {
-                resultsPromiseMap[mediaRemoveIds[this.resourceId]].result = 2
+                resultsPromiseMap[mediaId].result = 2
             },
             complete: function() {
                 for (var id in resultsPromiseMap) {
@@ -385,7 +385,7 @@ function onDeleteResourcesAccepted(){
                 parent.history.back();
             }
         });
-    }
+    })
 }
 
 function onTagPopupShow(selectedMediaIds){
@@ -397,10 +397,10 @@ function onTagPopupShow(selectedMediaIds){
     var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
     deleteThumbnailPanel.width(thumbnailsPanelWidth)
     var tagsCountMap = {}
-    for (i = 0; i < selectedMediaIds.length; i++) {
+    for (var i = 0; i < selectedMediaIds.length; i++) {
         var assignedTags = fetchedMedia[selectedMediaIds[i]].tags
 
-        for(j=0; j < assignedTags.length; j++){
+        for(var j=0; j < assignedTags.length; j++){
             if (assignedTags[j].name in tagsCountMap) {
                 tagsCountMap[assignedTags[j].name] = tagsCountMap[assignedTags[j].name] + 1
             } else {
@@ -432,10 +432,9 @@ function onTagPopupShow(selectedMediaIds){
                 )
         )
     }
-
-    for (tag in tagsCountMap) {
-        if (tagsCountMap[tag] == selectedMediaIds.length) {
-            commonTag[tag] = allTagsMap[tag].color
+    for (var itTag in tagsCountMap) {
+        if (tagsCountMap[itTag] == selectedMediaIds.length) {
+            commonTag[itTag] = allTagsMap[itTag].color
         }
     }
     onCommonTagsChanged()
@@ -450,7 +449,7 @@ function onApplyTags(){
                        "removeTags": []
                    }
 
-            for (tag in commonTag){
+            for (var tag in commonTag){
                 body.assignTags.push({
                     name:tag,
                     color:commonTag[tag]
@@ -462,7 +461,7 @@ function onApplyTags(){
             }
 
             //Update common tags with new colors and tags
-            for (tag in commonTagRemove){
+            for (var tag in commonTagRemove){
                 if (!(tag in commonTag)){
                     body.removeTags.push({
                         name:tag,

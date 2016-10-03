@@ -1,3 +1,5 @@
+/// <reference path="../../../typings/index.d.ts" />
+
 var MAX_THUMBNAIL_CELL_SIZE = 300
 
 var _cellSizeLayoutIndex = 0;
