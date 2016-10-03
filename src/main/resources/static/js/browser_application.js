@@ -319,6 +319,7 @@ function showHeader(){
     }
 }
 
+
 function onDeletePopupShow(selectedMediaIds){
     var deleteThumbnailPanel = $('#panel_delete_images')
     deleteThumbnailPanel.empty()
