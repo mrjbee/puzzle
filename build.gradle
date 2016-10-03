@@ -4,14 +4,19 @@ buildscript {
 	}
 	repositories {
 		mavenCentral()
+		maven {
+			url "https://plugins.gradle.org/m2/"
+		}
 	}
 	dependencies {
-		classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
+		classpath "de.richsource.gradle.plugins:typescript-gradle-plugin:1.8.0"
 	}
 }
 
 apply plugin: 'java'
 apply plugin: 'spring-boot'
+apply plugin: "de.richsource.gradle.plugins.typescript"
 
 jar {
 	baseName = 'box'
@@ -57,3 +62,10 @@ bootRun {
 	classpath = sourceSets.main.runtimeClasspath + configurations.dev
 	systemProperty "spring.profiles.active", "dev,default"
 }
+
+compileTypeScript {
+	source = file("src/main/typescript")
+	projectFile = file("tsconfig.json")
+	outputDir = file("src/main/resources/static/generated-js")
+}
+compileJava.dependsOn(compileTypeScript)

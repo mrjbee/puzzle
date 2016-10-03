@@ -1,4 +1,6 @@
 /// <reference path="../../../typings/index.d.ts" />
+declare var Waypoint: any
+
 function initialize_browser_module(){
 
    $(window).resize(function() {
@@ -48,9 +50,10 @@ function initialize_browser_module(){
         }
         parent.history.back();
         return false;
-    })
+    });
 
-    $.get("/api/tags")
+
+    (<any> $.get("/api/tags"))
         .success(function(data) {
             allTagsMap = {}
             for (var i = 0; i< data.length; i++){
@@ -77,7 +80,7 @@ function loadMoreMediaItems(){
                 textVisible: false,
     });
 
-    $.get("/api/media-stream?offset="+_mediaItemsOffset+"&limit=50")
+    (<any> $.get("/api/media-stream?offset="+_mediaItemsOffset+"&limit=50"))
         .success(function(data) {
             $("#total-counter-text").text(data.paging.actualCount)
             hasMoreMediaItems = data.mediaResourceIds.length == data.paging.limit
