@@ -12,3 +12,5 @@ logs/
 *nohup.out
 remfly-conf.json
 *.db
+.vscode
+generated-js
