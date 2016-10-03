@@ -23,7 +23,7 @@
     .controlgroup-textinput{
         padding-top:.22em;
         padding-bottom:.22em;
-        width: 150px !important;
+        width: 150px;
     }
     .panel-thumbnails {
         display: block;
@@ -127,10 +127,12 @@
 
     <div data-role="popup" id="selectedActionsPopup" data-theme="b">
         <ul data-role="listview" data-inset="true" style="min-width:210px;">
-            <li><a href="#pageDelete" data-transition="slide"
-                   class="ui-btn ui-btn-b ui-mini ui-corner-all ui-shadow ui-btn-inline ui-icon-delete ui-btn-icon-left">Delete resources</a></li>
             <li><a href="#" id="open-selection-btn"
                    class="ui-btn ui-btn-b ui-mini ui-corner-all ui-shadow ui-btn-inline ui-icon-action ui-btn-icon-left">Open in tabs</a></li>
+            <li><a href="#pageTagsEditor" data-transition="slide"
+                   class="ui-btn ui-btn-b ui-mini ui-corner-all ui-shadow ui-btn-inline ui-icon-tag ui-btn-icon-left">Tags Editor</a></li>
+            <li><a href="#pageDelete" data-transition="slide"
+                   class="ui-btn ui-btn-b ui-mini ui-corner-all ui-shadow ui-btn-inline ui-icon-delete ui-btn-icon-left">Delete resources</a></li>
         </ul>
 
     </div>
@@ -159,7 +161,10 @@
         <h4 style="padding: 15px;">Are you sure want to remove following media resources?</h4>
         <div id="panel_delete_images" role="main" class="ui-content panel-thumbnails" style="padding: 0px;">
         </div><!-- /content -->
+    </div>
 </div><!-- /page -->
+
+
 <div data-role="page" id="pageTagsEditor">
 
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
@@ -194,5 +199,6 @@
         </div>
     </div>
 </div><!-- /page -->
+
 </body>
 </html>
