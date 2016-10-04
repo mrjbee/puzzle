@@ -1,29 +1,43 @@
 /// <reference path="../../../typings/index.d.ts" />
 
-var MAX_THUMBNAIL_CELL_SIZE = 300
+/**
+ * ThumbnailMath
+ */
+class ThumbnailMath {
+    
+    static MAX_THUMBNAIL_CELL_SIZE = 300
 
-var _cellSizeLayoutIndex = 0;
-var _cellSizesPerLayout = []
+    private _pageWidth:number
+    private _cellWidth:number
+    private _cellHeight:number
 
-function initialize_size_module(){
-   _cellSizesPerLayout.push(_initBigGridThumbnailCellSize())
-}
-
-function _initBigGridThumbnailCellSize(){
-    var cellWidth = Math.floor(pageWidth() / 2)
-    if (cellWidth > MAX_THUMBNAIL_CELL_SIZE) {
-        cellWidth = MAX_THUMBNAIL_CELL_SIZE
+    constructor(width:number) {
+        this._pageWidth = width
+        this._cellWidth = Math.floor(width / 2)
+        if (this._cellWidth > ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE) {
+            this._cellWidth = ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE
+        }
+        this._cellHeight = this._cellWidth * 0.8    
     }
-    return {
-        width:cellWidth,
-        height:Math.round(cellWidth * 0.8)
+
+    get pageWidth():number{
+        return this._pageWidth
     }
-}
 
-function thumbnailCellSize(){
-    return _cellSizesPerLayout[_cellSizeLayoutIndex]
-}
+    get cellWidth():number{
+        return this._cellWidth
+    }
 
-function pageWidth(){
-    return $(window).width();
+    get cellHeight():number{
+        return this._cellHeight
+    }
+
+    updatePageWidth(width:number){
+        this._pageWidth = width
+    }
+
+    calculateThumbnailsPanelWidth():number{
+        return Math.floor(this.pageWidth/this.cellWidth) * this.cellWidth
+    }
+
 }
