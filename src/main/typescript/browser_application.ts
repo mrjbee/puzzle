@@ -1,13 +1,17 @@
 /// <reference path="../../../typings/index.d.ts" />
+/// <reference path="common_size.ts" />
+
 declare var Waypoint: any
+var thumbnailsMath:ThumbnailMath
 
 function initialize_browser_module(){
-
+   thumbnailsMath = new ThumbnailMath($(window).width())
    $(window).resize(function() {
-        var cellSize = thumbnailCellSize()
-        var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
+        thumbnailsMath.updatePageWidth($(window).width());
+        var cellSize = thumbnailsMath.cellWidth
+        var thumbnailsContentPanelWidth = thumbnailsMath.calculateThumbnailsPanelWidth()
         $('.panel-thumbnails').each(function() {
-                $(this).width(thumbnailsPanelWidth);
+                $(this).width(thumbnailsContentPanelWidth);
         });
    });
 
@@ -156,9 +160,7 @@ function onMedia(media){
         return
     }
 
-    var cellSize = thumbnailCellSize()
-    var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
-
+    var thumbnailsPanelWidth = thumbnailsMath.calculateThumbnailsPanelWidth()
     var panel_image = $("#panel_image")
     var groupId = "panel_thumbnails_" + media.sortByDate.getTime();
     var panel_thumbnails;
@@ -187,11 +189,11 @@ function onMedia(media){
         $('<div>')
             .attr("id","thumbnail_"+media.orig.id)
             .addClass("panel-thumbnail")
-            .width(cellSize.width - 8)
-            .height(cellSize.height - 8)
+            .width(thumbnailsMath.cellWidth - 8)
+            .height(thumbnailsMath.cellHeight - 8)
             .append(
                 $('<img>')
-                    .attr("src","api/thumbnail/"+media.orig.id+"?width="+MAX_THUMBNAIL_CELL_SIZE+"&height="+MAX_THUMBNAIL_CELL_SIZE)
+                    .attr("src","api/thumbnail/"+media.orig.id+"?width="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE+"&height="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE)
 
             )
             .append (
@@ -327,19 +329,18 @@ function showHeader(){
 function onDeletePopupShow(selectedMediaIds){
     var deleteThumbnailPanel = $('#panel_delete_images')
     deleteThumbnailPanel.empty()
-    var cellSize = thumbnailCellSize()
-    var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
+    var thumbnailsPanelWidth = thumbnailsMath.calculateThumbnailsPanelWidth()
     deleteThumbnailPanel.width(thumbnailsPanelWidth)
     for (var i = 0; i < selectedMediaIds.length; i++) {
         deleteThumbnailPanel.append(
             $('<div>')
                 .attr("id","delete_thumbnail_"+selectedMediaIds[i])
                 .addClass("panel-thumbnail")
-                .width(cellSize.width - 8)
-                .height(cellSize.height - 8)
+                .width(thumbnailsMath.cellWidth - 8)
+                .height(thumbnailsMath.cellHeight - 8)
                 .append(
                     $('<img>')
-                        .attr("src","api/thumbnail/"+selectedMediaIds[i]+"?width="+MAX_THUMBNAIL_CELL_SIZE+"&height="+MAX_THUMBNAIL_CELL_SIZE)
+                        .attr("src","api/thumbnail/"+selectedMediaIds[i]+"?width="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE+"&height="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE)
 
                 )
                 .append (
@@ -396,8 +397,7 @@ function onTagPopupShow(selectedMediaIds){
     commonTagRemove = {}
     var deleteThumbnailPanel = $('#panel_tags_images')
     deleteThumbnailPanel.empty()
-    var cellSize = thumbnailCellSize()
-    var thumbnailsPanelWidth = Math.floor(pageWidth()/cellSize.width) * cellSize.width
+    var thumbnailsPanelWidth = thumbnailsMath.calculateThumbnailsPanelWidth()
     deleteThumbnailPanel.width(thumbnailsPanelWidth)
     var tagsCountMap = {}
     for (var i = 0; i < selectedMediaIds.length; i++) {
@@ -415,23 +415,19 @@ function onTagPopupShow(selectedMediaIds){
             $('<div>')
                 .attr("id","tags_thumbnail_"+selectedMediaIds[i])
                 .addClass("panel-thumbnail")
-                .width(cellSize.width - 8)
-                .height(cellSize.height - 8)
+                .width(thumbnailsMath.cellWidth - 8)
+                .height(thumbnailsMath.cellHeight - 8)
                 .append(
                     $('<img>')
-                        .attr("src","api/thumbnail/"+selectedMediaIds[i]+"?width="+MAX_THUMBNAIL_CELL_SIZE+"&height="+MAX_THUMBNAIL_CELL_SIZE)
+                        .attr("src","api/thumbnail/"+selectedMediaIds[i]+"?width="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE+"&height="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE)
 
                 )
                 .append (
                     $('<div>')
                         .on( "taphold", function( event ) {
-                           //vibrate(100)
-                           //onThumbnailLongPress(media.orig.id)
                         } )
                        .on( "tap", function( event ) {
-                             // onThumbnailPress(media.orig.id)
                         } )
-
                 )
         )
     }
