@@ -4,6 +4,7 @@
 
 declare var Waypoint: any
 var THUMBNAILS_MATH = ThumbnailMath.DEFAULT;
+var currentMultiSelectionAction:MultiSelectionAction
 
 function initialize_browser_module(){
    
@@ -25,13 +26,32 @@ function initialize_browser_module(){
          onSelectedMediaChange()
    })
 
-   $( "#pageDelete" ).on( "pagebeforeshow", function( event ) {
-        onDeletePopupShow(selectedMediaIds)
-    } )
+    $("#delete-resources-btn").click(function(){
+        
+        currentMultiSelectionAction = new MultiSelectionAction(
+                "deleteResources",
+                "Delete Selected Media",
+                new DeleteResourcesPageHandler())
 
-
-    $('#delete-selected-approved-btn').click(function(){
-        onDeleteResourcesAccepted()
+        $('#external-page-caption-text').text(currentMultiSelectionAction.humanName)
+        $('#external-page-panel')
+            .empty().load(
+                currentMultiSelectionAction.generatePageUrl(),
+                null,
+                function(){
+                    jQuery.mobile.changePage($("#external-page"))     
+                    currentMultiSelectionAction.actionPageHandler.onLoad(selectedMediaIds)
+                }
+            )
+    })
+    
+    $('#external-page-approved-btn').click(function(){
+        currentMultiSelectionAction.actionPageHandler.onAccept((success)=>{
+            parent.history.back();
+            if(!success) {
+                alert("Please. Try again.")
+            }
+        })
         return false;
     })
 
@@ -314,59 +334,11 @@ function showHeader(){
 }
 
 
-function onDeletePopupShow(selectedMediaIds){
-    var thumbnailContentPanel = $('#panel_delete_images')
-    thumbnailContentPanel.empty()
-    thumbnailContentPanel.width(THUMBNAILS_MATH.calculateThumbnailsPanelWidth())
-    for (var i = 0; i < selectedMediaIds.length; i++) {
-        UiCommons.build(new ThumnailsPanelBuilder("delete_thumbnail")
-            .withMedia(
-                UiCommons.describeMedia()
-                    .withId(selectedMediaIds[i])
-                    .withType(fetchedMedia[selectedMediaIds[i]].type as string))
-            .withParent(thumbnailContentPanel))
-    }
-}
-
-function onDeleteResourcesAccepted(){
-    var resultsPromiseMap = {}
-    var mediaRemoveIds = selectedMediaIds.slice();
-    mediaRemoveIds.forEach((mediaId,index)=>{
-        resultsPromiseMap[mediaId] = {
-            result:0
-        }
-
-        $.ajax({
-            url: '/api/media/'+mediaId,
-            type: 'DELETE',
-            success: function(result) {
-                resultsPromiseMap[mediaId].result = 1
-                $("#delete_thumbnail_"+mediaId).remove();
-                $("#thumbnail_"+mediaId).remove();
-                var mediaIdIndex = $.inArray(mediaId, selectedMediaIds)
-                selectedMediaIds.splice(mediaIdIndex,1)
-                onSelectedMediaChange()
-            },
-            error: function(result) {
-                resultsPromiseMap[mediaId].result = 2
-            },
-            complete: function() {
-                for (var id in resultsPromiseMap) {
-                    if(resultsPromiseMap[id].result == 0){
-                        return
-                    }
-                }
-                parent.history.back();
-            }
-        });
-    })
-}
-
 function onTagPopupShow(selectedMediaIds){
     commonTag = {}
     commonTagRemove = {}
-    var deleteThumbnailPanel = $('#panel_tags_images')
-    deleteThumbnailPanel
+    var thumbnailContentPanel = $('#panel_tags_images')
+    thumbnailContentPanel
         .empty()
         .width(THUMBNAILS_MATH.calculateThumbnailsPanelWidth())
     var tagsCountMap = {}
@@ -387,7 +359,7 @@ function onTagPopupShow(selectedMediaIds){
                 UiCommons.describeMedia()
                     .withId(selectedMediaIds[i])
                     .withType(fetchedMedia[selectedMediaIds[i]].type as string))
-            .withParent(deleteThumbnailPanel))
+            .withParent(thumbnailContentPanel))
     }
 
     for (var itTag in tagsCountMap) {

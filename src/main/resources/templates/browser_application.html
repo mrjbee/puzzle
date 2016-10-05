@@ -12,6 +12,7 @@
     <script src="generated-js/common_size.js"></script>
     <script src="generated-js/ui_builders.js"></script> 
     <script src="generated-js/browser_application.js"></script>
+    <script src="generated-js/multi_selection_action.js"></script>
     <script style="js">
         $.event.special.tap.emitTapOnTaphold = false;
         $(document).ready(function() {             
@@ -131,7 +132,7 @@
                    class="ui-btn ui-btn-b ui-mini ui-corner-all ui-shadow ui-btn-inline ui-icon-action ui-btn-icon-left">Open in tabs</a></li>
             <li><a href="#pageTagsEditor" data-transition="slide"
                    class="ui-btn ui-btn-b ui-mini ui-corner-all ui-shadow ui-btn-inline ui-icon-tag ui-btn-icon-left">Tags Editor</a></li>
-            <li><a href="#pageDelete" data-transition="slide"
+            <li><a id="delete-resources-btn" href="#"
                    class="ui-btn ui-btn-b ui-mini ui-corner-all ui-shadow ui-btn-inline ui-icon-delete ui-btn-icon-left">Delete resources</a></li>
         </ul>
 
@@ -150,17 +151,14 @@
     </div>
 </div><!-- /page -->
 
-<div data-role="page" id="pageDelete">
-
+<div data-role="page" id="external-page">
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
         <a href="#pageDashboard" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Cancel</a>
-        <h1>Removing media</h1>
-        <button id='delete-selected-approved-btn' class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-check">Delete</button>
+        <h1 id="external-page-caption-text">Caption</h1>
+        <button id='external-page-approved-btn' class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-check">Delete</button>
     </div><!-- /header -->
-    <div role="main" class="ui-content" style="padding: 0px;">
-        <h4 style="padding: 15px;">Are you sure want to remove following media resources?</h4>
-        <div id="panel_delete_images" role="main" class="ui-content panel-thumbnails" style="padding: 0px;">
-        </div><!-- /content -->
+    <div id="external-page-panel">
+        
     </div>
 </div><!-- /page -->
 
