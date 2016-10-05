@@ -110,7 +110,7 @@ class ThumnailsPanelBuilder extends ParentAwareBuilder{
                         .addClass("ui-btn-b")
                         .addClass("ui-corner-all")
                         .addClass("thumbnail_tooltip_"+this._media._mediaType.toUpperCase())
-                        .text(+this._media._mediaType.toLocaleLowerCase())
+                        .text(this._media._mediaType.toLowerCase())
                 )
         )
         return answer;
