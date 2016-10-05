@@ -27,22 +27,7 @@ function initialize_browser_module(){
    })
 
     $("#delete-resources-btn").click(function(){
-        
-        currentMultiSelectionAction = new MultiSelectionAction(
-                "deleteResources",
-                "Delete Selected Media",
-                new DeleteResourcesPageHandler())
-
-        $('#external-page-caption-text').text(currentMultiSelectionAction.humanName)
-        $('#external-page-panel')
-            .empty().load(
-                currentMultiSelectionAction.generatePageUrl(),
-                null,
-                function(){
-                    jQuery.mobile.changePage($("#external-page"))     
-                    currentMultiSelectionAction.actionPageHandler.onLoad(selectedMediaIds)
-                }
-            )
+        activateMultiSelectionActionPage(MultiSelectionAction.ACTION_REMOVE_RESOURCES)
     })
     
     $('#external-page-approved-btn').click(function(){
@@ -55,20 +40,8 @@ function initialize_browser_module(){
         return false;
     })
 
-    $( "#pageTagsEditor" ).on( "pagebeforeshow", function( event ) {
-        onTagPopupShow(selectedMediaIds)
-    } )
-
-    $('#new-tag-btn').click(function(){
-        var newTagTitle = $('#new-tag-title-edit').val().toLowerCase();
-        var newTagColor = $("#new-tag-color-option option:selected" ).text().toLowerCase()
-        onNewCommonTag(newTagTitle, newTagColor);
-        return false;
-    })
-
-    $('#apply-tags-btn').click(function(){
-        onApplyTags()
-        return false;
+    $( "#tag-editor-btn" ).click(function(){
+        activateMultiSelectionActionPage(MultiSelectionAction.ACTION_TAG_EDITOR)
     })
 
     $('#open-selection-btn').click(function(){
@@ -86,11 +59,24 @@ function initialize_browser_module(){
             for (var i = 0; i< data.length; i++){
                 allTagsMap[data[i].name] = data[i]
             }
-            onAllTagsChanged()
         })
         .error(function() { alert("Error during loading tags"); });
 
     loadMoreMediaItems()
+}
+
+function activateMultiSelectionActionPage(action:MultiSelectionAction){
+    currentMultiSelectionAction = action
+    $('#external-page-caption-text').text(currentMultiSelectionAction.humanName)
+        $('#external-page-panel')
+            .empty().load(
+                currentMultiSelectionAction.generatePageUrl(),
+                null,
+                function(){
+                    jQuery.mobile.changePage($("#external-page"))     
+                    currentMultiSelectionAction.actionPageHandler.onLoad(selectedMediaIds)
+                }
+            )
 }
 
 var allTagsMap = {}
@@ -147,15 +133,6 @@ function onNewMediaItem(mediaResource){
 
     onMedia(media)
 }
-
-var firstMediaInACell = null
-
-function randomInteger(min, max) {
-    var rand = min - 0.5 + Math.random() * (max - min + 1)
-    rand = Math.round(rand);
-    return rand;
-}
-
 
 var content
 function onMedia(media){
@@ -333,171 +310,3 @@ function showHeader(){
     }
 }
 
-
-function onTagPopupShow(selectedMediaIds){
-    commonTag = {}
-    commonTagRemove = {}
-    var thumbnailContentPanel = $('#panel_tags_images')
-    thumbnailContentPanel
-        .empty()
-        .width(THUMBNAILS_MATH.calculateThumbnailsPanelWidth())
-    var tagsCountMap = {}
-    for (var i = 0; i < selectedMediaIds.length; i++) {
-    
-        var assignedTags = fetchedMedia[selectedMediaIds[i]].tags
-
-        for(var j=0; j < assignedTags.length; j++){
-            if (assignedTags[j].name in tagsCountMap) {
-                tagsCountMap[assignedTags[j].name] = tagsCountMap[assignedTags[j].name] + 1
-            } else {
-                tagsCountMap[assignedTags[j].name] = 1
-            }
-        }
-
-        UiCommons.build(new ThumnailsPanelBuilder("tags_thumbnail")
-            .withMedia(
-                UiCommons.describeMedia()
-                    .withId(selectedMediaIds[i])
-                    .withType(fetchedMedia[selectedMediaIds[i]].type as string))
-            .withParent(thumbnailContentPanel))
-    }
-
-    for (var itTag in tagsCountMap) {
-        if (tagsCountMap[itTag] == selectedMediaIds.length) {
-            commonTag[itTag] = allTagsMap[itTag].color
-        }
-    }
-    onCommonTagsChanged()
-}
-
-
-function onApplyTags(){
-    
-            var body = {
-                       "mediaIds": selectedMediaIds,
-                       "assignTags": [],
-                       "removeTags": []
-                   }
-
-            for (var tag in commonTag){
-                body.assignTags.push({
-                    name:tag,
-                    color:commonTag[tag]
-                })
-                allTagsMap[tag] = {
-                    name:tag,
-                    color:commonTag[tag]
-                }
-            }
-
-            //Update common tags with new colors and tags
-            for (var tag in commonTagRemove){
-                if (!(tag in commonTag)){
-                    body.removeTags.push({
-                        name:tag,
-                        color:commonTagRemove[tag]
-                    })
-                }
-            }
-
-            //Update selected media with changes
-            $.each(selectedMediaIds, function(selectedId){
-                var id = selectedMediaIds[selectedId]
-                $.each(commonTag, function(key,val){
-
-                    var index = $.inArray(key,$.map(fetchedMedia[id].tags, function(elem){
-                        return elem.name
-                    }))
-                    if (index == -1){
-                        fetchedMedia[id].tags.push({
-                                                   name: key,
-                                                   color:val
-                                              })
-                    } else {
-                        fetchedMedia[id].tags[index].color = val
-                    }
-                })
-
-                $.each(body.removeTags, function(itag, tag){
-                    var index = $.inArray(tag.name,$.map(fetchedMedia[id].tags, function(elem){
-                        return elem.name
-                    }))
-                    if (index != -1){
-                        fetchedMedia[id].tags.splice(index,1)
-                    }
-                })
-
-            })
-
-            $.ajax({
-                url: '/api/tags/update',
-                type: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(body),
-                success: function(result) {
-                    //TODO: update content dash if required
-                },
-                error: function(result) {
-                    alert(result)
-                },
-                complete: function() {
-                    parent.history.back();
-                }
-            });
-            onAllTagsChanged()
-}
-
-var commonTag = {}
-function onNewCommonTag(title, color){
-    commonTag[title] = color
-    console.log("New tag"+title)
-    onCommonTagsChanged()
-}
-
-var commonTagRemove = {}
-function onRemoveCommonTag(title, color){
-    commonTagRemove[title] = color
-    delete commonTag[title]
-    onCommonTagsChanged()
-}
-
-
-function onCommonTagsChanged(){
-    var tagsPanel = $("#common-tag-panel")
-    tagsPanel.empty()
-    $.each(commonTag,function(key, val){
-            tagsPanel.append(
-                $('<div>')
-                    .attr("id","common_tag_"+key)
-                    .text(key)
-                    .addClass("ui-page-theme-b")
-                    .addClass("ui-btn-b")
-                    .addClass("ui-corner-all")
-                    .addClass("tag")
-                    .addClass("tag-color-"+val)
-                    .on( "tap", function( event ) {
-                          onRemoveCommonTag(key, val)
-                    } )
-            )
-        })
-}
-
-function onAllTagsChanged(){
-    var tagsPanel = $("#all-tag-panel")
-    tagsPanel.empty()
-    $.each(allTagsMap,function(key, val){
-        tagsPanel.append(
-            $('<div>')
-                .attr("id","common_tag_"+key)
-                .text(key)
-                .addClass("ui-page-theme-b")
-                .addClass("ui-btn-b")
-                .addClass("ui-corner-all")
-                .addClass("tag")
-                .addClass("tag-color-"+val.color)
-                .on( "tap", function( event ) {
-                      onNewCommonTag(key, val.color)
-                } )
-        )
-    })
-}
