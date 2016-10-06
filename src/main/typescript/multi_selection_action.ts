@@ -93,7 +93,7 @@ class TagEditorPageHandler implements ActionPageHandler {
     //TODO: deals with fetchedMedia
     onLoad(selectedResourceIDs:string[]){
 
-        $('#new-tag-btn').click(function(){
+        $('#new-tag-btn').click(()=>{
             var newTagTitle = $('#new-tag-title-edit').val().toLowerCase();
             var newTagColor = $("#new-tag-color-option option:selected" ).text().toLowerCase()
             this.onNewCommonTag(newTagTitle, newTagColor);
