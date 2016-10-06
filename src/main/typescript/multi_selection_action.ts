@@ -1,47 +1,5 @@
 
 /**
- * MultiSelectionAction
- */
-class MultiSelectionAction {
-
-    static ACTION_REMOVE_RESOURCES = new MultiSelectionAction(
-                "deleteResources",
-                "Delete Selected Media",
-                new DeleteResourcesPageHandler())
-
-    static ACTION_TAG_EDITOR = new MultiSelectionAction(
-                "tagEditor",
-                "Tag Editor",
-                new TagEditorPageHandler())
-            
-    private _id:string;
-    private _humanName:string;
-    private _actionPageHandler:ActionPageHandler
-    
-    constructor(id:string, humanName:string, pageHandler:ActionPageHandler){
-        this._id = id
-        this._humanName = humanName
-        this._actionPageHandler = pageHandler
-    }
-
-    get id():string {
-        return this._id
-    }
-
-    get humanName():string {
-        return this._humanName
-    }
-
-    get actionPageHandler():ActionPageHandler {
-        return this._actionPageHandler
-    }
-
-    generatePageUrl():string{
-        return `pages/${this.id}Page.html`
-    }
-}
-
-/**
  * PageHandler
  */
 interface ActionPageHandler {
@@ -87,11 +45,11 @@ class TagEditorPageHandler implements ActionPageHandler {
             }
 
             //Update selected media with changes
-            $.each(selectedMediaIds, function(selectedId){
+            $.each(selectedMediaIds, (selectedId) => {
                 var id = selectedMediaIds[selectedId]
-                $.each(this.commonTag, function(key,val){
+                $.each(this.commonTag, (key,val) =>{
 
-                    var index = $.inArray(key,$.map(fetchedMedia[id].tags, function(elem){
+                    var index = $.inArray(key,$.map(fetchedMedia[id].tags, (elem) =>{
                         return elem.name
                     }))
                     if (index == -1){
@@ -104,8 +62,8 @@ class TagEditorPageHandler implements ActionPageHandler {
                     }
                 })
 
-                $.each(body.removeTags, function(itag, tag){
-                    var index = $.inArray(tag.name,$.map(fetchedMedia[id].tags, function(elem){
+                $.each(body.removeTags, (itag, tag) =>{
+                    var index = $.inArray(tag.name,$.map(fetchedMedia[id].tags, (elem) =>{
                         return elem.name
                     }))
                     if (index != -1){
@@ -195,7 +153,7 @@ class TagEditorPageHandler implements ActionPageHandler {
     private onCommonTagsChanged(){
         var tagsPanel = $("#common-tag-panel")
         tagsPanel.empty()
-        $.each(this.commonTag,function(key, val){
+        $.each(this.commonTag, (key, val) => {
                 tagsPanel.append(
                     $('<div>')
                         .attr("id","common_tag_"+key)
@@ -205,7 +163,7 @@ class TagEditorPageHandler implements ActionPageHandler {
                         .addClass("ui-corner-all")
                         .addClass("tag")
                         .addClass("tag-color-"+val)
-                        .on( "tap", function( event ) {
+                        .on( "tap", (event) => {
                             this.onRemoveCommonTag(key, val)
                         } )
                 )
@@ -216,7 +174,7 @@ class TagEditorPageHandler implements ActionPageHandler {
     private onAllTagsChanged(){
         var tagsPanel = $("#all-tag-panel")
         tagsPanel.empty()
-        $.each(allTagsMap,function(key, val){
+        $.each(allTagsMap, (key, val) => {
             tagsPanel.append(
                 $('<div>')
                     .attr("id","common_tag_"+key)
@@ -226,7 +184,7 @@ class TagEditorPageHandler implements ActionPageHandler {
                     .addClass("ui-corner-all")
                     .addClass("tag")
                     .addClass("tag-color-"+val.color)
-                    .on( "tap", function( event ) {
+                    .on( "tap", (event) => {
                         this.onNewCommonTag(key, val.color)
                     } )
             )
@@ -237,7 +195,7 @@ class TagEditorPageHandler implements ActionPageHandler {
 /**
  * DeleteResourcesPageHandler
  */
-class DeleteResourcesPageHandler implements ActionPageHandler {
+class DeleteMediaPageHandler implements ActionPageHandler {
 
     onAccept(callback:(success:boolean) => void){
         var resultsPromiseMap = {}
@@ -290,5 +248,47 @@ class DeleteResourcesPageHandler implements ActionPageHandler {
                 .withParent(thumbnailContentPanel))
         }
     }
+}
 
+/**
+ * MultiSelectionAction
+ */
+class MultiSelectionAction {
+
+    static ACTION_TAG_EDITOR = new MultiSelectionAction(
+                "tagEditor",
+                "Tag Editor",
+                new TagEditorPageHandler())
+
+    static ACTION_REMOVE_RESOURCES = new MultiSelectionAction(
+                "deleteResources",
+                "Delete Selected Media",
+                new DeleteMediaPageHandler())
+
+            
+    private _id:string;
+    private _humanName:string;
+    private _actionPageHandler:ActionPageHandler
+    
+    constructor(id:string, humanName:string, pageHandler:ActionPageHandler){
+        this._id = id
+        this._humanName = humanName
+        this._actionPageHandler = pageHandler
+    }
+
+    get id():string {
+        return this._id
+    }
+
+    get humanName():string {
+        return this._humanName
+    }
+
+    get actionPageHandler():ActionPageHandler {
+        return this._actionPageHandler
+    }
+
+    generatePageUrl():string{
+        return `pages/${this.id}Page.html`
+    }
 }

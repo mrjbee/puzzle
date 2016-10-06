@@ -1,6 +1,7 @@
 /// <reference path="../../../typings/index.d.ts" />
 /// <reference path="common_size.ts" />
 /// <reference path="ui_builders.ts" />
+/// <reference path="multi_selection_action.ts" />
 
 declare var Waypoint: any
 var THUMBNAILS_MATH = ThumbnailMath.DEFAULT;
