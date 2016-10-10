@@ -18,9 +18,31 @@
         $(document).ready(function() {             
             initialize_browser_module()
         });
+        
+
+        $( document ).on( "pagecreate", "#pageDashboard", function() {
+            $( document ).on( "swipeleft swiperight", "#pageDashboard", function( e ) {
+                // We check if there is no open panel on the page because otherwise
+                // a swipe to close the left panel would also open the right panel (and v.v.).
+                // We do this by checking the data that the framework stores on the page element (panel: open).
+                if ( $( ".ui-page-active" ).jqmData( "panel" ) !== "open" ) {
+                    if ( e.type === "swiperight" ) {
+                        $( "#left-panel" ).panel( "open" );
+                    }
+                }
+            });
+        });
+
     </script>
 </head>
 <style>
+    #pageDashboard * {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        -o-user-select: none;
+        user-select: none;
+    }
     .controlgroup-textinput{
         padding-top:.22em;
         padding-bottom:.22em;
@@ -139,16 +161,24 @@
     </div>
 
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
+        <a href="#left-panel" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-tag ui-btn-b">Tags</a>
+        <h1>Media Browser</h1>
         <div id="selection-actions-btn-group" data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right" style="display: none;">
-            <a href="#selectedActionsPopup"  data-rel="popup" data-transition="slideup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"><span id="selected-counter-text" class="ui-corner-all">0</span>selected</a>
+            <a href="#selectedActionsPopup"  data-rel="popup" data-transition="slideup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"><span id="selected-counter-text" class="ui-corner-all">0</span>media</a>
             <a href="#" id="drop-selection-btn" class="ui-btn ui-btn-b ui-corner-all ui-icon-forbidden ui-btn-icon-notext">Icon only</a>
         </div>
-        <h1>Media Browser</h1>
     </div><!-- /header -->
 
     <div id="panel_image" role="main" class="ui-content" style="padding: 0px;">
 
     </div>
+
+    <div data-role="panel" id="left-panel" data-theme="b">
+         <ul data-role="listview" data-theme="b" class="nav-search">
+            <li data-icon="delete"><a href="#" data-rel="close">Media Tags</a></li>
+        </ul>
+    </div><!-- /panel -->
+
 </div><!-- /page -->
 
 <div data-role="page" id="external-page">

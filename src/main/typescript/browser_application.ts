@@ -299,6 +299,8 @@ $(document).scroll( function() {
 
 function hideHeader(){
     // If the header is currently showing
+    if ($("#left-panel.ui-panel-open").length==1){return}
+
     if (!$('#pageDashboard [data-role=header].ui-fixed-hidden').length) {
       $('#pageDashboard [data-role=header]').toolbar('hide');
     }
