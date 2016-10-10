@@ -11,6 +11,12 @@ function initialize_browser_module(){
    
    THUMBNAILS_MATH.updatePageWidth($(window).width())
    
+    $( "#left-panel" ).on( "panelopen", (event, ui ) => {
+        ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)
+        selectedMediaIds = []
+        onSelectedMediaChange()
+    } );
+
    $(window).resize(function() {
         THUMBNAILS_MATH.updatePageWidth($(window).width());
         var cellSize = THUMBNAILS_MATH.cellWidth
@@ -298,9 +304,10 @@ $(document).scroll( function() {
 });
 
 function hideHeader(){
-    // If the header is currently showing
-    if ($("#left-panel.ui-panel-open").length==1){return}
 
+    if ($("#left-panel.ui-panel-open").length == 1) {return}
+
+    // If the header is currently showing
     if (!$('#pageDashboard [data-role=header].ui-fixed-hidden').length) {
       $('#pageDashboard [data-role=header]').toolbar('hide');
     }
