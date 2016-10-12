@@ -2,10 +2,13 @@
 /// <reference path="common_size.ts" />
 /// <reference path="ui_builders.ts" />
 /// <reference path="multi_selection_action.ts" />
+/// <reference path="tag_manager.ts" />
+
 
 declare var Waypoint: any
 var THUMBNAILS_MATH = ThumbnailMath.DEFAULT;
-var currentMultiSelectionAction:MultiSelectionAction
+var CURRENT_MULTISELECTION_ACTION:MultiSelectionAction
+var TAG_MANAGER = new TagManager()
 
 function initialize_browser_module(){
    
@@ -38,7 +41,7 @@ function initialize_browser_module(){
     })
     
     $('#external-page-approved-btn').click(function(){
-        currentMultiSelectionAction.actionPageHandler.onAccept((success)=>{
+        CURRENT_MULTISELECTION_ACTION.actionPageHandler.onAccept((success)=>{
             parent.history.back();
             if(!success) {
                 alert("Please. Try again.")
@@ -62,9 +65,11 @@ function initialize_browser_module(){
 
     (<any> $.get("/api/tags"))
         .success(function(data) {
-            allTagsMap = {}
             for (var i = 0; i< data.length; i++){
-                allTagsMap[data[i].name] = data[i]
+                TAG_MANAGER.updateTag(new Tag(
+                    (data[i].name) as string,
+                    (data[i].color) as string)
+                )
             }
         })
         .error(function() { alert("Error during loading tags"); });
@@ -73,20 +78,19 @@ function initialize_browser_module(){
 }
 
 function activateMultiSelectionActionPage(action:MultiSelectionAction){
-    currentMultiSelectionAction = action
-    $('#external-page-caption-text').text(currentMultiSelectionAction.humanName)
+    CURRENT_MULTISELECTION_ACTION = action
+    $('#external-page-caption-text').text(CURRENT_MULTISELECTION_ACTION.humanName)
         $('#external-page-panel')
             .empty().load(
-                currentMultiSelectionAction.generatePageUrl(),
+                CURRENT_MULTISELECTION_ACTION.generatePageUrl(),
                 null,
                 function(){
                     jQuery.mobile.changePage($("#external-page"))     
-                    currentMultiSelectionAction.actionPageHandler.onLoad(selectedMediaIds)
+                    CURRENT_MULTISELECTION_ACTION.actionPageHandler.onLoad(selectedMediaIds)
                 }
             )
 }
 
-var allTagsMap = {}
 var hasMoreMediaItems = true
 var _mediaItemsOffset = 0;
 function loadMoreMediaItems(){

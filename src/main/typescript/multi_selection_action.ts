@@ -28,10 +28,11 @@ class TagEditorPageHandler implements ActionPageHandler {
                     name:tag,
                     color:this.commonTag[tag]
                 })
-                allTagsMap[tag] = {
-                    name:tag,
-                    color:this.commonTag[tag]
-                }
+                TAG_MANAGER.updateTag(new Tag(
+                    tag as string,
+                    this.commonTag[tag] as string
+                    
+                ))
             }
 
             //Update common tags with new colors and tags
@@ -131,7 +132,7 @@ class TagEditorPageHandler implements ActionPageHandler {
 
         for (var itTag in tagsCountMap) {
             if (tagsCountMap[itTag] == selectedMediaIds.length) {
-                this.commonTag[itTag] = allTagsMap[itTag].color
+                this.commonTag[itTag] = TAG_MANAGER.tag(itTag).color()
             }
         }
         this.onCommonTagsChanged()    
@@ -170,22 +171,22 @@ class TagEditorPageHandler implements ActionPageHandler {
             })
     }
 
-    //TODO direct access to allTagsMap
+    //TODO pass TAG_MANAGER on creation ?!?
     private onAllTagsChanged(){
         var tagsPanel = $("#all-tag-panel")
         tagsPanel.empty()
-        $.each(allTagsMap, (key, val) => {
+        TAG_MANAGER.each((tag)=>{
             tagsPanel.append(
                 $('<div>')
-                    .attr("id","common_tag_"+key)
-                    .text(key)
+                    .attr("id","common_tag_"+tag.name())
+                    .text(tag.name())
                     .addClass("ui-page-theme-b")
                     .addClass("ui-btn-b")
                     .addClass("ui-corner-all")
                     .addClass("tag")
-                    .addClass("tag-color-"+val.color)
+                    .addClass("tag-color-"+tag.color())
                     .on( "tap", (event) => {
-                        this.onNewCommonTag(key, val.color)
+                        this.onNewCommonTag(tag.name(), tag.color())
                     } )
             )
         })
