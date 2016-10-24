@@ -85,8 +85,7 @@ class ThumnailsPanelBuilder extends ParentAwareBuilder{
                 .height(THUMBNAILS_MATH.cellHeight - 8)
                 .append(
                     $('<img>')
-                        .attr("src","api/thumbnail/"+this._media._mediaId+"?width="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE+"&height="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE)
-
+                        .attr("src","/api/thumbnail/"+this._media._mediaId+"?width="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE+"&height="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE)
                 )
                 .append (
                     $('<div>')

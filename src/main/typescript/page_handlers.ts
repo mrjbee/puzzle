@@ -1,22 +1,20 @@
 
-/**
- * PageHandler
- */
-interface ActionPageHandler {
-    onLoad(selectedResourceIDs:string[])
-    onAccept(callback:(success:boolean) => void)
+interface MultiSelectionPageActionHandler {
+    getPageId():string
+    onLoad(page:JQuery, selectedResourceIDs:string[])
 }
 
-/**
- * TagEditorPageHandler
- */
-class TagEditorPageHandler implements ActionPageHandler {
+class TagManagerPageHandler implements MultiSelectionPageActionHandler {
 
     private commonTag = {}
     private commonTagRemove = {}
+    private currentPage:JQuery
 
-    onAccept(callback:(success:boolean) => void){
-        
+    getPageId():string{
+        return "tag-editor-page"
+    }
+
+    onAccept(page:JQuery){
             var body = {
                        "mediaIds": selectedMediaIds,
                        "assignTags": [],
@@ -82,20 +80,25 @@ class TagEditorPageHandler implements ActionPageHandler {
                     //TODO: update content dash if required
                 },
                 error: function(result) {
-                    callback(false)
+                    alert("Error updating tags. Please try later...")   
                 },
                 complete: function() {
-                    callback(true) 
+                    parent.history.back();
                 }
             });        
     }
 
     //TODO: deals with fetchedMedia
-    onLoad(selectedResourceIDs:string[]){
+    onLoad(page:JQuery, selectedResourceIDs:string[]){
+        this.currentPage = page
+        this.currentPage.find('#tag-editor-approved-btn').click(()=>{
+            this.onAccept(page)
+            return false;
+        })
 
-        $('#new-tag-btn').click(()=>{
-            var newTagTitle = $('#new-tag-title-edit').val().toLowerCase();
-            var newTagColor = $("#new-tag-color-option option:selected" ).text().toLowerCase()
+        this.currentPage.find('#new-tag-btn').click(()=>{
+            var newTagTitle = this.currentPage.find('#new-tag-title-edit').val().toLowerCase();
+            var newTagColor = this.currentPage.find("#new-tag-color-option option:selected" ).text().toLowerCase()
             this.onNewCommonTag(newTagTitle, newTagColor);
             return false;
         })
@@ -104,7 +107,7 @@ class TagEditorPageHandler implements ActionPageHandler {
 
         this.commonTag = {}
         this.commonTagRemove = {}
-        var thumbnailContentPanel = $('#panel_tags_images')
+        var thumbnailContentPanel = this.currentPage.find('#panel_tags_images')
         thumbnailContentPanel
             .empty()
             .width(THUMBNAILS_MATH.calculateThumbnailsPanelWidth())
@@ -151,7 +154,7 @@ class TagEditorPageHandler implements ActionPageHandler {
 
 
     private onCommonTagsChanged(){
-        var tagsPanel = $("#common-tag-panel")
+        var tagsPanel = this.currentPage.find("#common-tag-panel")
         tagsPanel.empty()
         $.each(this.commonTag, (key, val) => {
                 tagsPanel.append(
@@ -172,7 +175,7 @@ class TagEditorPageHandler implements ActionPageHandler {
 
     //TODO direct access to allTagsMap
     private onAllTagsChanged(){
-        var tagsPanel = $("#all-tag-panel")
+        var tagsPanel = this.currentPage.find("#all-tag-panel")
         tagsPanel.empty()
         $.each(allTagsMap, (key, val) => {
             tagsPanel.append(
@@ -195,9 +198,13 @@ class TagEditorPageHandler implements ActionPageHandler {
 /**
  * DeleteResourcesPageHandler
  */
-class DeleteMediaPageHandler implements ActionPageHandler {
+class RemoveMediaPageHandler implements MultiSelectionPageActionHandler {
 
-    onAccept(callback:(success:boolean) => void){
+    getPageId():string{
+        return "delete-media-page"
+    }
+
+    onAccept(page:JQuery){
         var resultsPromiseMap = {}
         var mediaRemoveIds = selectedMediaIds.slice();
         mediaRemoveIds.forEach((mediaId,index)=>{
@@ -229,14 +236,22 @@ class DeleteMediaPageHandler implements ActionPageHandler {
                             answer = false
                         }
                     }
-                    callback(answer)
+
+                    if (!answer){
+                        alert("Fail to remove some medias")
+                    }
+                    parent.history.back()
                 }
             });
         })
     }
 
-    onLoad(selectedResourceIDs:string[]){
-        var thumbnailContentPanel = $('#panel_delete_images')
+    onLoad(page:JQuery, selectedResourceIDs:string[]){
+        page.find('#remove-media-approved-btn').click(()=>{
+            this.onAccept(page)
+            return false;
+        })
+        var thumbnailContentPanel = page.find('#panel_delete_images')
         thumbnailContentPanel.empty()
         thumbnailContentPanel.width(THUMBNAILS_MATH.calculateThumbnailsPanelWidth())
         for (var i = 0; i < selectedMediaIds.length; i++) {
@@ -247,48 +262,5 @@ class DeleteMediaPageHandler implements ActionPageHandler {
                         .withType(fetchedMedia[selectedMediaIds[i]].type as string))
                 .withParent(thumbnailContentPanel))
         }
-    }
-}
-
-/**
- * MultiSelectionAction
- */
-class MultiSelectionAction {
-
-    static ACTION_TAG_EDITOR = new MultiSelectionAction(
-                "tagEditor",
-                "Tag Editor",
-                new TagEditorPageHandler())
-
-    static ACTION_REMOVE_RESOURCES = new MultiSelectionAction(
-                "deleteResources",
-                "Delete Selected Media",
-                new DeleteMediaPageHandler())
-
-            
-    private _id:string;
-    private _humanName:string;
-    private _actionPageHandler:ActionPageHandler
-    
-    constructor(id:string, humanName:string, pageHandler:ActionPageHandler){
-        this._id = id
-        this._humanName = humanName
-        this._actionPageHandler = pageHandler
-    }
-
-    get id():string {
-        return this._id
-    }
-
-    get humanName():string {
-        return this._humanName
-    }
-
-    get actionPageHandler():ActionPageHandler {
-        return this._actionPageHandler
-    }
-
-    generatePageUrl():string{
-        return `pages/${this.id}Page.html`
     }
 }
