@@ -8,6 +8,7 @@
 declare var Waypoint: any
 var MULTI_SELECTION_HANDLERS = [new TagManagerPageHandler(), new RemoveMediaPageHandler()]
 var THUMBNAILS_MATH = ThumbnailMath.DEFAULT;
+var TAG_MANAGER = new TagManager();
 
 function initialize_browser_module(){
    
