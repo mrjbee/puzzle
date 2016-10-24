@@ -1,14 +1,13 @@
 /// <reference path="../../../typings/index.d.ts" />
 /// <reference path="common_size.ts" />
 /// <reference path="ui_builders.ts" />
-/// <reference path="multi_selection_action.ts" />
 /// <reference path="tag_manager.ts" />
+/// <reference path="page_handlers.ts" />
 
 
 declare var Waypoint: any
+var MULTI_SELECTION_HANDLERS = [new TagManagerPageHandler(), new RemoveMediaPageHandler()]
 var THUMBNAILS_MATH = ThumbnailMath.DEFAULT;
-var CURRENT_MULTISELECTION_ACTION:MultiSelectionAction
-var TAG_MANAGER = new TagManager()
 
 function initialize_browser_module(){
    
@@ -35,25 +34,19 @@ function initialize_browser_module(){
          selectedMediaIds = []
          onSelectedMediaChange()
    })
-
-    $("#delete-resources-btn").click(function(){
-        activateMultiSelectionActionPage(MultiSelectionAction.ACTION_REMOVE_RESOURCES)
-    })
-    
-    $('#external-page-approved-btn').click(function(){
-        CURRENT_MULTISELECTION_ACTION.actionPageHandler.onAccept((success)=>{
-            parent.history.back();
-            if(!success) {
-                alert("Please. Try again.")
-            }
-        })
-        return false;
-    })
-
-    $( "#tag-editor-btn" ).click(function(){
-        activateMultiSelectionActionPage(MultiSelectionAction.ACTION_TAG_EDITOR)
-    })
-
+   $( ":mobile-pagecontainer" ).on( "pagecontainerload", function( event, ui ) {
+        var pageId = ui.toPage.first().attr('id') as string
+        var pageHandlerIndex = MULTI_SELECTION_HANDLERS.map(it=>{
+            return it.getPageId()
+        }).indexOf(pageId)
+        if (pageHandlerIndex < 0){
+            alert("There is no handler for page = "+pageId)    
+        } else{
+           MULTI_SELECTION_HANDLERS[pageHandlerIndex].onLoad(
+               ui.toPage as JQuery,
+               selectedMediaIds)     
+        }  
+    } );
     $('#open-selection-btn').click(function(){
         for (var i = 0; i < selectedMediaIds.length; i++) {
             openMediaInTab(selectedMediaIds[i])
@@ -77,20 +70,7 @@ function initialize_browser_module(){
     loadMoreMediaItems()
 }
 
-function activateMultiSelectionActionPage(action:MultiSelectionAction){
-    CURRENT_MULTISELECTION_ACTION = action
-    $('#external-page-caption-text').text(CURRENT_MULTISELECTION_ACTION.humanName)
-        $('#external-page-panel')
-            .empty().load(
-                CURRENT_MULTISELECTION_ACTION.generatePageUrl(),
-                null,
-                function(){
-                    jQuery.mobile.changePage($("#external-page"))     
-                    CURRENT_MULTISELECTION_ACTION.actionPageHandler.onLoad(selectedMediaIds)
-                }
-            )
-}
-
+var allTagsMap = {}
 var hasMoreMediaItems = true
 var _mediaItemsOffset = 0;
 function loadMoreMediaItems(){
