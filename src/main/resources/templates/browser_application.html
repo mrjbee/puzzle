@@ -106,6 +106,7 @@
     }
 
     .tag {
+        background: #2378BB;
         width: initial !important;
         height: initial !important;
         padding: 10px;
@@ -114,19 +115,19 @@
     }
 
 
-    .tag-color-purple{
+    .ttag-color-purple{
         background: #A00B84;
     }
 
-    .tag-color-green{
+    .ttag-color-green{
         background: #07B769;
     }
 
-    .tag-color-blue{
+    .ttag-color-blue{
         background: #2378BB;
     }
 
-    .tag-color-red{
+    .ttag-color-red{
         background: rgba(181, 21, 77, 0.95);
     }
 </style>
@@ -150,7 +151,8 @@
     </div>
 
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
-        <a href="#left-panel" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-tag ui-btn-b">Tags</a>
+        <a href="#left-panel" 
+            class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-tag ui-btn-b">Tags</a>
         <h1>Media Browser</h1>
         <div id="selection-actions-btn-group" data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right" style="display: none;">
             <a href="#selectedActionsPopup"  data-rel="popup" data-transition="slideup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b"><span id="selected-counter-text" class="ui-corner-all">0</span>media</a>
@@ -162,25 +164,35 @@
 
     </div>
 
-    <div data-role="panel" id="left-panel" data-theme="b">
-         <ul data-role="listview" data-theme="b" class="nav-search">
-            <li data-icon="delete"><a href="#" data-rel="close">Media Tags</a></li>
+
+    <div data-role="panel" 
+        data-position-fixed="true"
+        data-display="overlay"
+        id="left-panel" data-theme="b">
+        <fieldset class="ui-grid-a">
+            <div class="ui-block-a" style="width:80%"><h3 class="ui-content">Display Filter</h3></div>
+            <div class="ui-block-b" style="width:20%">
+                <a href="#" data-rel="close" class="ui-shadow ui-btn ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline">Close</a></div>
+        </fieldset>
+
+        <ul data-role="listview" data-theme="b" >
+            <li class="ui-field-contain">
+                 <button class="ui-btn ui-mini ui-btn-a" style="margin:0px">Apply</button>
+            </li>
+            <li data-role="list-divider">Tags <span class="ui-li-count">2</span></li>
+            <li class="ui-field-contain" style="padding:0px">
+                 <label for="checkbox-1">Black And White</label>
+                 <input name="checkbox-1" id="checkbox-1" type="checkbox" data-mini="true" data-iconpos="right">
+            </li>
+            
+            <li class="ui-field-contain" style="padding:0px">
+                 <label for="checkbox-2">Featured</label>
+                 <input name="checkbox-2" id="checkbox-2" type="checkbox" data-mini="true" data-iconpos="right">
+            </li>
         </ul>
     </div><!-- /panel -->
 
 </div><!-- /page -->
-
-<div data-role="page" id="external-page">
-    <div data-role="header" data-position="fixed" data-tap-toggle="false">
-        <a href="#pageDashboard" class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-back">Cancel</a>
-        <h1 id="external-page-caption-text">Caption</h1>
-        <button id='external-page-approved-btn' class="ui-btn-right ui-btn ui-btn-b ui-btn-inline ui-mini ui-corner-all ui-btn-icon-right ui-icon-check">Apply</button>
-    </div><!-- /header -->
-    <div id="external-page-panel">
-        
-    </div>
-</div><!-- /page -->
-
 
 <div data-role="page" id="pageTagsEditor">
 
