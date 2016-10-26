@@ -38,6 +38,10 @@
     </script>
 </head>
 <style>
+    .filter_tag_group {
+        padding:0px !important;
+    }
+
     #pageDashboard * {
         -webkit-user-select: none;
         -moz-user-select: none;
@@ -175,17 +179,17 @@
                 <a href="#" data-rel="close" class="ui-shadow ui-btn ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-inline">Close</a></div>
         </fieldset>
 
-        <ul data-role="listview" data-theme="b" >
+        <ul id="filter-tag-list" data-role="listview" data-theme="b" >
             <li class="ui-field-contain">
                  <button class="ui-btn ui-mini ui-btn-a" style="margin:0px">Apply</button>
             </li>
             <li data-role="list-divider">Tags <span class="ui-li-count">2</span></li>
-            <li class="ui-field-contain" style="padding:0px">
+            <li id="filter_tag_1" class="filter_tag_group ui-field-contain" style="padding:0px">
                  <label for="checkbox-1">Black And White</label>
                  <input name="checkbox-1" id="checkbox-1" type="checkbox" data-mini="true" data-iconpos="right">
             </li>
             
-            <li class="ui-field-contain" style="padding:0px">
+            <li id="filter_tag_2" class="filter_tag_group ui-field-contain" style="padding:0px">
                  <label for="checkbox-2">Featured</label>
                  <input name="checkbox-2" id="checkbox-2" type="checkbox" data-mini="true" data-iconpos="right">
             </li>

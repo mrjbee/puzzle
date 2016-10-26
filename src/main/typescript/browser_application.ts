@@ -13,7 +13,33 @@ var TAG_MANAGER = new TagManager();
 function initialize_browser_module(){
    
    THUMBNAILS_MATH.updatePageWidth($(window).width())
-   
+   TAG_MANAGER.onTagsChangedCallback = ()=>{
+       $(".filter_tag_group").remove()
+       var filterTagsList = $("#filter-tag-list")
+       TAG_MANAGER.each((tag:Tag)=>{
+           let li = $("<li>")
+           li.attr("id","filter_tag_"+tag.name())
+                    .addClass("filter_tag_group")
+                    .addClass("ui-field-contain")
+                    .append(
+                        $("<label>")
+                            .attr("for","filter_tag_input_"+tag.name())
+                            .text(tag.name())    
+                    ).append(
+                        $("<input>")
+                            .attr("name","filter_tag_input_"+tag.name())    
+                            .attr("id","filter_tag_input_"+tag.name())
+                            .attr("type","checkbox")
+                            .attr("data-mini","true")
+                            .attr("data-iconpos","right")                                
+                    )
+
+           filterTagsList.append(li)
+           li.trigger('create');
+       })
+       filterTagsList.listview("refresh");       
+   }
+
     $( "#left-panel" ).on( "panelopen", (event, ui ) => {
         ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)
         selectedMediaIds = []
@@ -65,6 +91,7 @@ function initialize_browser_module(){
                     (data[i].color) as string)
                 )
             }
+            TAG_MANAGER.notifyOnTagsChanged()
         })
         .error(function() { alert("Error during loading tags"); });
 

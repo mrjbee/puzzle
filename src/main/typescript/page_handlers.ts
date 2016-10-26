@@ -86,7 +86,8 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
                 complete: function() {
                     parent.history.back();
                 }
-            });        
+            });
+            TAG_MANAGER.notifyOnTagsChanged();        
     }
 
     //TODO: deals with fetchedMedia

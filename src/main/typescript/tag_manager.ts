@@ -32,6 +32,11 @@ class Tag {
 class TagManager {
     
     private _tags : { [key:string]:Tag; } = {};
+    private _onTagsChanged:() => void 
+
+    set onTagsChangedCallback(callback:() => void){
+        this._onTagsChanged = callback
+    }
 
     tag(name:string):Tag {
       return this._tags[name]
@@ -45,5 +50,9 @@ class TagManager {
        for (var key in this._tags){
            func(this._tags[key])
        }
+    }
+    
+    notifyOnTagsChanged() {
+        this._onTagsChanged()
     }
 }
