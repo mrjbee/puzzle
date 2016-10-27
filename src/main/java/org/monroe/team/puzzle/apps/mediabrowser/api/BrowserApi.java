@@ -61,11 +61,15 @@ public class BrowserApi {
     @RequestMapping(value = "/media-stream", method = RequestMethod.GET)
     public MediaStream mediaStream(
             @RequestParam(value = "offset", defaultValue = "0") Integer offset,
-            @RequestParam(value = "limit", defaultValue = "100") Integer limit) {
+            @RequestParam(value = "limit", defaultValue = "100") Integer limit,
+            @RequestParam(value = "tags", defaultValue = ",") String tagsFilter) {
 
         final Pageable pageRequest = new ChunkPageable(
                 offset, limit, Sort.Direction.DESC, "creationDate"
         );
+
+        String[] tags = tagsFilter.split(",");
+
 
         Page<MediaFileEntity> mediaFileEntityList = mediFileRepository.findAll(pageRequest);
         List<MediaResource> answerList = mediaFileEntityList.map(new Converter<MediaFileEntity, MediaResource>() {

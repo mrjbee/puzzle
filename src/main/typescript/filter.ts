@@ -30,8 +30,8 @@ class FilterManager {
         let filter = this.findTagFilterByTag(tag)
 
         if (filter){
-            this._tagFilters = this._tagFilters.splice(
-                this._tagFilters.indexOf(filter)
+            this._tagFilters.splice(
+                this._tagFilters.indexOf(filter),1
             )
         } 
     }
@@ -45,5 +45,8 @@ class FilterManager {
         } else {
             return null
         }
+    }
+    asTagsFilterQuery():string{
+        return this._tagFilters.map((tagFilter)=>{return tagFilter.tag.name()}).join(",")
     }
 }

@@ -50,10 +50,6 @@ function initialize_browser_module(){
        $("#filter-tag-count").text(TAG_MANAGER.tagCount())       
    }
 
-    $("#filter-apply-btn").click((event)=>{
-        alert("YEAP")
-    })
-
     $( "#left-panel" ).on( "panelopen", (event, ui ) => {
         ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)
         selectedMediaIds = []
@@ -108,6 +104,13 @@ function initialize_browser_module(){
             TAG_MANAGER.notifyOnTagsChanged()
         })
         .error(function() { alert("Error during loading tags"); });
+    
+    $("#filter-apply-btn").click((event)=>{
+        $("#panel_image").empty()
+        hasMoreMediaItems = true
+        _mediaItemsOffset = 0;
+        loadMoreMediaItems()
+    })    
 
     loadMoreMediaItems()
 }
@@ -126,7 +129,9 @@ function loadMoreMediaItems(){
                 textVisible: false,
     });
 
-    (<any> $.get("/api/media-stream?offset="+_mediaItemsOffset+"&limit=50"))
+    let filters = encodeURIComponent(FILTER_MANAGER.asTagsFilterQuery());
+
+    (<any> $.get("/api/media-stream?offset="+_mediaItemsOffset+"&limit=50&tags="+filters))
         .success(function(data) {
             $("#total-counter-text").text(data.paging.actualCount)
             hasMoreMediaItems = data.mediaResourceIds.length == data.paging.limit
