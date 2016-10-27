@@ -106,6 +106,7 @@ function initialize_browser_module(){
         .error(function() { alert("Error during loading tags"); });
     
     $("#filter-apply-btn").click((event)=>{
+        //($( "#left-panel" ) as any).panel("close")
         $("#panel_image").empty()
         hasMoreMediaItems = true
         _mediaItemsOffset = 0;

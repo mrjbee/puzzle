@@ -26,9 +26,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
+import java.util.*;
 import java.util.List;
 
 @RestController
@@ -69,42 +67,60 @@ public class BrowserApi {
         );
 
         String[] tags = tagsFilter.split(",");
-
-
-        Page<MediaFileEntity> mediaFileEntityList = mediFileRepository.findAll(pageRequest);
-        List<MediaResource> answerList = mediaFileEntityList.map(new Converter<MediaFileEntity, MediaResource>() {
-            @Override
-            public MediaResource convert(final MediaFileEntity source) {
-
-                List<MediaFileToTagLink> tagLinks =
-                        mediaFileToTagLinkRepository
-                                .findAll(Example.of(new MediaFileToTagLink(source.getId(), null)));
-                List<Tag> tags = new ArrayList<Tag>(tagLinks.size());
-                for (MediaFileToTagLink tagLink : tagLinks) {
-                    TagEntity tagEntity = tagRepository.findOne(tagLink.getId().getTagId());
-                    tags.add(new Tag(tagEntity.getTitle(), tagEntity.getColor()));
+        if (tags.length == 0) {
+            Page<MediaFileEntity> mediaFileEntityList = mediFileRepository.findAll(pageRequest);
+            List<MediaResource> answerList = mediaFileEntityList.map(new Converter<MediaFileEntity, MediaResource>() {
+                @Override
+                public MediaResource convert(final MediaFileEntity source) {
+                    return asMediaResource(source);
                 }
+            }).getContent();
 
-
-                return new MediaResource(
-                        Long.toString(source.getId()),
-                        source.getType().name(),
-                        source.getCreationDate(),
-                        new File(source.getFileName()).getName(),
-                        source.getHeight(),
-                        source.getWidth(),
-                        tags);
+            return new MediaStream(
+                    new Paging(
+                            offset,
+                            limit,
+                            answerList.size()
+                    ),
+                    answerList
+            );
+        } else {
+            List<MediaFileEntity> fileEntities = mediFileRepository.findFilteredByTag(tags, limit, offset);
+            List<MediaResource> mediaResources = new LinkedList<>();
+            for (MediaFileEntity fileEntity : fileEntities) {
+                mediaResources.add(asMediaResource(fileEntity));
             }
-        }).getContent();
 
-        return new MediaStream(
-                new Paging(
-                        offset,
-                        limit,
-                        answerList.size()
-                ),
-                answerList
-        );
+            return new MediaStream(
+                    new Paging(
+                            offset,
+                            limit,
+                            mediaResources.size()
+                    ),
+                    mediaResources
+            );
+        }
+    }
+
+    private MediaResource asMediaResource(final MediaFileEntity source) {
+        List<MediaFileToTagLink> tagLinks =
+                mediaFileToTagLinkRepository
+                        .findAll(Example.of(new MediaFileToTagLink(source.getId(), null)));
+        List<Tag> tags = new ArrayList<Tag>(tagLinks.size());
+        for (MediaFileToTagLink tagLink : tagLinks) {
+            TagEntity tagEntity = tagRepository.findOne(tagLink.getId().getTagId());
+            tags.add(new Tag(tagEntity.getTitle(), tagEntity.getColor()));
+        }
+
+
+        return new MediaResource(
+                Long.toString(source.getId()),
+                source.getType().name(),
+                source.getCreationDate(),
+                new File(source.getFileName()).getName(),
+                source.getHeight(),
+                source.getWidth(),
+                tags);
     }
 
     @RequestMapping(value = "media/{mediaId}", method = RequestMethod.DELETE)
