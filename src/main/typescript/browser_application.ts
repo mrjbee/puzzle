@@ -9,6 +9,7 @@ declare var Waypoint: any
 var MULTI_SELECTION_HANDLERS = [new TagManagerPageHandler(), new RemoveMediaPageHandler()]
 var THUMBNAILS_MATH = ThumbnailMath.DEFAULT;
 var TAG_MANAGER = new TagManager();
+var FILTER_MANAGER = new FilterManager();
 
 function initialize_browser_module(){
    
@@ -31,14 +32,27 @@ function initialize_browser_module(){
                             .attr("id","filter_tag_input_"+tag.name())
                             .attr("type","checkbox")
                             .attr("data-mini","true")
-                            .attr("data-iconpos","right")                                
+                            .attr("data-iconpos","right")
+                            .attr(FILTER_MANAGER.findTagFilterByTag(tag)? "checked" : "notchecked", "some")
+                            .change(function() {
+                                if($(this).is(":checked")) {
+                                   FILTER_MANAGER.addTagFilter(tag)
+                                } else{
+                                   FILTER_MANAGER.removeTagFilter(tag) 
+                                }
+                            })                                
                     )
 
            filterTagsList.append(li)
            li.trigger('create');
        })
-       filterTagsList.listview("refresh");       
+       filterTagsList.listview("refresh");
+       $("#filter-tag-count").text(TAG_MANAGER.tagCount())       
    }
+
+    $("#filter-apply-btn").click((event)=>{
+        alert("YEAP")
+    })
 
     $( "#left-panel" ).on( "panelopen", (event, ui ) => {
         ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)

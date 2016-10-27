@@ -5,7 +5,7 @@ class Tag {
 
     private _name:string;
     private _color:string;
-
+    
     constructor(name:string, color:string) {
         this._name = name
         this._color = color
@@ -22,7 +22,6 @@ class Tag {
     name():string{
         return this._name
     }
-
 }
 
 
@@ -54,5 +53,9 @@ class TagManager {
     
     notifyOnTagsChanged() {
         this._onTagsChanged()
+    }
+
+    tagCount() : number {
+        return Object.keys(this._tags).length
     }
 }
