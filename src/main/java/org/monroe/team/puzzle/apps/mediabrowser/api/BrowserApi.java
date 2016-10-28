@@ -8,6 +8,7 @@ import org.monroe.team.puzzle.apps.mediabrowser.tags.MediaFileToTagLink;
 import org.monroe.team.puzzle.apps.mediabrowser.tags.MediaFileToTagLinkRepository;
 import org.monroe.team.puzzle.apps.mediabrowser.tags.TagEntity;
 import org.monroe.team.puzzle.apps.mediabrowser.tags.TagRepository;
+import org.monroe.team.puzzle.core.log.Logs;
 import org.monroe.team.puzzle.pieces.fs.LinuxVideoFileMetadataExtractor;
 import org.monroe.team.puzzle.pieces.metadata.MediaMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
@@ -279,7 +281,9 @@ public class BrowserApi {
 
     @RequestMapping(value = "tags", method = RequestMethod.GET)
     @ResponseBody
+    @Transactional
     public List<Tag> tags() {
+        int removeCount = tagRepository.removeOrphan();
         List<Tag> tags = new LinkedList<>();
         for (TagEntity tagEntity : tagRepository.findAll()) {
             tags.add(new Tag(tagEntity.getTitle(),tagEntity.getType()));
