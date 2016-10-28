@@ -109,7 +109,7 @@ public class BrowserApi {
         List<Tag> tags = new ArrayList<Tag>(tagLinks.size());
         for (MediaFileToTagLink tagLink : tagLinks) {
             TagEntity tagEntity = tagRepository.findOne(tagLink.getId().getTagId());
-            tags.add(new Tag(tagEntity.getTitle(), tagEntity.getColor()));
+            tags.add(new Tag(tagEntity.getTitle(), tagEntity.getType()));
         }
 
 
@@ -251,7 +251,7 @@ public class BrowserApi {
 
         List<TagEntity> tagEntities = new ArrayList<>(tagsUpdate.getAssignTags().size());
         for (Tag tag : tagsUpdate.getAssignTags()) {
-            tagEntities.add(tagRepository.save(new TagEntity(tag.getName(), tag.getColor())));
+            tagEntities.add(tagRepository.save(new TagEntity(tag.getName(), tag.getType())));
         }
 
         if (tagsUpdate.getRemoveTags() != null && !tagsUpdate.getRemoveTags().isEmpty()){
@@ -260,7 +260,7 @@ public class BrowserApi {
                     mediaFileToTagLinkRepository.delete(
                             new MediaFileToTagLink(
                                 mediaId,
-                                new TagEntity(tag.getName(), tag.getColor()).getId()
+                                new TagEntity(tag.getName(), tag.getType()).getId()
                             )
                     );
                 }
@@ -282,7 +282,7 @@ public class BrowserApi {
     public List<Tag> tags() {
         List<Tag> tags = new LinkedList<>();
         for (TagEntity tagEntity : tagRepository.findAll()) {
-            tags.add(new Tag(tagEntity.getTitle(),tagEntity.getColor()));
+            tags.add(new Tag(tagEntity.getTitle(),tagEntity.getType()));
         }
         return tags;
     }

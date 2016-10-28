@@ -98,7 +98,7 @@ function initialize_browser_module(){
             for (var i = 0; i< data.length; i++){
                 TAG_MANAGER.updateTag(new Tag(
                     (data[i].name) as string,
-                    (data[i].color) as string)
+                    (data[i].type) as string)
                 )
             }
             TAG_MANAGER.notifyOnTagsChanged()

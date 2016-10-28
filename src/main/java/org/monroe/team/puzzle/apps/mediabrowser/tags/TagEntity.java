@@ -9,14 +9,14 @@ public class TagEntity {
     @Id
     private Long id;
     private String title;
-    private String color;
+    private String type;
 
     protected TagEntity() {
     }
 
-    public TagEntity(final String title, final String color) {
+    public TagEntity(final String title, final String type) {
         this.title = title;
-        this.color = color;
+        this.type = type;
         this.id = (long) title.hashCode();
     }
 
@@ -36,11 +36,11 @@ public class TagEntity {
         this.title = title;
     }
 
-    public String getColor() {
-        return color;
+    public String getType() {
+        return type;
     }
 
-    protected void setColor(final String color) {
-        this.color = color;
+    protected void setType(final String type) {
+        this.type = type;
     }
 }

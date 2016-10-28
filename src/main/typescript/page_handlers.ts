@@ -24,7 +24,7 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
             for (var tag in this.commonTag){
                 body.assignTags.push({
                     name:tag,
-                    color:this.commonTag[tag]
+                    type:this.commonTag[tag]
                 })
                 TAG_MANAGER.updateTag(new Tag(
                     tag as string,
@@ -33,12 +33,12 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
                 ))
             }
 
-            //Update common tags with new colors and tags
+            //Update common tags with new type and tags
             for (var tag in this.commonTagRemove){
                 if (!(tag in this.commonTag)){
                     body.removeTags.push({
                         name:tag,
-                        color:this.commonTagRemove[tag]
+                        type:this.commonTagRemove[tag]
                     })
                 }
             }
@@ -54,10 +54,10 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
                     if (index == -1){
                         fetchedMedia[id].tags.push({
                                                    name: key,
-                                                   color:val
+                                                   type:val
                                               })
                     } else {
-                        fetchedMedia[id].tags[index].color = val
+                        fetchedMedia[id].tags[index].type = val
                     }
                 })
 
@@ -100,8 +100,8 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
 
         this.currentPage.find('#new-tag-btn').click(()=>{
             var newTagTitle = this.currentPage.find('#new-tag-title-edit').val().toLowerCase();
-            var newTagColor = this.currentPage.find("#new-tag-color-option option:selected" ).text().toLowerCase()
-            this.onNewCommonTag(newTagTitle, newTagColor);
+            var newTagType = this.currentPage.find("#new-tag-type-option option:selected" ).text().toLowerCase()
+            this.onNewCommonTag(newTagTitle, newTagType);
             return false;
         })
 
@@ -136,20 +136,19 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
 
         for (var itTag in tagsCountMap) {
             if (tagsCountMap[itTag] == selectedMediaIds.length) {
-                this.commonTag[itTag] = TAG_MANAGER.tag(itTag).color()
+                this.commonTag[itTag] = TAG_MANAGER.tag(itTag).type()
             }
         }
         this.onCommonTagsChanged()    
     }
 
-    private onNewCommonTag(title:string, color:string){
-        this.commonTag[title] = color
-        console.log("New tag"+title)
+    private onNewCommonTag(title:string, type:string){
+        this.commonTag[title] = type
         this.onCommonTagsChanged()
     }
 
-    private onRemoveCommonTag(title:string, color:string){
-        this.commonTagRemove[title] = color
+    private onRemoveCommonTag(title:string, type:string){
+        this.commonTagRemove[title] = type
         delete this.commonTag[title]
         this.onCommonTagsChanged()
     }
@@ -167,7 +166,7 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
                         .addClass("ui-btn-b")
                         .addClass("ui-corner-all")
                         .addClass("tag")
-                        .addClass("tag-color-"+val)
+                        .addClass("tag-type-"+val)
                         .on( "tap", (event) => {
                             this.onRemoveCommonTag(key, val)
                         } )
@@ -188,9 +187,9 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
                     .addClass("ui-btn-b")
                     .addClass("ui-corner-all")
                     .addClass("tag")
-                    .addClass("tag-color-"+tag.color())
+                    .addClass("tag-type-"+tag.type())
                     .on( "tap", (event) => {
-                        this.onNewCommonTag(tag.name(), tag.color())
+                        this.onNewCommonTag(tag.name(), tag.type())
                     } )
             )
         })

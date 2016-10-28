@@ -4,19 +4,19 @@
 class Tag {
 
     private _name:string;
-    private _color:string;
+    private _type:string;
     
-    constructor(name:string, color:string) {
+    constructor(name:string, type:string) {
         this._name = name
-        this._color = color
+        this._type = type
     }
 
-    updateColor(color:string){
-        this._color = color
+    updateType(type:string){
+        this._type = type
     }
 
-    color():string {
-        return this._color
+    type():string {
+        return this._type
     }
 
     name():string{
