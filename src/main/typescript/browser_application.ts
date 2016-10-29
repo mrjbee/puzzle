@@ -1,17 +1,66 @@
 /// <reference path="../../../typings/index.d.ts" />
 /// <reference path="common_size.ts" />
 /// <reference path="ui_builders.ts" />
+/// <reference path="tag_manager.ts" />
 /// <reference path="page_handlers.ts" />
 
 
 declare var Waypoint: any
 var MULTI_SELECTION_HANDLERS = [new TagManagerPageHandler(), new RemoveMediaPageHandler()]
 var THUMBNAILS_MATH = ThumbnailMath.DEFAULT;
+var TAG_MANAGER = new TagManager();
+var FILTER_MANAGER = new FilterManager();
 
 function initialize_browser_module(){
    
    THUMBNAILS_MATH.updatePageWidth($(window).width())
-   
+   TAG_MANAGER.onTagsChangedCallback = ()=>{
+       $(".filter_tag_group").remove()
+       var filterTagsList = $("#filter-tag-list")
+       TAG_MANAGER.each((tag:Tag)=>{
+           let li = $("<li>")
+           li.attr("id","filter_tag_"+tag.name())
+                    .addClass("filter_tag_group")
+                    .addClass("ui-field-contain")
+                    .append(
+                        $("<label>")
+                            .attr("for","filter_tag_input_"+tag.name())
+                            .append(
+                                $("<span>")
+                                    .addClass("filter_tag_caption")
+                                    .addClass("tag-type-"+tag.type())
+                                    .text(tag.name())
+                            )
+                     ).append(
+                        $("<input>")
+                            .attr("name","filter_tag_input_"+tag.name())    
+                            .attr("id","filter_tag_input_"+tag.name())
+                            .attr("type","checkbox")
+                            .attr("data-mini","true")
+                            .attr("data-iconpos","right")
+                            .attr(FILTER_MANAGER.findTagFilterByTag(tag)? "checked" : "notchecked", "some")
+                            .change(function() {
+                                if($(this).is(":checked")) {
+                                   FILTER_MANAGER.addTagFilter(tag)
+                                } else{
+                                   FILTER_MANAGER.removeTagFilter(tag) 
+                                }
+                            })                                
+                    )
+
+           filterTagsList.append(li)
+           li.trigger('create');
+       })
+       filterTagsList.listview("refresh");
+       $("#filter-tag-count").text(TAG_MANAGER.tagCount())       
+   }
+
+    $( "#left-panel" ).on( "panelopen", (event, ui ) => {
+        ui_updateByIdOrIds(selectedMediaIds, ui_thumbnail_deSelectById)
+        selectedMediaIds = []
+        onSelectedMediaChange()
+    } );
+
    $(window).resize(function() {
         THUMBNAILS_MATH.updatePageWidth($(window).width());
         var cellSize = THUMBNAILS_MATH.cellWidth
@@ -51,12 +100,23 @@ function initialize_browser_module(){
 
     (<any> $.get("/api/tags"))
         .success(function(data) {
-            allTagsMap = {}
             for (var i = 0; i< data.length; i++){
-                allTagsMap[data[i].name] = data[i]
+                TAG_MANAGER.updateTag(new Tag(
+                    (data[i].name) as string,
+                    (data[i].type) as string)
+                )
             }
+            TAG_MANAGER.notifyOnTagsChanged()
         })
         .error(function() { alert("Error during loading tags"); });
+    
+    $("#filter-apply-btn").click((event)=>{
+        //($( "#left-panel" ) as any).panel("close")
+        $("#panel_image").empty()
+        hasMoreMediaItems = true
+        _mediaItemsOffset = 0;
+        loadMoreMediaItems()
+    })    
 
     loadMoreMediaItems()
 }
@@ -75,7 +135,9 @@ function loadMoreMediaItems(){
                 textVisible: false,
     });
 
-    (<any> $.get("/api/media-stream?offset="+_mediaItemsOffset+"&limit=50"))
+    let filters = encodeURIComponent(FILTER_MANAGER.asTagsFilterQuery());
+
+    (<any> $.get("/api/media-stream?offset="+_mediaItemsOffset+"&limit=50&tags="+filters))
         .success(function(data) {
             $("#total-counter-text").text(data.paging.actualCount)
             hasMoreMediaItems = data.mediaResourceIds.length == data.paging.limit
@@ -279,6 +341,9 @@ $(document).scroll( function() {
 });
 
 function hideHeader(){
+
+    if ($("#left-panel.ui-panel-open").length == 1) {return}
+
     // If the header is currently showing
     if (!$('#pageDashboard [data-role=header].ui-fixed-hidden').length) {
       $('#pageDashboard [data-role=header]').toolbar('hide');
@@ -286,6 +351,8 @@ function hideHeader(){
 }
 
 function showHeader(){
+   if ($("#left-panel.ui-panel-open").length == 1) {return}
+
 // If the header is currently hidden
     if ($('#pageDashboard [data-role=header].ui-fixed-hidden').length) {
       $('#pageDashboard [data-role=header]').toolbar('show');

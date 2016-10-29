@@ -3,15 +3,18 @@ package org.monroe.team.puzzle.apps.mediabrowser.api.dto;
 public class Tag {
 
     private String name;
-    private String color;
+    private String type;
 
-    public Tag(final String name, final String color) {
+    public Tag(final String name, final String type) {
         this.name = name;
-        this.color = color;
+        this.type = type;
+        if (this.type == null){
+            //fallback value
+            this.type = "normal";
+        }
     }
 
-    public Tag() {
-    }
+    public Tag() {}
 
     public String getName() {
         return name;
@@ -21,12 +24,12 @@ public class Tag {
         this.name = name;
     }
 
-    public String getColor() {
-        return color;
+    public String getType() {
+        return type;
     }
 
-    public void setColor(final String color) {
-        this.color = color;
+    public void setType(final String type) {
+        this.type = type;
     }
 
 }
