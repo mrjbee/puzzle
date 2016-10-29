@@ -138,7 +138,7 @@ function loadMoreMediaItems(){
 
     let filters = encodeURIComponent(FILTER_MANAGER.asTagsFilterQuery());
 
-    (<any> $.get("/api/media-stream?offset="+_mediaItemsOffset+"&limit=50&tags="+filters))
+    (<any> $.get("api/media-stream?offset="+_mediaItemsOffset+"&limit=50&tags="+filters))
         .success(function(data) {
             $("#total-counter-text").text(data.paging.actualCount)
             hasMoreMediaItems = data.mediaResourceIds.length == data.paging.limit
