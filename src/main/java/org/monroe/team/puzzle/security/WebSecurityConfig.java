@@ -17,6 +17,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .httpBasic()
             .and()
+                //TODO http://stackoverflow.com/questions/21128058/invalid-csrf-token-null-was-found-on-the-request-parameter-csrf-or-header
+                .csrf().disable()
                 .authorizeRequests()
             .       antMatchers("/")
                         .permitAll()
