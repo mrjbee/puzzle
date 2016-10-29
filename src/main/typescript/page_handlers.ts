@@ -73,7 +73,7 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
             })
 
             $.ajax({
-                url: '/api/tags/update',
+                url: 'api/tags/update',
                 type: 'POST',
                 contentType: 'application/json',
                 data: JSON.stringify(body),
@@ -240,7 +240,7 @@ class RemoveMediaPageHandler implements MultiSelectionPageActionHandler {
             }
 
             $.ajax({
-                url: '/api/media/'+mediaId,
+                url: 'api/media/'+mediaId,
                 type: 'DELETE',
                 success: function(result) {
                     resultsPromiseMap[mediaId].result = 1
