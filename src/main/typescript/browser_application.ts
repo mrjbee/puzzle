@@ -99,7 +99,7 @@ function initialize_browser_module(){
     });
 
 
-    (<any> $.get("/api/tags"))
+    (<any> $.get("api/tags"))
         .success(function(data) {
             for (var i = 0; i< data.length; i++){
                 TAG_MANAGER.updateTag(new Tag(
