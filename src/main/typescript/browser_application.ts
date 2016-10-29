@@ -25,8 +25,13 @@ function initialize_browser_module(){
                     .append(
                         $("<label>")
                             .attr("for","filter_tag_input_"+tag.name())
-                            .text(tag.name())    
-                    ).append(
+                            .append(
+                                $("<span>")
+                                    .addClass("filter_tag_caption")
+                                    .addClass("tag-type-"+tag.type())
+                                    .text(tag.name())
+                            )
+                     ).append(
                         $("<input>")
                             .attr("name","filter_tag_input_"+tag.name())    
                             .attr("id","filter_tag_input_"+tag.name())

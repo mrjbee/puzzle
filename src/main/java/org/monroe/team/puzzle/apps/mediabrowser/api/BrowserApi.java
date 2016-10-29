@@ -285,7 +285,7 @@ public class BrowserApi {
     public List<Tag> tags() {
         int removeCount = tagRepository.removeOrphan();
         List<Tag> tags = new LinkedList<>();
-        for (TagEntity tagEntity : tagRepository.findAll()) {
+        for (TagEntity tagEntity : tagRepository.findAll(new Sort("title"))) {
             tags.add(new Tag(tagEntity.getTitle(),tagEntity.getType()));
         }
         return tags;
