@@ -159,17 +159,20 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
         tagsPanel.empty()
         $.each(this.commonTag, (key, val) => {
                 tagsPanel.append(
-                    $('<div>')
+                    $('<a>')
                         .attr("id","common_tag_"+key)
-                        .text(key)
-                        .addClass("ui-page-theme-b")
+                        .attr("href","#")
+                        .addClass("ui-btn")
+                        .addClass("ui-mini")
                         .addClass("ui-btn-b")
+                        .addClass("ui-shadow")
                         .addClass("ui-corner-all")
                         .addClass("tag")
                         .addClass("tag-type-"+val)
+                        .text(key)
                         .on( "tap", (event) => {
                             this.onRemoveCommonTag(key, val)
-                        } )
+                        }).trigger('create')      
                 )
             })
     }
@@ -180,17 +183,20 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
         tagsPanel.empty()
         TAG_MANAGER.each((tag)=>{
             tagsPanel.append(
-                $('<div>')
+                $('<a>')
                     .attr("id","common_tag_"+tag.name())
-                    .text(tag.name())
-                    .addClass("ui-page-theme-b")
+                    .attr("href","#")
+                    .addClass("ui-btn")
+                    .addClass("ui-mini")
                     .addClass("ui-btn-b")
+                    .addClass("ui-shadow")
                     .addClass("ui-corner-all")
                     .addClass("tag")
                     .addClass("tag-type-"+tag.type())
+                    .text(tag.name())
                     .on( "tap", (event) => {
                         this.onNewCommonTag(tag.name(), tag.type())
-                    } )
+                    }).trigger('create')
             )
         })
     }
