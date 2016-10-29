@@ -252,7 +252,7 @@ function vibrate(ms){
 }
 
 function openMediaInTab(mediaId){
-        var url = window.location.origin+'/api/media/'+mediaId
+        var url = 'api/media/'+mediaId
         var win = window.open(url, '_blank');
         /*if (win) {
             //Browser has allowed it to be opened
