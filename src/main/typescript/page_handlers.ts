@@ -98,11 +98,13 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
             return false;
         })
 
-        this.currentPage.find('#new-tag-btn').click(()=>{
-            var newTagTitle = this.currentPage.find('#new-tag-title-edit').val().toLowerCase();
-            var newTagType = this.currentPage.find("#new-tag-type-option option:selected" ).text().toLowerCase()
+        this.currentPage.find('#new-tag-btn').click((event)=>{
+            var newTagTitle = this.currentPage.find('#new-tag-title-edit').val().toLowerCase() as string;
+            var newTagType = $('input[name=tag-type-options]:checked').val().toLowerCase()
+            if (newTagTitle.trim().length == 0){
+                return false;
+            }
             this.onNewCommonTag(newTagTitle, newTagType);
-            return false;
         })
 
         this.onAllTagsChanged()
@@ -162,8 +164,9 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
                     $('<a>')
                         .attr("id","common_tag_"+key)
                         .attr("href","#")
+                        .addClass("ui-btn-icon-left")
+                        .addClass("ui-icon-tag")
                         .addClass("ui-btn")
-                        .addClass("ui-mini")
                         .addClass("ui-btn-b")
                         .addClass("ui-shadow")
                         .addClass("ui-corner-all")
@@ -186,6 +189,8 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
                 $('<a>')
                     .attr("id","common_tag_"+tag.name())
                     .attr("href","#")
+                    .addClass("ui-btn-icon-left")
+                    .addClass("ui-icon-tag")
                     .addClass("ui-btn")
                     .addClass("ui-mini")
                     .addClass("ui-btn-b")
@@ -199,6 +204,21 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
                     }).trigger('create')
             )
         })
+        tagsPanel.append(
+                $('<a>')
+                    .attr("href","#new-tag-panel")
+                    .attr("data-transition","slidedown")
+                    .addClass("ui-btn-icon-left")
+                    .addClass("ui-mini")
+                    .addClass("ui-icon-plus")
+                    .addClass("ui-btn")
+                    .addClass("ui-btn-a")
+                    .addClass("ui-shadow")
+                    .addClass("ui-corner-all")
+                    .addClass("tag")
+                    .text("New Tag ...")
+                    .trigger('create')
+            )
     }
 }
 

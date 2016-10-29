@@ -7,26 +7,36 @@
     <div role="main" class="ui-content" style="padding: 0px;">
         <div id="panel_tags_images" role="main" class="ui-content panel-thumbnails" style="padding: 0px;">
         </div>
-
-        <h3 class="ui-bar ui-bar-a ui-corner-all">Assigned Tags</h3>
+        <div id="common-tag-panel" role="main" class="ui-content"></div>
         <div class="ui-body ui-body-a ui-corner-all">
-            <p>List of all common resource tags. Click to remove a tag for all resources</p>
-            <div id="common-tag-panel" role="main" class="ui-content"></div>
-        </div>
-
-        <h3 class="ui-bar ui-bar-a ui-corner-all">Tags Space</h3>
-        <div class="ui-body ui-body-a ui-corner-all">
-            <p>List of all existing tags. Click to assign or create and assign new</p>
-            <div id="all-tag-panel" role="main" class="ui-content"></div>
-            <div data-role="controlgroup" data-theme="b" data-type="horizontal">
-                <select id="new-tag-type-option">
-                    <option>Normal</option>
-                    <option>Important</option>
-                    <option>Attention</option>
-                </select>
-                <input id="new-tag-title-edit" data-wrapper-class="controlgroup-textinput ui-btn ui-btn-b" type="text">
-                <button id="new-tag-btn" class="ui-btn ui-btn-b ui-icon-tag ui-btn-icon-left ui-btn-icon-notext">Assign</button>
-            </div>
+            <h4>Assign more tags</h4>
+            <div id="all-tag-panel" role="main" class="ui-content"></div>            
+        </div>    
+    </div>
+      <div 
+        data-role="panel" 
+        data-position-fixed="true"
+        data-display="overlay"
+        data-position="right"
+        id="new-tag-panel" data-theme="b">
+        
+        <h2 class="panel-caption ui-content">Create New Tag</h2>
+        
+        <input id="new-tag-title-edit" placeholder="Title ..." name="new-tag-title-edit" type="text">
+        <p></p>
+        <fieldset data-role="controlgroup">
+            <input name="tag-type-options" id="tag-type-option-normal" value="normal" checked="checked" type="radio">
+            <label for="tag-type-option-normal"><span class="filter_tag_caption tag-type-normal ui-corner-all">Normal</span></label>
+            <input name="tag-type-options" id="tag-type-option-important" value="important" type="radio">
+            <label for="tag-type-option-important"><span class="filter_tag_caption tag-type-important  ui-corner-all">Important</span></label>
+            <input name="tag-type-options" id="tag-type-option-attention" value="attention" type="radio">
+            <label for="tag-type-option-attention"><span class="filter_tag_caption tag-type-attention  ui-corner-all">Attention</span></label>
+        </fieldset>
+        <p></p>
+        
+        <div data-role="controlgroup" data-type="horizontal" >
+            <button id="new-tag-btn" data-rel="close" class="ui-btn ui-btn-c ui-corner-all ui-icon-plus ui-btn-icon-left">Create</button>
+            <button data-rel="close" class="ui-btn ui-btn-b ui-corner-all ui-icon-delete ui-btn-icon-right">Cancel</button>
         </div>
     </div>
 </div>

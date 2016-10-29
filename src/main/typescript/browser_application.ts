@@ -27,6 +27,7 @@ function initialize_browser_module(){
                             .attr("for","filter_tag_input_"+tag.name())
                             .append(
                                 $("<span>")
+                                    .addClass("ui-corner-all")
                                     .addClass("filter_tag_caption")
                                     .addClass("tag-type-"+tag.type())
                                     .text(tag.name())
