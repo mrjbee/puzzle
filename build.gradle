@@ -40,9 +40,9 @@ configurations {
 
 dependencies {
 	dev("org.springframework.boot:spring-boot-devtools")
-
 	compile("io.projectreactor:reactor-bus")
 	compile('com.drewnoakes:metadata-extractor:2.9.1')
+	compile("org.springframework.boot:spring-boot-starter-security")
 	compile('org.springframework.boot:spring-boot-starter')
 	compile('org.springframework.boot:spring-boot-starter-actuator')
 	compile('org.springframework.boot:spring-boot-starter-hateoas')
