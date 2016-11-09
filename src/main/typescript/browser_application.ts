@@ -10,6 +10,7 @@ var MULTI_SELECTION_HANDLERS = [new TagManagerPageHandler(), new RemoveMediaPage
 var THUMBNAILS_MATH = ThumbnailMath.DEFAULT;
 var TAG_MANAGER = new TagManager();
 var FILTER_MANAGER = new FilterManager();
+var MEDIA_ITERATOR = new MediaIterator();
 
 function initialize_browser_module(){
    
@@ -112,50 +113,33 @@ function initialize_browser_module(){
         .error(function() { alert("Error during loading tags"); });
     
     $("#filter-apply-btn").click((event)=>{
-        //($( "#left-panel" ) as any).panel("close")
         $("#panel_image").empty()
-        hasMoreMediaItems = true
-        _mediaItemsOffset = 0;
+        let filters = encodeURIComponent(FILTER_MANAGER.asTagsFilterQuery());
+        MEDIA_ITERATOR.applyFilters(filters)
         loadMoreMediaItems()
     })    
 
     loadMoreMediaItems()
 }
 
-var allTagsMap = {}
-var hasMoreMediaItems = true
-var _mediaItemsOffset = 0;
 function loadMoreMediaItems(){
 
-    if(_mediaItemsOffset == 0){
-        fetchedMedia = {};
-    }
-
-    $.mobile.loading( "show", {
-                text: "Loading. PLease wait",
-                textVisible: false,
-    });
-
-    let filters = encodeURIComponent(FILTER_MANAGER.asTagsFilterQuery());
-
-    (<any> $.get("api/media-stream?offset="+_mediaItemsOffset+"&limit=50&tags="+filters))
-        .success(function(data) {
-            $("#total-counter-text").text(data.paging.actualCount)
-            hasMoreMediaItems = data.mediaResourceIds.length == data.paging.limit
-            _mediaItemsOffset += data.mediaResourceIds.length
-            console.log("Has more elements:"+hasMoreMediaItems)
-            for (var i = 0; i < data.mediaResourceIds.length; i++) {
-                onNewMediaItem(data.mediaResourceIds[i])
-            }
-            onNewMediaItem(null)
-        })
-        .error(function() { alert("Error during loading media-stream"); })
-        .complete(function() {
-            $.mobile.loading( "hide" );
+    /*
+        $.mobile.loading( "show", {
+                    text: "Loading. PLease wait",
+                    textVisible: false,
         });
+        $.mobile.loading( "hide" );
+    */
+    MEDIA_ITERATOR.next(10,(position:number, media:Media, isLast:boolean) => {
+        if (media != null){
+            onNewMediaItem(media.model())
+        }
+        if (isLast){
+            onNewMediaItem(null)
+        }
+    });
 }
-
-var fetchedMedia = {}
 
 function onNewMediaItem(mediaResource){
 
@@ -164,7 +148,6 @@ function onNewMediaItem(mediaResource){
         return
     }
 
-    fetchedMedia[mediaResource.id] = mediaResource
     var creationDate = new Date(mediaResource.creationDate);
 
     var sortingDate  = new Date(
@@ -182,7 +165,7 @@ function onNewMediaItem(mediaResource){
 var content
 function onMedia(media){
     if (media == null) {
-        if (hasMoreMediaItems){
+        if (MEDIA_ITERATOR.canNext()) {
             var panel = content
             if (panel == null){
                 panel = $("#panel_image")
@@ -201,7 +184,7 @@ function onMedia(media){
               },
               offset: '100%'
             })
-        }
+        } 
         return
     }
 

@@ -48,25 +48,25 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
                 var id = selectedMediaIds[selectedId]
                 $.each(this.commonTag, (key,val) =>{
 
-                    var index = $.inArray(key,$.map(fetchedMedia[id].tags, (elem) =>{
+                    var index = $.inArray(key,$.map(MEDIA_ITERATOR.findById(id)[1].tags(), (elem) =>{
                         return elem.name
                     }))
                     if (index == -1){
-                        fetchedMedia[id].tags.push({
+                        MEDIA_ITERATOR.findById(id)[1].tags().push({
                                                    name: key,
                                                    type:val
                                               })
                     } else {
-                        fetchedMedia[id].tags[index].type = val
+                        MEDIA_ITERATOR.findById(id)[1].tags()[index].type = val
                     }
                 })
 
                 $.each(body.removeTags, (itag, tag) =>{
-                    var index = $.inArray(tag.name,$.map(fetchedMedia[id].tags, (elem) =>{
+                    var index = $.inArray(tag.name,$.map(MEDIA_ITERATOR.findById(id)[1].tags(), (elem) =>{
                         return elem.name
                     }))
                     if (index != -1){
-                        fetchedMedia[id].tags.splice(index,1)
+                        MEDIA_ITERATOR.findById(id)[1].tags().splice(index,1)
                     }
                 })
 
@@ -90,7 +90,6 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
             TAG_MANAGER.notifyOnTagsChanged();        
     }
 
-    //TODO: deals with fetchedMedia
     onLoad(page:JQuery, selectedResourceIDs:string[]){
         this.currentPage = page
         this.currentPage.find('#tag-editor-approved-btn').click(()=>{
@@ -118,7 +117,7 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
         var tagsCountMap = {}
         for (var i = 0; i < selectedMediaIds.length; i++) {
         
-            var assignedTags = fetchedMedia[selectedMediaIds[i]].tags
+            var assignedTags = MEDIA_ITERATOR.findById(selectedMediaIds[i])[1].tags()
 
             for(var j=0; j < assignedTags.length; j++){
                 if (assignedTags[j].name in tagsCountMap) {
@@ -132,7 +131,7 @@ class TagManagerPageHandler implements MultiSelectionPageActionHandler {
                 .withMedia(
                     UiCommons.describeMedia()
                         .withId(selectedMediaIds[i])
-                        .withType(fetchedMedia[selectedMediaIds[i]].type as string))
+                        .withType(MEDIA_ITERATOR.findById(selectedMediaIds[i])[1].type()))
                 .withParent(thumbnailContentPanel))
         }
 
@@ -286,7 +285,7 @@ class RemoveMediaPageHandler implements MultiSelectionPageActionHandler {
                 .withMedia(
                     UiCommons.describeMedia()
                         .withId(selectedMediaIds[i])
-                        .withType(fetchedMedia[selectedMediaIds[i]].type as string))
+                        .withType(MEDIA_ITERATOR.findById(selectedMediaIds[i])[1].type()))
                 .withParent(thumbnailContentPanel))
         }
     }
