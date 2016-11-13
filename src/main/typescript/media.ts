@@ -111,6 +111,10 @@ class MediaIterator {
         this._mediaRepository.clear()
     }
 
+    filters():string{
+        return this._filters
+    }
+
     dropFilter(){
         this.applyFilters("")
     }
@@ -129,6 +133,8 @@ class MediaIterator {
 
     seek(position:number) : boolean {
         if (position > this.maxSeekPosition()){
+            return false
+        } else if (position < -1){
             return false
         }
         
@@ -168,7 +174,7 @@ class MediaIterator {
     }
 
     canNext():boolean {
-        return this._position < this._mediaRepository.size()
+        return this._position < (this._mediaRepository.size() -1)
     }
 
     private _do_next(until_pos:number, mediator:(position:number, media:Media, isLast: boolean) => void) {

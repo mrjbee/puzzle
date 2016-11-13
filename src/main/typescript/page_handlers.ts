@@ -299,6 +299,7 @@ class MediaPreviewPage {
     private mediaIterator: MediaIterator;
     private page:JQuery
     private curMedia:Media
+    private updateDashboardRequest = false
 
     constructor(page:JQuery, iter: MediaIterator) {
         this.mediaIterator = iter;
@@ -342,6 +343,7 @@ class MediaPreviewPage {
     }
 
     onLoad(currentMediaId:string){
+        this.updateDashboardRequest = false
         let curIndex = this.mediaIterator.findById(currentMediaId)[0] - 1
         this.mediaIterator.seek(curIndex);
         this._updateNvaigationUI(false, false)
@@ -374,6 +376,40 @@ class MediaPreviewPage {
             var url = 'api/media/'+this.curMedia.id()+"?disposition=attachment"
             var win = window.open(url, 'download_window');   
         })
+
+        this.page.find("#exit-btn").click(()=>{
+            if (this.updateDashboardRequest){
+                $("#panel_image").empty()
+                MEDIA_ITERATOR.seek(-1)
+                loadMoreMediaItems()
+            }
+        })
+
+
+        this.page.find("#delete-media-btn").click(()=>{
+             this._updateNvaigationUI(false, false)
+             let idToRemove = this.curMedia.id()
+             $.ajax({
+                url: 'api/media/'+idToRemove,
+                type: 'DELETE',
+                success: (result) => {
+                    this.updateDashboardRequest = true
+                    if (this.mediaIterator.canNext()){
+                        this._loadNextAndSetImage((next,prev)=>{this._updateNvaigationUI(next,prev)})
+                        this.mediaIterator.delete(idToRemove)
+                    } else {
+                        this.mediaIterator.delete(idToRemove)
+                        $("#exit-btn").click();                    
+                    } 
+                },
+                error: function(result) {
+                    alert("Medi resource removing failed.")
+                    console.log(result)
+                },
+            });
+            
+       })
+
     }
 
     _fullScreen() {
