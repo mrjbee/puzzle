@@ -47,6 +47,9 @@ public class BrowserApi {
     @Autowired
     LinuxVideoFileMetadataExtractor linuxVideoFileMetadataExtractor;
 
+    @Autowired
+    ImageLoader imageLoader;
+
     private BufferedImage playImage;
 
     @PostConstruct
@@ -161,7 +164,7 @@ public class BrowserApi {
         FileInputStream fileInputStream = null;
         try {
             fileInputStream = new FileInputStream(file);
-            return ResponseEntity.ok()
+            return enableCache(ResponseEntity.ok())
                     .header("Content-Disposition", disposition+"; filename=\"" + file.getName() + "\"")
                     .contentLength(file.length())
                     .contentType(mediaFileEntity.getType() == MediaMetadata.Type.VIDEO ?
@@ -194,7 +197,7 @@ public class BrowserApi {
         }
 
         try {
-            BufferedImage originalImage = ImageIO.read(file);
+            BufferedImage originalImage = imageLoader.readImage(file);
             int originalWidth = originalImage.getWidth();
             int originalHeight = originalImage.getHeight();
             Dimension outputSize = null;
@@ -239,7 +242,7 @@ public class BrowserApi {
 
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ImageIO.write(resizedImage, "jpg", os);
-            return ResponseEntity.ok()
+            return enableCache(ResponseEntity.ok())
                     .contentLength(os.size())
                     .contentType(MediaType.IMAGE_JPEG)
                     .body(new InputStreamResource(new ByteArrayInputStream(os.toByteArray())));
@@ -290,5 +293,18 @@ public class BrowserApi {
             tags.add(new Tag(tagEntity.getTitle(),tagEntity.getType()));
         }
         return tags;
+    }
+
+
+    private static ResponseEntity.BodyBuilder enableCache(ResponseEntity.BodyBuilder builder){
+        Date expdate = new Date ();
+        expdate.setTime (expdate.getTime() + 86400);
+        String expiresValue = expdate.toGMTString();
+
+        return builder
+                //TODO read about public here
+                .header("Pragma","public")
+                .header("Cache-Control","max-age=86400")
+                .header("Expires", expiresValue);
     }
 }

@@ -1,5 +1,7 @@
 /// <reference path="../../../typings/index.d.ts" />
 
+var IMAGE_LOADER = new ImageLoader()
+
 /**
  * UiCommons
  */
@@ -77,6 +79,8 @@ class ThumnailsPanelBuilder extends ParentAwareBuilder{
 
     buildChilds():JQuery[]{
         var answer : JQuery[] = []
+
+        let imgElem = $('<img>');
         answer.push(
             $('<div>')
                 .attr("id",`${this._prefix}_${this._media._mediaId}`)
@@ -84,8 +88,7 @@ class ThumnailsPanelBuilder extends ParentAwareBuilder{
                 .width(THUMBNAILS_MATH.cellWidth - 8)
                 .height(THUMBNAILS_MATH.cellHeight - 8)
                 .append(
-                    $('<img>')
-                        .attr("src","api/thumbnail/"+this._media._mediaId+"?width="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE+"&height="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE)
+                    imgElem
                 )
                 .append (
                     $('<div>')
@@ -112,6 +115,13 @@ class ThumnailsPanelBuilder extends ParentAwareBuilder{
                         .text(this._media._mediaType.toLowerCase())
                 )
         )
+
+        IMAGE_LOADER.pushTask(new ImageLoadingTask(
+            imgElem,
+            "api/thumbnail/"+this._media._mediaId+"?width="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE+"&height="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE,
+            "api/thumbnail/"+this._media._mediaId+"?width="+10+"&height="+10
+        ))
+
         return answer;
     }
 
