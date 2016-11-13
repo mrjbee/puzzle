@@ -80,16 +80,23 @@ function initialize_browser_module(){
    })
    $( ":mobile-pagecontainer" ).on( "pagecontainerload", function( event, ui ) {
         var pageId = ui.toPage.first().attr('id') as string
-        var pageHandlerIndex = MULTI_SELECTION_HANDLERS.map(it=>{
-            return it.getPageId()
-        }).indexOf(pageId)
-        if (pageHandlerIndex < 0){
-            alert("There is no handler for page = "+pageId)    
+
+        if ("photo-view-page" == pageId){
+            let iterator = MEDIA_ITERATOR.clone() 
+            new MediaPreviewPage(ui.toPage as JQuery, iterator).onLoad(waitForPreviewMediaId)  
         } else{
-           MULTI_SELECTION_HANDLERS[pageHandlerIndex].onLoad(
-               ui.toPage as JQuery,
-               selectedMediaIds)     
-        }  
+            //asume that on of the MULTI_SELECTION_HANDLERS would be found
+            var pageHandlerIndex = MULTI_SELECTION_HANDLERS.map(it=>{
+                return it.getPageId()
+            }).indexOf(pageId)
+            if (pageHandlerIndex < 0){
+                alert("There is no handler for page = "+pageId)    
+            } else{
+            MULTI_SELECTION_HANDLERS[pageHandlerIndex].onLoad(
+                ui.toPage as JQuery,
+                selectedMediaIds)     
+            }  
+        }
     } );
     $('#open-selection-btn').click(function(){
         for (var i = 0; i < selectedMediaIds.length; i++) {
@@ -247,9 +254,17 @@ function openMediaInTab(mediaId){
 }
 
 var selectedMediaIds = []
+var waitForPreviewMediaId
+
 function onThumbnailPress(mediaId){
     if (selectedMediaIds.length == 0){
-        openMediaInTab(mediaId)
+        waitForPreviewMediaId = mediaId;
+        ($(":mobile-pagecontainer") as any)
+            .pagecontainer("change","pages/photoView.html", {
+                 transition:"slide",
+                 showLoadMsg:true,
+                 changeHash:true
+            } );
     } else {
         vibrate(50)
         var mediaIdIndex = $.inArray(mediaId, selectedMediaIds)

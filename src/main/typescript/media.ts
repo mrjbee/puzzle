@@ -96,6 +96,14 @@ class MediaIterator {
         this._mediaRepository = repository
     }
 
+    clone(): MediaIterator {
+        let answer = new MediaIterator(this._mediaLoader, this._mediaRepository)
+        answer._hasMore = this._hasMore
+        answer._position = this._position
+        answer._filters = this._filters
+        return answer;
+    }
+
     applyFilters(filters:string) {
         this._filters = filters
         this._position = -1
@@ -109,6 +117,10 @@ class MediaIterator {
 
     position() : number {
         return this._position
+    }
+
+    seekPrev() : boolean {
+        return this.seek(this._position-1)
     }
 
     seekNext() : boolean {

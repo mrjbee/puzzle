@@ -290,3 +290,72 @@ class RemoveMediaPageHandler implements MultiSelectionPageActionHandler {
         }
     }
 }
+
+/**
+ * MediaPreviewPage
+ */
+class MediaPreviewPage {
+    
+    private mediaIterator: MediaIterator;
+    private page:JQuery
+
+    constructor(page:JQuery, iter: MediaIterator) {
+        this.mediaIterator = iter;
+        this.page = page
+    }
+
+    _loadNextAndSetImage(onResult:(hasNext:boolean, hasPrev:boolean) => void){
+        this.page.find("#media-preview")
+              .removeAttr("src")
+        let hasNextAnswer = true;      
+        this.mediaIterator.next(1,(position, media) => {
+            if (media == null){
+                alert("Sory no media more")
+            } else{
+                
+                this.page.find("#media-preview")
+                    .attr("src","api/thumbnail/"+media.id()+"?width="+window.innerWidth+"&height="+window.innerHeight)
+                
+                this.mediaIterator.next(1,(position, media) => {
+                    this.mediaIterator.seek(position - 1)
+                    onResult(media != null, position > 1)
+                })
+
+            }
+        }) 
+        
+    }
+
+    _updateNvaigationUI(hasNext:boolean, hasPrev:boolean){
+       if (hasNext){
+            this.page.find("#go-next-btn").removeClass("ui-state-disabled")
+       } else {
+            this.page.find("#go-next-btn").addClass("ui-state-disabled")
+       }
+
+       if (hasPrev){
+            this.page.find("#go-prev-btn").removeClass("ui-state-disabled")
+       } else {
+            this.page.find("#go-prev-btn").addClass("ui-state-disabled")
+       }
+    }
+
+    onLoad(currentMediaId:string){
+        let curIndex = this.mediaIterator.findById(currentMediaId)[0] - 1
+        this.mediaIterator.seek(curIndex);
+        this._updateNvaigationUI(false, false)
+        this._loadNextAndSetImage((next,prev)=>{this._updateNvaigationUI(next,prev)})
+
+        this.page.find("#go-prev-btn").click(()=>{
+            this._updateNvaigationUI(false, false)
+            this.mediaIterator.seek(this.mediaIterator.position() - 2);
+            this._loadNextAndSetImage((next,prev)=>{this._updateNvaigationUI(next,prev)})
+        })  
+
+        this.page.find("#go-next-btn").click(()=>{
+            this._updateNvaigationUI(false, false)
+            this._loadNextAndSetImage((next,prev)=>{this._updateNvaigationUI(next,prev)})
+        })   
+    }
+
+}
