@@ -356,6 +356,38 @@ class MediaPreviewPage {
             this._updateNvaigationUI(false, false)
             this._loadNextAndSetImage((next,prev)=>{this._updateNvaigationUI(next,prev)})
         })   
+
+        this.page.find("#fullscreen-btn").click(()=>{
+            this._fullScreen()
+        })   
+        
     }
+
+    _fullScreen() {
+        let doc = (document as any)
+        if (!document.fullscreenElement &&    // alternative standard method
+            !doc.mozFullScreenElement && !document.webkitFullscreenElement && !doc.msFullscreenElement ) {  // current working methods
+            if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+            } else if (doc.documentElement.msRequestFullscreen) {
+            doc.documentElement.msRequestFullscreen();
+            } else if (doc.documentElement.mozRequestFullScreen) {
+            doc.documentElement.mozRequestFullScreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+            doc.documentElement.webkitRequestFullscreen((Element as any).ALLOW_KEYBOARD_INPUT);
+            }
+        } else {
+            if (document.exitFullscreen) {
+            document.exitFullscreen();
+            } else if (doc.msExitFullscreen) {
+            doc.msExitFullscreen();
+            } else if (doc.mozCancelFullScreen) {
+            doc.mozCancelFullScreen();
+            } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+            }
+        }
+    }
+     
 
 }
