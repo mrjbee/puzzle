@@ -148,6 +148,7 @@ public class BrowserApi {
 
     @RequestMapping(value = "media/{mediaId}", method = RequestMethod.GET)
     public ResponseEntity getMedia(
+            @RequestParam(value = "disposition", defaultValue = "inline") String disposition,
             @PathVariable Long mediaId) {
         MediaFileEntity mediaFileEntity = mediFileRepository.findOne(mediaId);
         if (mediaFileEntity == null) {
@@ -161,7 +162,7 @@ public class BrowserApi {
         try {
             fileInputStream = new FileInputStream(file);
             return ResponseEntity.ok()
-                    .header("Content-Disposition", "inline; filename=\"" + file.getName() + "\"")
+                    .header("Content-Disposition", disposition+"; filename=\"" + file.getName() + "\"")
                     .contentLength(file.length())
                     .contentType(mediaFileEntity.getType() == MediaMetadata.Type.VIDEO ?
                             MediaType.parseMediaType("video/mp4") : MediaType.IMAGE_JPEG)

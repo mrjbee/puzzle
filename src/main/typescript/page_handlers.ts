@@ -298,6 +298,7 @@ class MediaPreviewPage {
     
     private mediaIterator: MediaIterator;
     private page:JQuery
+    private curMedia:Media
 
     constructor(page:JQuery, iter: MediaIterator) {
         this.mediaIterator = iter;
@@ -312,7 +313,7 @@ class MediaPreviewPage {
             if (media == null){
                 alert("Sory no media more")
             } else{
-                
+                this.curMedia = media;
                 this.page.find("#media-preview")
                     .attr("src","api/thumbnail/"+media.id()+"?width="+window.innerWidth+"&height="+window.innerHeight)
                 
@@ -358,9 +359,21 @@ class MediaPreviewPage {
         })   
 
         this.page.find("#fullscreen-btn").click(()=>{
+            $("#media-actions-popup").popup( "close" )
             this._fullScreen()
-        })   
-        
+        })  
+
+        this.page.find("#raw-btn").click(()=>{
+            $("#media-actions-popup").popup( "close" )
+            var url = 'api/media/'+this.curMedia.id()
+            var win = window.open(url, '_blank');   
+        })
+
+        this.page.find("#download-btn").click(()=>{
+            $("#media-actions-popup").popup( "close" )
+            var url = 'api/media/'+this.curMedia.id()+"?disposition=attachment"
+            var win = window.open(url, 'download_window');   
+        })
     }
 
     _fullScreen() {

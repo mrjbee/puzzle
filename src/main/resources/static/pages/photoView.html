@@ -8,11 +8,21 @@
                 <a href="#pageDashboard"  data-rel="back" data-transition="slide" 
                 class="ui-btn ui-corner-all ui-btn-icon-left ui-icon-back">Exit</a>
                 <a href="#" id="go-prev-btn" class="ui-btn ui-corner-all ui-icon-arrow-l ui-btn-icon-left">Previous</a>
+                <a href="#media-actions-popup" data-rel="popup" data-transition="slideup" 
+                   class="ui-btn ui-corner-all ui-shadow ui-icon-gear ui-btn-icon-left">More...</a>
                 <a href="#" id="go-next-btn" class="ui-btn ui-corner-all ui-icon-arrow-r ui-btn-icon-right">Next</a>
-                <a href="#" id="fullscreen-btn" class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-right">Fullscreen</a>
             </div>
             
         </div>
 
+    </div>
+    <div data-role="popup" id="media-actions-popup" data-theme="b">
+            <ul data-role="listview" data-inset="true" style="min-width:210px;">
+                <li data-role="list-divider">Choose an action</li>
+                <a href="#" id="fullscreen-btn" class="ui-btn ui-corner-all ui-icon-action ui-btn-icon-right">Fullscreen</a>
+                <li data-icon="forward"><a href="#" id="raw-btn">Open In Tab</a></li>
+                <li data-icon="carat-d"><a href="#" id="download-btn">Download</a></li>
+                <li><a href="#">Delete</a></li>
+            </ul>
     </div>
 </div>
