@@ -36,6 +36,12 @@ public final class ImageLoader {
                        return answer == 0? 1: answer;
                    }
                })
+               .removalListener(new RemovalListener<String, CacheEntry>() {
+                   @Override
+                   public void onRemoval(final RemovalNotification<String, CacheEntry> notification) {
+                       System.out.println(notification.getKey());
+                   }
+               })
                .build();
     }
 
