@@ -172,7 +172,7 @@ function onNewMediaItem(mediaResource){
 var content
 function onMedia(media){
     if (media == null) {
-        if (MEDIA_ITERATOR.canNext()) {
+        if (MEDIA_ITERATOR.canNext() || MEDIA_ITERATOR.hasMore()) {
             var panel = content
             if (panel == null){
                 panel = $("#panel_image")

@@ -96,6 +96,10 @@ class MediaIterator {
         this._mediaRepository = repository
     }
 
+    hasMore(){
+        return this._hasMore;
+    }
+
     clone(): MediaIterator {
         let answer = new MediaIterator(this._mediaLoader, this._mediaRepository)
         answer._hasMore = this._hasMore

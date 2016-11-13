@@ -25,13 +25,15 @@ public final class ImageLoader {
                .weigher(new Weigher<String, CacheEntry>() {
                    @Override
                    public int weigh(final String key, final CacheEntry value) {
+                       int answer = 0;
                        if (value.file.length() == 0){
-                           return Math.round(
+                           answer = Math.round(
                                    (value.image.getWidth() *
                                    value.image.getHeight() * 4 * 4 * 4 * 4) / 1000000);
                        } else {
-                           return Math.round(value.file.length() / 1000000);
+                           answer = Math.round(value.file.length() / 1000000);
                        }
+                       return answer == 0? 1: answer;
                    }
                })
                .build();
