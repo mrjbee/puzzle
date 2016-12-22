@@ -1,5 +1,6 @@
 package org.monroe.team.puzzle.apps.mediabrowser.api;
 
+import org.monroe.team.puzzle.apps.mediabrowser.Log;
 import org.monroe.team.puzzle.apps.mediabrowser.api.dto.*;
 import org.monroe.team.puzzle.apps.mediabrowser.api.ext.ChunkPageable;
 import org.monroe.team.puzzle.apps.mediabrowser.indexer.MediaFileEntity;
@@ -8,7 +9,6 @@ import org.monroe.team.puzzle.apps.mediabrowser.tags.MediaFileToTagLink;
 import org.monroe.team.puzzle.apps.mediabrowser.tags.MediaFileToTagLinkRepository;
 import org.monroe.team.puzzle.apps.mediabrowser.tags.TagEntity;
 import org.monroe.team.puzzle.apps.mediabrowser.tags.TagRepository;
-import org.monroe.team.puzzle.core.log.Logs;
 import org.monroe.team.puzzle.pieces.fs.LinuxVideoFileMetadataExtractor;
 import org.monroe.team.puzzle.pieces.metadata.MediaMetadata;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +34,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class BrowserApi {
+
+    @Autowired
+    Log log;
 
     @Autowired
     MediaFileRepository mediFileRepository;
@@ -167,7 +170,7 @@ public class BrowserApi {
             return enableCache(ResponseEntity.ok())
                     .header("Content-Disposition", disposition+"; filename=\"" + file.getName() + "\"")
                     .contentLength(file.length())
-                    .contentType(mediaFileEntity.getType() == MediaMetadata.Type.VIDEO ?
+                    .contentType(isAVideo(mediaFileEntity) ?
                             MediaType.parseMediaType("video/mp4") : MediaType.IMAGE_JPEG)
                     .body(new InputStreamResource(fileInputStream));
         } catch (FileNotFoundException e) {
@@ -188,7 +191,8 @@ public class BrowserApi {
             return ResponseEntity.notFound().build();
         }
         File file = new File(mediaFileEntity.getFileName());
-        if (mediaFileEntity.getType() == MediaMetadata.Type.VIDEO) {
+        boolean isVideoResource = isAVideo(mediaFileEntity);
+        if (isVideoResource) {
             file = linuxVideoFileMetadataExtractor.getVideoThumbnail(file);
         }
 
@@ -197,49 +201,7 @@ public class BrowserApi {
         }
 
         try {
-            BufferedImage originalImage = imageLoader.readImage(file);
-            int originalWidth = originalImage.getWidth();
-            int originalHeight = originalImage.getHeight();
-            Dimension outputSize = null;
-            float widthDiff = (float) width / (float) originalWidth;
-            float heightDiff = (float) height / (float) originalHeight;
-
-            if (widthDiff > heightDiff) {
-                outputSize = new Dimension(
-                        Math.round(originalWidth * widthDiff),
-                        Math.round(originalHeight * widthDiff)
-                );
-            } else {
-                outputSize = new Dimension(
-                        Math.round(originalWidth * heightDiff),
-                        Math.round(originalHeight * heightDiff)
-                );
-            }
-
-            BufferedImage resizedImage = new BufferedImage(
-                    width,
-                    height,
-                    BufferedImage.TYPE_INT_RGB);
-            Graphics2D g = resizedImage.createGraphics();
-            g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
-            g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
-            g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-
-            int xOffset = (int) ((outputSize.getWidth() - width) / 2);
-            int yOffset = (int) ((outputSize.getHeight() - height) / 2);
-
-            g.drawImage(originalImage, -xOffset, -yOffset,
-                    outputSize.width,
-                    outputSize.height, null);
-            if (mediaFileEntity.getType() == MediaMetadata.Type.VIDEO) {
-                g.setColor(new Color(0, 0, 0, 151));
-                g.fillRect(0, 0, width, height);
-                g.drawImage(playImage,
-                        width / 2 - playImage.getWidth() / 2,
-                        height / 2 - playImage.getHeight() / 2, null);
-            }
-            g.dispose();
-
+            BufferedImage resizedImage = prepareThumbnailImage(width, height, file, isVideoResource);
             ByteArrayOutputStream os = new ByteArrayOutputStream();
             ImageIO.write(resizedImage, "jpg", os);
             return enableCache(ResponseEntity.ok())
@@ -249,6 +211,60 @@ public class BrowserApi {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    private BufferedImage prepareThumbnailImage(
+            final Integer width,
+            final Integer height,
+            final File file,
+            final boolean isVideoResource) {
+        BufferedImage originalImage = imageLoader.readImage(file);
+        int originalWidth = originalImage.getWidth();
+        int originalHeight = originalImage.getHeight();
+        Dimension outputSize = null;
+        float widthDiff = (float) width / (float) originalWidth;
+        float heightDiff = (float) height / (float) originalHeight;
+
+        if (widthDiff > heightDiff) {
+            outputSize = new Dimension(
+                    Math.round(originalWidth * widthDiff),
+                    Math.round(originalHeight * widthDiff)
+            );
+        } else {
+            outputSize = new Dimension(
+                    Math.round(originalWidth * heightDiff),
+                    Math.round(originalHeight * heightDiff)
+            );
+        }
+
+        BufferedImage resizedImage = new BufferedImage(
+                width,
+                height,
+                BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = resizedImage.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        int xOffset = (int) ((outputSize.getWidth() - width) / 2);
+        int yOffset = (int) ((outputSize.getHeight() - height) / 2);
+
+        g.drawImage(originalImage, -xOffset, -yOffset,
+                outputSize.width,
+                outputSize.height, null);
+        if (isVideoResource) {
+            g.setColor(new Color(0, 0, 0, 151));
+            g.fillRect(0, 0, width, height);
+            g.drawImage(playImage,
+                    width / 2 - playImage.getWidth() / 2,
+                    height / 2 - playImage.getHeight() / 2, null);
+        }
+        g.dispose();
+        return resizedImage;
+    }
+
+    private boolean isAVideo(final MediaFileEntity mediaFileEntity) {
+        return mediaFileEntity.getType() == MediaMetadata.Type.VIDEO;
     }
 
     @RequestMapping(value = "tags/update", method = RequestMethod.POST)
