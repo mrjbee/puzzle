@@ -11,8 +11,7 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.awt.image.DataBuffer;
 import java.io.File;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
+import java.util.concurrent.*;
 
 @Component
 public final class ImageLoader {
@@ -25,6 +24,8 @@ public final class ImageLoader {
     @Value("${media.browser.image.cache.mb}")
     Long cacheMaxSize;
     Cache<String, CacheEntry> imageCache;
+
+    ExecutorService imageIOReadAtOnce = Executors.newFixedThreadPool(1);
 
     @PostConstruct
     public void inti(){
@@ -55,7 +56,13 @@ public final class ImageLoader {
             return imageCache.get(file.getAbsolutePath(), new Callable<CacheEntry>() {
                 @Override
                 public CacheEntry call() throws Exception {
-                    return new CacheEntry(ImageIO.read(file), file);
+                    BufferedImage image = imageIOReadAtOnce.submit(new Callable<BufferedImage>() {
+                        @Override
+                        public BufferedImage call() throws Exception {
+                            return ImageIO.read(file);
+                        }
+                    }).get();
+                    return new CacheEntry( image, file);
                 }
             }).image;
         } catch (ExecutionException e) {
