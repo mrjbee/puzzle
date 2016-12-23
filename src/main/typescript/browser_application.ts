@@ -168,6 +168,32 @@ function onNewMediaItem(mediaResource){
 
     onMedia(media)
 }
+var waypoint = null
+function waypoint_init(){
+    if (waypoint){
+            waypoint.destroy()
+            waypoint = null
+        }
+        
+    waypoint = new Waypoint({
+            element: document.getElementById('element_waypoint'),
+            handler: function(direction) {
+                waypoint_onTriger()
+            },
+            offset: '100%'
+        })
+}
+
+function waypoint_onTriger(){
+        //remove
+        if (waypoint){
+            waypoint.destroy()
+            waypoint = null
+        }
+
+        $("#element_waypoint").remove();
+        loadMoreMediaItems()
+}
 
 var content
 function onMedia(media){
@@ -181,16 +207,7 @@ function onMedia(media){
                 $('<div>')
                     .attr("id", "element_waypoint")
             )
-            var waypoint = new Waypoint({
-              element: document.getElementById('element_waypoint'),
-              handler: function(direction) {
-                //remove
-                waypoint.destroy()
-                $("#element_waypoint").remove();
-                loadMoreMediaItems()
-              },
-              offset: '100%'
-            })
+            waypoint_init()
         } 
         return
     }
