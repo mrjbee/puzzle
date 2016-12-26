@@ -382,11 +382,7 @@ class MediaPreviewPage {
                 $("#panel_image").empty()
                 MEDIA_ITERATOR.seek(-1)
                 loadMoreMediaItems()
-            } else {
-                //TODO: Remove this workaorond some day
-                waypoint_onTriger()
             }
-            
         })
 
 

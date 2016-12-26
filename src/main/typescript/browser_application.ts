@@ -4,8 +4,6 @@
 /// <reference path="tag_manager.ts" />
 /// <reference path="page_handlers.ts" />
 
-
-declare var Waypoint: any
 var MULTI_SELECTION_HANDLERS = [new TagManagerPageHandler(), new RemoveMediaPageHandler()]
 var THUMBNAILS_MATH = ThumbnailMath.DEFAULT;
 var TAG_MANAGER = new TagManager();
@@ -125,35 +123,45 @@ function initialize_browser_module(){
         MEDIA_ITERATOR.applyFilters(filters)
         loadMoreMediaItems()
     })    
+    testLoadMore()
+}
 
-    loadMoreMediaItems()
+var loadAllowedMore = true
+
+function testLoadMore(){
+    if($(window).scrollTop() + $(window).height() == $(document).height()) {
+        if ($("#panel_image").is(":visible")){
+            //if (loadAllowedMore){
+                loadMoreMediaItems()
+                loadAllowedMore = false
+                // if (MEDIA_ITERATOR.canNext() || MEDIA_ITERATOR.hasMore()) {
+            //}
+        }
+    }
+    setTimeout(() => { 
+        testLoadMore() 
+    }, 300);
 }
 
 function loadMoreMediaItems(){
-
-    /*
-        $.mobile.loading( "show", {
-                    text: "Loading. PLease wait",
-                    textVisible: false,
-        });
-        $.mobile.loading( "hide" );
-    */
-    MEDIA_ITERATOR.next(10,(position:number, media:Media, isLast:boolean) => {
+    $.mobile.loading( "show", {
+                    text: "Loading more... Please wait",
+                    textVisible: true,
+                    theme: "b"
+    });
+    MEDIA_ITERATOR.next(4,(position:number, media:Media, isLast:boolean) => {
+        //TODO: fix isLast
         if (media != null){
             onNewMediaItem(media.model())
         }
         if (isLast){
-            onNewMediaItem(null)
+             $.mobile.loading( "hide" );
         }
+        
     });
 }
 
 function onNewMediaItem(mediaResource){
-
-    if (mediaResource == null){
-        onMedia(null)
-        return
-    }
 
     var creationDate = new Date(mediaResource.creationDate);
 
@@ -168,50 +176,10 @@ function onNewMediaItem(mediaResource){
 
     onMedia(media)
 }
-var waypoint = null
-function waypoint_init(){
-    if (waypoint){
-            waypoint.destroy()
-            waypoint = null
-        }
-        
-    waypoint = new Waypoint({
-            element: document.getElementById('element_waypoint'),
-            handler: function(direction) {
-                waypoint_onTriger()
-            },
-            offset: '100%'
-        })
-}
 
-function waypoint_onTriger(){
-        //remove
-        if (waypoint){
-            waypoint.destroy()
-            waypoint = null
-        }
-
-        $("#element_waypoint").remove();
-        loadMoreMediaItems()
-}
 
 var content
 function onMedia(media){
-    if (media == null) {
-        if (MEDIA_ITERATOR.canNext() || MEDIA_ITERATOR.hasMore()) {
-            var panel = content
-            if (panel == null){
-                panel = $("#panel_image")
-            }
-            panel.append(
-                $('<div>')
-                    .attr("id", "element_waypoint")
-            )
-            waypoint_init()
-        } 
-        return
-    }
-
     var thumbnailsPanelWidth = THUMBNAILS_MATH.calculateThumbnailsPanelWidth()
     var panel_image = $("#panel_image")
     var groupId = "panel_thumbnails_" + media.sortByDate.getTime();
