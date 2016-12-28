@@ -126,14 +126,12 @@ function initialize_browser_module(){
     testLoadMore()
 }
 
-var loadAllowedMore = true
-
 function testLoadMore(){
     if($(window).scrollTop() + $(window).height() == $(document).height()) {
+        //Prevent loading when other dialog is opened
         if ($("#panel_image").is(":visible")){
             //if (loadAllowedMore){
                 loadMoreMediaItems()
-                loadAllowedMore = false
                 // if (MEDIA_ITERATOR.canNext() || MEDIA_ITERATOR.hasMore()) {
             //}
         }
@@ -144,20 +142,11 @@ function testLoadMore(){
 }
 
 function loadMoreMediaItems(){
-    $.mobile.loading( "show", {
-                    text: "Loading more... Please wait",
-                    textVisible: true,
-                    theme: "b"
-    });
     MEDIA_ITERATOR.next(4,(position:number, media:Media, isLast:boolean) => {
         //TODO: fix isLast
         if (media != null){
             onNewMediaItem(media.model())
-        }
-        if (isLast){
-             $.mobile.loading( "hide" );
-        }
-        
+        }     
     });
 }
 
