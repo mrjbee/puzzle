@@ -25,7 +25,7 @@ public final class ImageLoader {
     Long cacheMaxSize;
     Cache<String, CacheEntry> imageCache;
 
-    
+
     ExecutorService imageIOReadAtOnce = Executors.newFixedThreadPool(4);
 
     @PostConstruct

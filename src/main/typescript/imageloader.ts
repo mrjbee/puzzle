@@ -23,10 +23,30 @@ class ImageLoader {
     
     private imageLoadingTasks = new Array<ImageLoadingTask>()
     private tasksUnderAwaiting = new Array<ImageLoadingTask>()
+    private tasksAwaitingViewport = new Array<ImageLoadingTask>()
+
+    constructor() {
+        $(document).scroll(() => {
+            
+            let tasksToTransfer = this.tasksAwaitingViewport.filter((task)=>{
+                return this._isInViewport(task.img.get()[0])     
+            })
+            
+            tasksToTransfer.forEach((task) => {
+                let inex = this.tasksAwaitingViewport.indexOf(task)
+                this.tasksAwaitingViewport.splice(inex,1)
+                this.imageLoadingTasks.push(task)
+            })
+
+            if (tasksToTransfer.length > 0){
+                this._execute()
+            }
+        });
+    }
 
     pushTask(task:ImageLoadingTask){
         //remove bad quality preloading
-        task.lowResDone = true
+        //task.lowResDone = true
 
         this.imageLoadingTasks.push(task)
         this._execute()
@@ -61,7 +81,6 @@ class ImageLoader {
             this.imageLoadingTasks = this.imageLoadingTasks.sort((task, otherTask) => {
                 let taskWeight = this._calculateTaskWeight(task)
                 let otherTaskWeight = this._calculateTaskWeight(otherTask)
-
                 if (taskWeight > otherTaskWeight){
                     return -1
                 } else if (otherTaskWeight > taskWeight){
@@ -72,8 +91,18 @@ class ImageLoader {
             })
             let taskToPerform = this.imageLoadingTasks.shift()
             if (taskToPerform){
-                this._performTask(taskToPerform)
+                if (this._isInViewport(taskToPerform.img.get()[0])){
+                    this._performTask(taskToPerform)
+                } else{
+                    this.tasksAwaitingViewport.push(taskToPerform)
+                    if (this.imageLoadingTasks.length > 0){
+                        this._execute()
+                    } else {
+                        $.mobile.loading( "hide" );
+                    }    
+                }
             } else {
+                $.mobile.loading( "hide" );
             }
         }
     }
