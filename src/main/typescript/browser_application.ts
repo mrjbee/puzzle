@@ -136,9 +136,12 @@ function testLoadMore(){
             //}
         }
     }
+
+    /*
     setTimeout(() => { 
         testLoadMore() 
     }, 300);
+    */
 }
 
 function loadMoreMediaItems(){
@@ -147,6 +150,11 @@ function loadMoreMediaItems(){
         if (media != null){
             onNewMediaItem(media.model())
         }     
+        if (isLast){
+            setTimeout(() => { 
+                testLoadMore() 
+            }, 300);
+        }
     });
 }
 
@@ -303,6 +311,7 @@ $(document).scroll( function() {
   // Scrolling down
   if (scrollPosition > lastScrollPosition){
     hideHeader()
+    testLoadMore()
   }
 
   // Scrolling up
