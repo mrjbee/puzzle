@@ -123,11 +123,11 @@ function initialize_browser_module(){
         MEDIA_ITERATOR.applyFilters(filters)
         loadMoreMediaItems()
     })    
-    testLoadMore()
+    loadMoreMediaItems()
 }
 
 function testLoadMore(){
-    if($(window).scrollTop() + $(window).height() == $(document).height()) {
+    if(Math.abs($(window).scrollTop() + $(window).height() - $(document).height()) < 3) {
         //Prevent loading when other dialog is opened
         if ($("#panel_image").is(":visible")){
             //if (loadAllowedMore){
