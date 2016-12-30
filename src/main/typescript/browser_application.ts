@@ -184,7 +184,7 @@ function onMedia(media){
     if ( $( "#"+groupId ).length ) {
         panel_thumbnails =  $( "#"+groupId )
     } else {
-        panel_thumbnails = $('<div>').attr("id",groupId)
+        panel_thumbnails = $('<div>').attr("id",groupId).addClass("panel-thumbnails-container")
             .append(
                 $('<h4>')
                     .addClass("ui-bar")
@@ -306,11 +306,39 @@ function ui_thumbnail_selectById(id){
 var lastScrollPosition;
 
 $(document).scroll( function() {
+  
+  
+  var headerToRefElement:Element = null
+  //TODO: current assumption that querry select in order appeared on a page
+  $(".panel-thumbnails-container > h4:first-child").each((index, element) => {
+        var rect = element.getBoundingClientRect();
+        var html = document.documentElement;
+        if (rect.top < 20){
+            headerToRefElement = element;
+        }
+  })
+
+  var captionChanged:boolean = false
+
+  if (headerToRefElement){
+      captionChanged = $("#top-most-header").text() != headerToRefElement.innerHTML
+      $("#top-most-header").text(headerToRefElement.innerHTML)
+  } else {
+      captionChanged = $("#top-most-header").text() != "Media Browser"
+      $("#top-most-header").text("Media Browser")
+  }
+
+  
+  
   var scrollPosition = $(this).scrollTop();
 
   // Scrolling down
   if (scrollPosition > lastScrollPosition){
-    hideHeader()
+    if (captionChanged){
+        showHeader()
+    } else{
+        hideHeader(false)
+    }
     testLoadMore()
   }
 
@@ -320,19 +348,27 @@ $(document).scroll( function() {
   }
 
   lastScrollPosition = scrollPosition;
+    
 });
 
-function hideHeader(){
-
-    if ($("#left-panel.ui-panel-open").length == 1) {return}
-
-    // If the header is currently showing
-    if (!$('#pageDashboard [data-role=header].ui-fixed-hidden').length) {
-      $('#pageDashboard [data-role=header]').toolbar('hide');
+var scheduledHideTimeout = null
+function hideHeader(imediatlly=true){
+    clearTimeout(scheduledHideTimeout)
+    if (imediatlly){
+        if ($("#left-panel.ui-panel-open").length == 1) {return}
+        // If the header is currently showing
+        if (!$('#pageDashboard [data-role=header].ui-fixed-hidden').length) {
+        $('#pageDashboard [data-role=header]').toolbar('hide');
+        }
+    } else {
+        scheduledHideTimeout = setTimeout(()=>{
+            hideHeader(true)
+        }, 500)
     }
 }
 
 function showHeader(){
+   clearTimeout(scheduledHideTimeout)
    if ($("#left-panel.ui-panel-open").length == 1) {return}
 
 // If the header is currently hidden
