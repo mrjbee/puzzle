@@ -51,6 +51,11 @@
         box-shadow: 0px 0px 2px RGBA(0, 0, 0, 0.52);
     }
 
+    #top-most-header{
+        text-align: left  !important;
+        margin-left: 50px !important;
+    }
+
     .cover{
         position: fixed; 
         top: 0; 
@@ -169,7 +174,7 @@
 
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
         <a href="#left-panel" 
-            class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-left ui-icon-tag ui-btn-b">Tags</a>
+            class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-tag ui-btn-b">Tags</a>
         <h1 id="top-most-header">Media Browser</h1>
         <div id="selection-actions-btn-group" data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right" style="display: none;">
             <a href="#selectedActionsPopup"  data-rel="popup" data-transition="slideup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b">
