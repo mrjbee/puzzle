@@ -54,6 +54,7 @@
     #top-most-header{
         text-align: left  !important;
         margin-left: 50px !important;
+        padding-top: 10px;
     }
 
     .cover{
@@ -118,7 +119,7 @@
 
     #selected-counter-text {
         background: #D43069;
-        padding: 2px 4px 4px 4px;
+        padding: 4px 8px 4px 8px;
         margin-right: 5px;
     }
 
@@ -174,11 +175,12 @@
 
     <div data-role="header" data-position="fixed" data-tap-toggle="false">
         <a href="#left-panel" 
-            class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-icon-tag ui-btn-b">Tags</a>
+            style="background: transparent; border: none;"
+            class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-nodisc-icon ui-alt-icon ui-icon-bars ui-btn-a">Tags</a>
         <h1 id="top-most-header">Media Browser</h1>
         <div id="selection-actions-btn-group" data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right" style="display: none;">
             <a href="#selectedActionsPopup"  data-rel="popup" data-transition="slideup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b">
-                <span id="selected-counter-text" class="ui-corner-all">0</span>media</a>
+                <span id="selected-counter-text">0</span>media</a>
             <a href="#" id="drop-selection-btn" class="ui-btn ui-btn-b ui-corner-all ui-icon-forbidden ui-btn-icon-notext">Icon only</a>
         </div>
     </div><!-- /header -->
