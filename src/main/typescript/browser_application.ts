@@ -324,8 +324,9 @@ $(document).scroll( function() {
       captionChanged = $("#top-most-header").text() != headerToRefElement.innerHTML
       $("#top-most-header").text(headerToRefElement.innerHTML)
   } else {
-      captionChanged = $("#top-most-header").text() != "Media Browser"
-      $("#top-most-header").text("Media Browser")
+      let text = 'My <span class="selected-text">Private</span> Media'
+      captionChanged = $("#top-most-header").html() != text
+      $("#top-most-header").html(text)
   }
 
   
