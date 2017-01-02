@@ -46,7 +46,7 @@
 
     
     .ui-header{
-        background: rgba(235, 229, 230, 0.90) !important;
+        background: rgba(238, 238, 238, 0.90) !important;
     }
 
     .ui-header-shadow{
@@ -59,6 +59,14 @@
         margin-top: 16px !important;
         padding-top: 0px !important;
         font-size: 20px;
+    }
+
+
+    #left-panel .ui-panel-inner{
+            background: #3876E6;
+            background-size: 80px 80px;
+            background-image: url(images/icon_back.png);
+            background-repeat: repeat; 
     }
 
     .selected-text {
@@ -219,20 +227,25 @@
     <div data-role="panel" 
         data-position-fixed="true"
         data-display="overlay"
-        id="left-panel" data-theme="a">
+        id="left-panel" data-theme="c">
         <fieldset class="ui-grid-a">
             <div class="ui-block-a" style="width:80%"><h3 class="ui-content">Display Filter</h3></div>
             <div class="ui-block-b" style="width:20%">
                 <a href="#" 
-                style="background: transparent; border: none; margin-top: 35px;"
+                style="
+                        background: #4688FF;
+                        border: none;
+                        margin-top: 33px;
+                        padding: 2px;
+                "
                 data-rel="close" class="ui-btn ui-corner-all ui-icon-delete ui-btn-icon-notext 
-                 ui-nodisc-icon ui-btn-inline ui-alt-icon">Close</a>
+                 ui-nodisc-icon ui-btn-inline">Close</a>
             </div>
         </fieldset>
 
-        <ul id="filter-tag-list" data-role="listview" data-theme="a" >
+        <ul id="filter-tag-list" data-role="listview" data-theme="c" >
             <li class="ui-field-contain">
-                 <button id="filter-apply-btn"  data-rel="close" class="ui-btn ui-mini ui-btn-a" style="margin:0px">Apply</button>
+                 <button id="filter-apply-btn"  data-rel="close" class="ui-btn ui-mini ui-btn-c" style="margin:0px">Apply</button>
             </li>
             <li data-role="list-divider">Tags <span id="filter-tag-count" class="ui-li-count">2</span></li>
             <li id="filter_tag_1" class="filter_tag_group ui-field-contain" style="padding:0px">
