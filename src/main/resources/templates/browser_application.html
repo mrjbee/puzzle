@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
-    <title>My Private Media</title>
+    <title>My Private</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="webjars/jquery/1.11.1/jquery.js"></script>
@@ -44,6 +44,7 @@
 </head>
 <style>
 
+    
     .ui-header{
         background: rgba(235, 229, 230, 0.90) !important;
     }
@@ -54,10 +55,15 @@
 
     #top-most-header{
         text-align: left  !important;
-        margin-left: 85px !important;
-        margin-top: 9px !important;
+        margin-left: 35px !important;
+        margin-top: 16px !important;
+        padding-top: 0px !important;
+        font-size: 20px;
     }
 
+    .selected-text {
+        color: #D43069;
+    }
     .cover{
         position: fixed; 
         top: 0; 
@@ -132,9 +138,7 @@
         margin-right: 5px;
     }
 
-    .selected-text {
-        color: #D43069;
-    }
+    
 
     .thumbnail_tooltip_PICTURE {
         display: none;
@@ -195,8 +199,11 @@
         <a href="#left-panel" 
             style="background: transparent; border: none; margin-top: 10px;"
             class="ui-btn-left ui-btn ui-btn-inline ui-mini ui-corner-all ui-btn-icon-notext ui-nodisc-icon ui-alt-icon ui-icon-bars ui-btn-a">Tags</a>
-        <img style="height: 40px; float: left;margin-left: 50px;margin-top: 3px; margin-bottom: 5px;" src="images/icon_small.png"></img>
-            <h1 id="top-most-header">My <span class="selected-text">Private</span> Media</h1>
+       <!-- 
+           <img style="height: 40px; float: left;margin-left: 50px;margin-top: 3px; margin-bottom: 5px;" 
+        src="images/icon_small_no_lock.png"></img>
+        -->
+            <h1 id="top-most-header">My <span class="selected-text">Private</span></h1>
         <div id="selection-actions-btn-group" data-role="controlgroup" data-type="horizontal" class="ui-mini ui-btn-right" style="display: none; margin-top: 8px;">
             <a href="#selectedActionsPopup"  data-rel="popup" data-transition="slideup" class="ui-btn ui-corner-all ui-shadow ui-btn-inline ui-btn-b">
                 <span id="selected-counter-text">0</span>media</a>
