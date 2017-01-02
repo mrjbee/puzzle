@@ -47,6 +47,7 @@ class ThumnailsMediaDescriptor {
  
     _mediaId:string;
     _mediaType:string;
+    _lazyLoad: boolean = false;
     
     withId(id:string):ThumnailsMediaDescriptor{
         this._mediaId = id;
@@ -55,6 +56,11 @@ class ThumnailsMediaDescriptor {
     
     withType(type:string):ThumnailsMediaDescriptor{
         this._mediaType = type;
+        return this;
+    }
+
+    usingLazyLoading():ThumnailsMediaDescriptor{
+        this._lazyLoad = true;
         return this;
     }
     
@@ -116,11 +122,15 @@ class ThumnailsPanelBuilder extends ParentAwareBuilder{
                 )
         )
 
-        IMAGE_LOADER.pushTask(new ImageLoadingTask(
-            imgElem,
-            "api/thumbnail/"+this._media._mediaId+"?width="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE+"&height="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE,
-            "api/thumbnail/"+this._media._mediaId+"?width="+10+"&height="+10
-        ))
+        if (this._media._lazyLoad){
+            IMAGE_LOADER.pushTask(new ImageLoadingTask(
+                imgElem,
+                "api/thumbnail/"+this._media._mediaId+"?width="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE+"&height="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE,
+                "api/thumbnail/"+this._media._mediaId+"?width="+10+"&height="+10
+            ))
+        } else {
+            imgElem.attr("src", "api/thumbnail/"+this._media._mediaId+"?width="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE+"&height="+ThumbnailMath.MAX_THUMBNAIL_CELL_SIZE)
+        }
 
         return answer;
     }

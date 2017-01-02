@@ -207,7 +207,8 @@ function onMedia(media){
         .withMedia(
             UiCommons.describeMedia()
                 .withId(media.orig.id as string)
-                .withType(media.orig.type as string))
+                .withType(media.orig.type as string)
+                .usingLazyLoading())
         .withTapFunction((id) => {
             onThumbnailPress(id)
         })
