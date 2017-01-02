@@ -349,7 +349,13 @@ $(document).scroll( function() {
   }
 
   lastScrollPosition = scrollPosition;
-    
+
+  if (scrollPosition > 10){
+      $(".ui-header").addClass("ui-header-shadow")
+  } else {
+      $(".ui-header").removeClass("ui-header-shadow")
+  }
+
 });
 
 var scheduledHideTimeout = null
