@@ -71,6 +71,10 @@ class ImageLoader {
     }
 
     private _execute(){
+        setTimeout(()=>{this._executeImpl()},0)
+    }
+
+    private _executeImpl(){
         $.mobile.loading( "show", {
                     text: "Loading more... Please wait",
                     textVisible: true,
