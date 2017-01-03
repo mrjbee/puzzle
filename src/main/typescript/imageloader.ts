@@ -22,7 +22,7 @@ class ImageLoadingTask {
 class ImageLoader {
     
     private imageLoadingTasks = new Array<ImageLoadingTask>()
-    private tasksUnderAwaiting = new Array<ImageLoadingTask>()
+    private tasksLoadFinishAwaiting = new Array<ImageLoadingTask>()
     private tasksAwaitingViewport = new Array<ImageLoadingTask>()
 
     constructor() {
@@ -72,10 +72,10 @@ class ImageLoader {
     private _executeTimerId = null
     private _execute(){
         if (this._executeTimerId == null){
-            setTimeout(()=>{
+            this._executeTimerId = setTimeout(()=>{
                 this._executeTimerId = null
                 this._executeImpl()
-            },0)
+            }, 0)
         }
     }
 
@@ -88,7 +88,7 @@ class ImageLoader {
            $.mobile.loading( "hide" );
         */
         
-        if (this.tasksUnderAwaiting.length < 5){
+        if (this.tasksLoadFinishAwaiting.length < 5 && this.imageLoadingTasks.length > 0){
             this.imageLoadingTasks = this.imageLoadingTasks.sort((task, otherTask) => {
                 let taskWeight = this._calculateTaskWeight(task)
                 let otherTaskWeight = this._calculateTaskWeight(otherTask)
@@ -106,34 +106,32 @@ class ImageLoader {
                     this._performTask(taskToPerform)
                 } else{
                     this.tasksAwaitingViewport.push(taskToPerform)    
+                    this._execute()
                 }
             }
         }
     }
+    
 
     private _performTask(task:ImageLoadingTask){
-        this.tasksUnderAwaiting.push(task)
+        this.tasksLoadFinishAwaiting.push(task)
         if (task.lowResDone){
             task.img.one("load", () => {
-                let inex = this.tasksUnderAwaiting.indexOf(task)
-                this.tasksUnderAwaiting.splice(inex,1)
-                if (this.imageLoadingTasks.length > 0){
-                    this._execute()
-                }
-                                      
+                let inex = this.tasksLoadFinishAwaiting.indexOf(task)
+                this.tasksLoadFinishAwaiting.splice(inex,1)
+                this._execute()
             })    
             task.img.attr("src", task.hiResUrl)
        } else {
             task.img.one("load", () => {
-                let inex = this.tasksUnderAwaiting.indexOf(task)                              
-                this.tasksUnderAwaiting.splice(inex,1)                       
+                let inex = this.tasksLoadFinishAwaiting.indexOf(task)                              
+                this.tasksLoadFinishAwaiting.splice(inex,1)                       
                 task.lowResDone = true
                 this.pushTask(task)
                 this._execute()
             })
             task.img.attr("src", task.lowResUrl)
         }
-        this._execute()
     }
     
 
