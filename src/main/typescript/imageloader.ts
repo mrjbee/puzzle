@@ -69,17 +69,24 @@ class ImageLoader {
         answer = this._isInViewport(task.img.get()[0]) ? answer * 2 + 1 : answer;
         return answer;
     }
-
+    private _executeTimerId = null
     private _execute(){
-        setTimeout(()=>{this._executeImpl()},0)
+        if (this._executeTimerId == null){
+            setTimeout(()=>{
+                this._executeTimerId = null
+                this._executeImpl()
+            },0)
+        }
     }
 
     private _executeImpl(){
-        $.mobile.loading( "show", {
+        /*$.mobile.loading( "show", {
                     text: "Loading more... Please wait",
                     textVisible: true,
                     theme: "b"
         });
+           $.mobile.loading( "hide" );
+        */
         
         if (this.tasksUnderAwaiting.length < 5){
             this.imageLoadingTasks = this.imageLoadingTasks.sort((task, otherTask) => {
@@ -98,15 +105,8 @@ class ImageLoader {
                 if (this._isInViewport(taskToPerform.img.get()[0])){
                     this._performTask(taskToPerform)
                 } else{
-                    this.tasksAwaitingViewport.push(taskToPerform)
-                    if (this.imageLoadingTasks.length > 0){
-                        this._execute()
-                    } else {
-                        $.mobile.loading( "hide" );
-                    }    
+                    this.tasksAwaitingViewport.push(taskToPerform)    
                 }
-            } else {
-                $.mobile.loading( "hide" );
             }
         }
     }
@@ -119,9 +119,8 @@ class ImageLoader {
                 this.tasksUnderAwaiting.splice(inex,1)
                 if (this.imageLoadingTasks.length > 0){
                     this._execute()
-                } else {
-                    $.mobile.loading( "hide" );
-                }                       
+                }
+                                      
             })    
             task.img.attr("src", task.hiResUrl)
        } else {
