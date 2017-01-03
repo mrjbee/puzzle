@@ -145,7 +145,7 @@ function testLoadMore(){
 }
 
 function loadMoreMediaItems(){
-    MEDIA_ITERATOR.next(4,(position:number, media:Media, isLast:boolean) => {
+    MEDIA_ITERATOR.next(30,(position:number, media:Media, isLast:boolean) => {
         //TODO: fix isLast
         if (media != null){
             onNewMediaItem(media.model())

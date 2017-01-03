@@ -31,7 +31,7 @@ class Media {
  */
 class MediaLoader {
 
-    private _loadAtOnce = 50
+    private _loadAtOnce = 100
 
     loadMore(startingFrom:number,
              filter:string, 
