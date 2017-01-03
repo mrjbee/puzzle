@@ -23,31 +23,19 @@ class ImageLoader {
     
     private imageLoadingTasks = new Array<ImageLoadingTask>()
     private tasksLoadFinishAwaiting = new Array<ImageLoadingTask>()
-    private tasksAwaitingViewport = new Array<ImageLoadingTask>()
+    private _scrollLazyExecuteTimer = null
 
     constructor() {
         $(document).scroll(() => {
-            
-            let tasksToTransfer = this.tasksAwaitingViewport.filter((task)=>{
-                return this._isInViewport(task.img.get()[0])     
-            })
-            
-            tasksToTransfer.forEach((task) => {
-                let inex = this.tasksAwaitingViewport.indexOf(task)
-                this.tasksAwaitingViewport.splice(inex,1)
-                this.imageLoadingTasks.push(task)
-            })
-
-            if (tasksToTransfer.length > 0){
-                this._execute()
-            }
+            clearTimeout(this._scrollLazyExecuteTimer)
+            //execute if no more scrolling
+            this._scrollLazyExecuteTimer = setTimeout(()=>{
+               this._execute();     
+            }, 200)
         });
     }
 
     pushTask(task:ImageLoadingTask){
-        //remove bad quality preloading
-        //task.lowResDone = true
-
         this.imageLoadingTasks.push(task)
         this._execute()
     }
@@ -65,10 +53,11 @@ class ImageLoader {
     }
 
     private _calculateTaskWeight(task:ImageLoadingTask):Number{
-        let answer = task.lowResDone ? 0 : 1;
-        answer = this._isInViewport(task.img.get()[0]) ? answer * 2 + 1 : answer;
+        let answer = task.lowResDone ? 1 : 2;
+        answer = this._isInViewport(task.img.get()[0]) ? answer * 2 : answer * 0;
         return answer;
     }
+
     private _executeTimerId = null
     private _execute(){
         if (this._executeTimerId == null){
@@ -77,6 +66,22 @@ class ImageLoader {
                 this._executeImpl()
             }, 0)
         }
+    }
+
+    private  _findNextTask() : ImageLoadingTask{
+        let lowPriorTask = null
+        for (let i=0;i<this.imageLoadingTasks.length;i++) {
+            
+            let task = this.imageLoadingTasks[i]
+            let taskWeight = this._calculateTaskWeight(task)
+            
+            if (taskWeight == 2 && lowPriorTask == null){
+                lowPriorTask = task
+            } else if (taskWeight == 4){
+                return task;
+            } 
+        }
+        return lowPriorTask
     }
 
     private _executeImpl(){
@@ -89,29 +94,15 @@ class ImageLoader {
         */
         
         if (this.tasksLoadFinishAwaiting.length < 5 && this.imageLoadingTasks.length > 0){
-            this.imageLoadingTasks = this.imageLoadingTasks.sort((task, otherTask) => {
-                let taskWeight = this._calculateTaskWeight(task)
-                let otherTaskWeight = this._calculateTaskWeight(otherTask)
-                if (taskWeight > otherTaskWeight){
-                    return -1
-                } else if (otherTaskWeight > taskWeight){
-                    return 1
-                } else {
-                    return 0
-                }
-            })
-            let taskToPerform = this.imageLoadingTasks.shift()
+            let taskToPerform = this._findNextTask()
             if (taskToPerform){
-                if (this._isInViewport(taskToPerform.img.get()[0])){
-                    this._performTask(taskToPerform)
-                } else{
-                    this.tasksAwaitingViewport.push(taskToPerform)    
-                    this._execute()
-                }
+                let inex = this.imageLoadingTasks.indexOf(taskToPerform)
+                this.imageLoadingTasks.splice(inex,1)
+                this._performTask(taskToPerform)
             }
         }
     }
-    
+
 
     private _performTask(task:ImageLoadingTask){
         this.tasksLoadFinishAwaiting.push(task)
@@ -132,6 +123,8 @@ class ImageLoader {
             })
             task.img.attr("src", task.lowResUrl)
         }
+        //allow to schedule multiple at once
+        this._execute()
     }
     
 
