@@ -41,7 +41,7 @@ class ImageLoader {
     }
 
     private _isInViewport(element:HTMLElement):boolean {
-        var rect = element.getBoundingClientRect();
+        var rect = element.parentElement.getBoundingClientRect();
         var html = document.documentElement;
         
         //perhaps invisible, mean its defenetlly not visible to user with 0 size
