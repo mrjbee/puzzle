@@ -30,7 +30,7 @@ public class FilePerExtensionFilterActor extends AbstractMessageSubscriber<FileM
     public void onMessage(String parentKey, FileMessage message) {
         for (String supportedExtension : supportedExtensions) {
             if (message.ext != null && supportedExtension.toLowerCase().equals(message.ext.toLowerCase())){
-                log.info("Message gpong to be republished = {}", message);
+                log.info("Message going to be republished = {}", message);
                 publisher.republish(parentKey, message, messagePublisher);
                 return;
             }
