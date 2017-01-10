@@ -15,6 +15,7 @@ public class MetadataExtractorTest {
 
     @Test
     public void galaxyNote2CameraPhotoDataTest() throws ImageProcessingException, IOException {
+
         InputStream imagePath = getClass().getClassLoader().getResourceAsStream("IMG_20160522_120724.jpg");
         Metadata metadata = ImageMetadataReader.readMetadata(imagePath);
         // obtain the Exif directory
