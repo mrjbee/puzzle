@@ -86,11 +86,11 @@ start on runlevel [3]
 stop on runlevel [!3]
 
 console log
-setuid mrjbee
+setuid vagrant
 
 env LANG=en_US.UTF-8
-JAVA_OPTIONS="-Xmx1000m"
-OPTIONS="-Dmedia.browser.image.cache.mb=300 -Dmedia.dispatching.watcher.watchFolders[0]=/mnt/Storage/Sink -Dlog_folder=/var/log/custom/puzzle"
+env JAVA_OPTIONS="-Xmx1000m"
+env OPTIONS="-Dmedia.browser.image.cache.mb=300 -Dmedia.dispatching.watcher.watchFolders[0]=/mnt/Storage/Sink -Dlog_folder=/var/log/custom/puzzle"
 exec /usr/bin/java \$JAVA_OPTIONS \$OPTIONS -jar /opt/puzzle/bin/${project.name}-${project.version}.jar
 """.trim();
 }
@@ -109,7 +109,9 @@ task releaseDeb(type: Deb, group: "release", dependsOn: [clean, build, buildUpst
 	from("${buildDir}/puzzle.conf"){
 		into "/etc/init"
 	}
-
+	
+	directory('/opt/puzzle/sink', 644)
+	directory('/opt/puzzle/tmp', 644)
 	//openjdk-7-jre
 	//oracle-java8-installer and oracle-java8-set-default
 }
