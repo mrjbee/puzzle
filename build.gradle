@@ -90,7 +90,7 @@ setuid vagrant
 
 env LANG=en_US.UTF-8
 env JAVA_OPTIONS="-Xmx1000m"
-env OPTIONS="-Dmedia.browser.image.cache.mb=300 -Dmedia.dispatching.watcher.watchFolders[0]=/mnt/Storage/Sink -Dlog_folder=/var/log/custom/puzzle"
+env OPTIONS="-Dmedia.browser.image.cache.mb=300 -Dmedia.dispatching.watcher.watchFolders[0]=/opt/puzzle/sink -Dmedia.dispatching.catalog.folder=/opt/puzzle/catalog -Dvideo.ext.tool.tmp.folder=/opt/puzzle/tmp -Dlog_folder=/var/log/puzzle -Dmedia.browser.index.file=/opt/puzzle/embedded.index"
 exec /usr/bin/java \$JAVA_OPTIONS \$OPTIONS -jar /opt/puzzle/bin/${project.name}-${project.version}.jar
 """.trim();
 }
@@ -110,8 +110,10 @@ task releaseDeb(type: Deb, group: "release", dependsOn: [clean, build, buildUpst
 		into "/etc/init"
 	}
 	
+	directory('/opt/puzzle/catalog')
 	directory('/opt/puzzle/sink')
 	directory('/opt/puzzle/tmp')
+	directory('/var/log/puzzle')
 	//openjdk-7-jre
 	//oracle-java8-installer and oracle-java8-set-default
 }
