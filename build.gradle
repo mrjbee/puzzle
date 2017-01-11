@@ -110,8 +110,8 @@ task releaseDeb(type: Deb, group: "release", dependsOn: [clean, build, buildUpst
 		into "/etc/init"
 	}
 	
-	directory('/opt/puzzle/sink', 644)
-	directory('/opt/puzzle/tmp', 644)
+	directory('/opt/puzzle/sink')
+	directory('/opt/puzzle/tmp')
 	//openjdk-7-jre
 	//oracle-java8-installer and oracle-java8-set-default
 }
