@@ -11,24 +11,25 @@ buildscript {
 	dependencies {
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}"
 		classpath "de.richsource.gradle.plugins:typescript-gradle-plugin:1.8.0"
+		classpath 'com.netflix.nebula:gradle-ospackage-plugin:4.3.0'
 	}
 }
 
 apply plugin: 'java'
 apply plugin: 'spring-boot'
 apply plugin: "de.richsource.gradle.plugins.typescript"
+apply plugin: 'nebula.deb'
 
-jar {
-	baseName = 'box'
-	version = '0.0.1-SNAPSHOT'
-}
+group = "org.monroe.team"
+version = 0.1
+description = "Bus based platform for a plugin (actor) based applications"
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
 
 bootRun {
 	systemProperties = System.properties
 }
 
-sourceCompatibility = 1.7
-targetCompatibility = 1.7
 
 repositories {
 	mavenCentral()
@@ -69,4 +70,48 @@ compileTypeScript {
 	projectFile = file("tsconfig.json")
 	outputDir = file("src/main/resources/static/generated-js")
 }
+
 compileJava.dependsOn(compileTypeScript)
+
+task buildUpstartScript (dependsOn: clean) {
+doLast {
+file("${buildDir}/puzzle.conf").text =
+"""
+# Puzzle
+#
+# Puzzle application server: startup/shutdown upstart job
+#
+
+start on runlevel [3]
+stop on runlevel [!3]
+
+console log
+setuid mrjbee
+
+env LANG=en_US.UTF-8
+JAVA_OPTIONS="-Xmx1000m"
+OPTIONS="-Dmedia.browser.image.cache.mb=300 -Dmedia.dispatching.watcher.watchFolders[0]=/mnt/Storage/Sink -Dlog_folder=/var/log/custom/puzzle"
+exec /usr/bin/java \$JAVA_OPTIONS \$OPTIONS -jar /opt/puzzle/bin/${project.name}-${project.version}.jar
+""".trim();
+}
+}
+
+task releaseDeb(type: Deb, group: "release", dependsOn: [clean, build, buildUpstartScript] ) {
+
+	maintainer = "Mr. Jbee (MisterJBee at gmail.com)"
+	release = '1'
+	into '/opt/puzzle'
+
+	from(jar.outputs.files) {
+		into 'bin'
+	}
+
+	from("${buildDir}/puzzle.conf"){
+		into "/etc/init"
+	}
+
+	//openjdk-7-jre
+	//oracle-java8-installer and oracle-java8-set-default
+}
+
+build.mustRunAfter clean
