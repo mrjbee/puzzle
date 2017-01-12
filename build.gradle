@@ -95,7 +95,7 @@ script
   set -a
   . /etc/default/puzzle
   OPTIONS="-Dmedia.browser.image.cache.mb=300 -Dmedia.dispatching.watcher.watchFolders[0]=\$FOLDER_SINK -Dmedia.dispatching.catalog.folder=/opt/puzzle/catalog -Dvideo.ext.tool.tmp.folder=\$FOLDER_TMP -Dlog_folder=\$FOLDER_LOG -Dmedia.browser.index.file=\$FILE_DB"
-  start-stop-daemon --start --background -m --pidfile "/var/run/puzzle.pid" --chuid $USER --exec /usr/bin/java -- \$JAVA_OPTIONS \$OPTIONS -jar /opt/puzzle/bin/${project.name}-${project.version}.jar
+  start-stop-daemon --start --background -m --pidfile "/var/run/puzzle.pid" --chuid \$USER --exec /usr/bin/java -- \$JAVA_OPTIONS \$OPTIONS -jar /opt/puzzle/bin/${project.name}-${project.version}.jar
 end script
 
 """.trim();
