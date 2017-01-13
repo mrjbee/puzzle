@@ -82,11 +82,10 @@ task buildUpstartScript (dependsOn: clean) {
 # Puzzle application server: startup/shutdown upstart job
 #
 
-start on runlevel [3]
-stop on runlevel [!3]
+start on runlevel [23]
+stop on runlevel [!23]
 
 console log
-expect daemon
 
 env LANG=en_US.UTF-8
 env JAVA_OPTIONS="-Xmx1000m"
@@ -95,7 +94,7 @@ script
   set -a
   . /etc/default/puzzle
   OPTIONS="-Dmedia.browser.image.cache.mb=300 -Dmedia.dispatching.watcher.watchFolders[0]=\$FOLDER_SINK -Dmedia.dispatching.catalog.folder=/opt/puzzle/catalog -Dvideo.ext.tool.tmp.folder=\$FOLDER_TMP -Dlog_folder=\$FOLDER_LOG -Dmedia.browser.index.file=\$FILE_DB"
-  start-stop-daemon --start --background -m --pidfile "/var/run/puzzle.pid" --chuid \$USER --exec /usr/bin/java -- \$JAVA_OPTIONS \$OPTIONS -jar /opt/puzzle/bin/${project.name}-${project.version}.jar
+  exec sudo -u $USER /usr/bin/java $JAVA_OPTIONS $OPTIONS -jar /opt/puzzle/bin/puzzle-0.1.jar
 end script
 
 """.trim();
