@@ -88,28 +88,40 @@ stop on runlevel [!23]
 console log
 
 env LANG=en_US.UTF-8
-env JAVA_OPTIONS="-Xmx1000m"
+env JAVA_OPTIONS="-Xmx1000m -Dlog_folder=/var/log/puzzle"
+env OPTIONS=""
 
 script
   set -a
   . /etc/default/puzzle
   OPTIONS="-Dmedia.browser.image.cache.mb=300 -Dmedia.dispatching.watcher.watchFolders[0]=\$FOLDER_SINK -Dmedia.dispatching.catalog.folder=/opt/puzzle/catalog -Dvideo.ext.tool.tmp.folder=\$FOLDER_TMP -Dlog_folder=\$FOLDER_LOG -Dmedia.browser.index.file=\$FILE_DB"
-  exec sudo -u $USER /usr/bin/java $JAVA_OPTIONS $OPTIONS -jar /opt/puzzle/bin/puzzle-0.1.jar
+  exec sudo -u \$USER /usr/bin/java \$JAVA_OPTIONS \$OPTIONS -jar /opt/puzzle/bin/puzzle-0.1.jar
 end script
 
 """.trim();
 
-		file("${buildDir}/puzzle").text =
+	Properties applicationProperties = new Properties()
+	file("$rootDir/src/main/resources/application.properties").withInputStream {
+		stream -> applicationProperties.load(stream)
+	}
+
+	file("${buildDir}/puzzle").text =
 				"""
 #
 # Puzzle application server: configuration file
 #
 
-FOLDER_SINK="/opt/puzzle/sink"
-FOLDER_TMP="/opt/puzzle/tmp"
-FOLDER_LOG="/var/log/puzzle"
-FILE_DB="/opt/puzzle/embedded.index"
-USER=YOUR_USER_HERE
+${
+	StringBuilder out = new StringBuilder()
+	applicationProperties.each { k, v ->
+		if (!k.toString().endsWith("subscriberKey")){
+			out.append("# OPTIONS=\"\$OPTIONS ")
+			out.append("-D$k=$v\"")
+			out.append("\n")
+		}
+	}
+	out.toString()
+}
 
 """.trim();
 	}
