@@ -131,6 +131,7 @@ task releaseDeb(type: Deb, group: "release", dependsOn: [clean, build, buildUpst
 
 	maintainer = "Mr. Jbee (MisterJBee at gmail.com)"
 	release = '1'
+
 	into '/opt/puzzle'
 
 	from(jar.outputs.files) {
@@ -149,6 +150,8 @@ task releaseDeb(type: Deb, group: "release", dependsOn: [clean, build, buildUpst
 	directory('/opt/puzzle/sink')
 	directory('/opt/puzzle/tmp')
 	directory('/var/log/puzzle')
+
+	configurationFile("/etc/default/puzzle")
 	//openjdk-7-jre
 	//oracle-java8-installer and oracle-java8-set-default
 }
