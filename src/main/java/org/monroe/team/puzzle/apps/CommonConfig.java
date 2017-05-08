@@ -72,7 +72,7 @@ public class CommonConfig {
     @ConfigurationProperties(prefix="video-file-filter", ignoreUnknownFields = true)
     public FilePerExtensionFilterActor videoFilter(){
         return new FilePerExtensionFilterActor(
-                Arrays.asList(".mp4"),
+                Arrays.asList(".mp4",".mov"),
                 new FilePerExtensionFilterActor.Publisher() {
                     @Override
                     public void republish(
